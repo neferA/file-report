@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -11,13 +12,19 @@ use Spatie\Permission\Models\Role;
 
 class UsuarioController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('permission:crud-usuario', ['only' => ['index']]);
+        $this->middleware('permission:crud-usuario', ['only' => ['create', 'store']]);
+        $this->middleware('permission:crud-usuario', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:crud-usuario', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $usuarios = User::paginate(5); //Mostrar 5 registros por página
-        // return view('usuarios.index');
         return view('usuarios.index', compact('usuarios'));
     }
 
@@ -45,13 +52,19 @@ class UsuarioController extends Controller
         $input['password'] = Hash::make($input['password']);
 
         $user = User::create($input);
-        $user->assignRole($request->$input('roles'));
+        $user->assignRole($request->input('roles'));
         return redirect()->route('usuarios.index');
     }
 
     /**
      * Display the specified resource.
      */
+    public function account_details()
+    {
+        $user = auth()->user();
+        $role = $user->roles->first();
+        return view('usuarios.account', compact('user', 'role'));
+    }
     public function show(string $id)
     {
         //
@@ -73,15 +86,15 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
             'roles' => 'required',
         ]);
         $input = $request->all();
 
-        if (!empty($input['password'])){
+        if (!empty($input['password'])) {
             $input['password'] = Hash::make($input['password']);
         } else {
             $input = Arr::except($input, array('password'));

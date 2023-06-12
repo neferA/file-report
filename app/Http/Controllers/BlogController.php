@@ -9,11 +9,11 @@ class BlogController extends Controller
 {
     function __construct()
     {
-        $this->middleware('permission:ver-blog | crear-blog | editar-blog
-            | borrar-blog')->only('index');
-        $this->middleware('permission:crear-rol',['only'=>['create', 'store']]);
-        $this->middleware('permission:editar-rol',['only'=>['edit', 'update']]);
-        $this->middleware('permission:borrar-rol',['only'=>['destroy']]);
+        $this->middleware('permission:ver-blog|crear-blog|editar-blog|borrar-blog')
+            ->only('index');
+        $this->middleware('permission:crear-blog',['only'=>['create', 'store']]);
+        $this->middleware('permission:editar-blog',['only'=>['edit', 'update']]);
+        $this->middleware('permission:borrar-blog',['only'=>['destroy']]);
     }
 
     /**

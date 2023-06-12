@@ -15,7 +15,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            @can('crear-rol')
+                            @can('crear-blog')
                             <a class="btn btn-warning" href="{{ route('blogs.create') }}">Nuevo</a>
                             @endcan
                             <table class="table table-striped mt-2">

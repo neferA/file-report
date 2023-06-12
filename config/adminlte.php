@@ -257,8 +257,8 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'dashboard',
-    // 'dashboard_url' => 'home',
+    // 'dashboard_url' => 'dashboard',
+    'dashboard_url' => '/account',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -315,20 +315,24 @@ return [
         //     'type' => 'sidebar-menu-search',
         //     'text' => 'search',
         // ],
-        // [
-        //     'text' => 'blog',
-        //     'url'  => 'admin/blog',
-        //     'can'  => 'manage-blog',
-        // ],
+        [
+            'text' => 'Dashboard',
+            'url'  => '/dashboard',
+            // 'icon' => 'fa fa-users-cog',
+            'icon' => 'fa fa-tachometer-alt',
+            'can'  => 'crud-usuario',
+        ],
         [
             'text'          => 'Usuarios',
             'url'           => '/usuarios',
             'icon'          => 'fa fa-users',
+            'can'           => 'crud-usuario',
         ],
         [
             'text'          => 'Roles',
             'url'           => '/roles',
             'icon'          => 'fa fa-user-lock',
+            'can'           => 'crud-usuario',
         ],
         [
             'text'          => 'Blog',
@@ -345,14 +349,14 @@ return [
         ['header' => 'AJUSTE DE LA CUENTA'],
         [
             'text' => 'Perfil',
-            'url'  => 'admin/settings',
+            'url'  => 'account',
             'icon' => 'fas fa-fw fa-user',
         ],
-        [
-            'text' => 'cambiar contraseña',
-            'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
+        // [
+        //     'text' => 'cambiar contraseña',
+        //     'url'  => 'admin/settings',
+        //     'icon' => 'fas fa-fw fa-lock',
+        // ],
         // [
         //     'text'    => 'multilevel',
         //     'icon'    => 'fas fa-fw fa-share',
