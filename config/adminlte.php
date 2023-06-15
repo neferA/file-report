@@ -14,8 +14,8 @@ return [
     |
     */
 
-    'title' => 'AdminLTE 3',
-    'title_prefix' => '',
+    'title' => '',
+    'title_prefix' => 'File Management | ',
     'title_postfix' => '',
 
     /*
@@ -27,7 +27,7 @@ return [
     |
     | For detailed instructions you can look the favicon section here:
     | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/Basic-Configuration
-    |
+    | PATH -> public/favicons/favicon.ico
     */
 
     'use_ico_only' => false,
@@ -136,7 +136,7 @@ return [
     'usermenu_header_class' => 'bg-primary',
     'usermenu_image' => false,
     'usermenu_desc' => false,
-    'usermenu_profile_url' => false,
+    'usermenu_profile_url' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -258,7 +258,7 @@ return [
 
     'use_route_url' => false,
     // 'dashboard_url' => 'dashboard',
-    'dashboard_url' => '/account',
+    'dashboard_url' => '/home',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -292,6 +292,9 @@ return [
     | For detailed instructions you can look here:
     | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/Menu-Configuration
     |
+    | All icons are donwloaded from:
+    | https://fontawesome.com/search?o=r&m=free
+    | Icons free for the packages dependencies from adminlte
     */
 
     'menu' => [
@@ -316,6 +319,11 @@ return [
         //     'text' => 'search',
         // ],
         [
+            'text' => 'Inicio',
+            'url'  => '/home',
+            'icon' => 'fa fa-home',
+        ],
+        [
             'text' => 'Dashboard',
             'url'  => '/dashboard',
             // 'icon' => 'fa fa-users-cog',
@@ -335,9 +343,15 @@ return [
             'can'           => 'crud-usuario',
         ],
         [
-            'text'          => 'Blog',
+            'text'          => 'Cloud',
+            'url'           => '/cloud',
+            'icon'          => 'fa fa-download',
+        ],
+        [
+            'text'          => 'Blog test',
             'url'           => '/blogs',
             'icon'          => 'fa fa-blog',
+            // 'can'           => 'crear-blog'
         ],
         // [
         //     'text'        => 'pages',
@@ -346,12 +360,13 @@ return [
         //     'label'       => 4,
         //     'label_color' => 'success',
         // ],
-        ['header' => 'AJUSTE DE LA CUENTA'],
-        [
-            'text' => 'Perfil',
-            'url'  => 'account',
-            'icon' => 'fas fa-fw fa-user',
-        ],
+        // Seccion ajuste de cuenta
+        // ['header' => 'AJUSTE DE LA CUENTA'],
+        // [
+        //     'text' => 'Perfil',
+        //     'url'  => 'account',
+        //     'icon' => 'fas fa-fw fa-user',
+        // ],
         // [
         //     'text' => 'cambiar contraseña',
         //     'url'  => 'admin/settings',

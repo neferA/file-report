@@ -26,9 +26,9 @@
                                                 <h5 class="my-3">{{ $user->name }}</h5>
                                                 <p class="text-muted mb-1">{{ $user-> email }}</p>
                                                 @if ($role)
-                                                    <p class="text-muted mb-4">{{ $role->name }}</p>
+                                                <p class="text-muted mb-4">{{ $role->name }}</p>
                                                 @else
-                                                    <p>No tiene un rol asignado. Por favor, contacte al administrador.</p>
+                                                <p>No tiene un rol asignado. Por favor, contacte al administrador.</p>
                                                 @endif
                                                 <div class="d-flex justify-content-center mb-2">
                                                     <!-- <button type="button" class="btn btn-primary">Follow</button> -->

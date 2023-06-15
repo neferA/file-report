@@ -24,7 +24,7 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        $usuarios = User::paginate(5); //Mostrar 5 registros por página
+        $usuarios = User::paginate(10); //Mostrar 5 registros por página
         return view('usuarios.index', compact('usuarios'));
     }
 
@@ -59,6 +59,12 @@ class UsuarioController extends Controller
     /**
      * Display the specified resource.
      */
+    public function adminlte_profile_url()
+    {
+        $user = auth()->user();
+        $role = $user->roles->first();
+        return view('usuarios.account', compact('user', 'role'));
+    }
     public function account_details()
     {
         $user = auth()->user();

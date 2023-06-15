@@ -23,7 +23,7 @@ class SeederTablaPermisos extends Seeder
             'borrar-rol',
             // tabla usuarios
             'crud-usuario',
-            //tabla blogs
+            //tabla blogs esto es un crud de prueba
             'ver-blog',
             'crear-blog',
             'editar-blog',

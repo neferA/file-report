@@ -52,10 +52,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/account', [UsuarioController::class, 'account_details'])->name('usuarios.account');
 });
 
-Route::group(['middleware' => ['auth']], function(){
+Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RolController::class);
     Route::resource('usuarios', UsuarioController::class);
     Route::resource('blogs', BlogController::class);
 });
+
+// guest users
+Route::middleware('guest')->group(function () {
+    // Access Routes for guest users
+    Route::get('/home', function () {
+        return view('usuarios.home');
+    });
+    Route::get('/cloud', function () {
+        return view('cloud.index');
+    });
+});
+
+// cloud routes guest and with priviligies
 
 require __DIR__.'/auth.php';
