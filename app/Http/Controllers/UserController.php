@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
-class UsuarioController extends Controller
+class UserController extends Controller
 {
     function __construct()
     {
