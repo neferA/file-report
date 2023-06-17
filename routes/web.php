@@ -3,7 +3,7 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolController;
-use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
@@ -28,7 +28,7 @@ Route::middleware(['auth', 'verified'])
     ->name('account')
     ->group(function () {
     Route::get('/account', function () {
-        return view('usuarios.cuenta');
+        return view('users.account');
     });
 });
 
@@ -49,12 +49,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     // show account
-    Route::get('/account', [UsuarioController::class, 'account_details'])->name('usuarios.account');
+    Route::get('/account', [UserController::class, 'account_details'])->name('users.account');
 });
 
 Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RolController::class);
-    Route::resource('usuarios', UsuarioController::class);
+    Route::resource('users', UserController::class);
     Route::resource('blogs', BlogController::class);
 });
 
@@ -62,7 +62,7 @@ Route::group(['middleware' => ['auth']], function() {
 Route::middleware('guest')->group(function () {
     // Access Routes for guest users
     Route::get('/home', function () {
-        return view('usuarios.home');
+        return view('users.home');
     });
     Route::get('/cloud', function () {
         return view('cloud.index');
