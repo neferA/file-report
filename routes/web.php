@@ -54,7 +54,7 @@ Route::middleware('auth')->group(function () {
 
 Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RolController::class);
-    Route::resource('usuarios', UserController::class);
+    Route::resource('users', UserController::class);
     Route::resource('blogs', BlogController::class);
 });
 

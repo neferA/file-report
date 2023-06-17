@@ -26,9 +26,7 @@
                                 </button>
                             </div>
                             @endif
-
-                            <!-- {!! Form::model($user, ['method' => 'PATCH', 'route' => ['usuarios.update', $user->id]]) !!} -->
-                            {!! Form::model($user, ['method' => 'PUT', 'route' => ['usuarios.update', $user->id]]) !!}
+                            {!! Form::model($user, ['method' => 'PUT', 'route' => ['users.update', $user->id]]) !!}
                             <div class="row">
                                 <div class="col-xs-12 col-sm-12 col-md-12">
                                     <div class="form-group">
@@ -62,7 +60,7 @@
                                 </div>
                                 <div class="col-xs-12 col-sm-12 col-md-12">
                                     <button type="submit" class="btn btn-primary">Guardar</button>
-                                    <a class="btn btn-danger" href="{{route('usuarios.index')}}">Cancelar</a>
+                                    <a class="btn btn-danger" href="{{route('users.index')}}">Cancelar</a>
                                 </div>
                             </div>
                             {!! Form::close() !!}
