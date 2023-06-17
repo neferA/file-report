@@ -28,6 +28,16 @@ class UserController extends Controller
         return view('users.index', compact('users'));
     }
 
+    public function home()
+    {
+        return view('users.home');
+    }
+
+    public function cloud()
+    {
+        return view('cloud.index');
+    }
+
     /**
      * Show the form for creating a new resource.
      */
