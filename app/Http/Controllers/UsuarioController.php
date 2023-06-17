@@ -24,8 +24,18 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        $usuarios = User::paginate(10); //Mostrar 5 registros por página
-        return view('usuarios.index', compact('usuarios'));
+        $users = User::paginate(10); //Mostrar 5 registros por página
+        return view('users.index', compact('users'));
+    }
+
+    public function home()
+    {
+        return view('users.home');
+    }
+
+    public function cloud()
+    {
+        return view('cloud.index');
     }
 
     /**
@@ -34,7 +44,7 @@ class UsuarioController extends Controller
     public function create()
     {
         $roles = Role::pluck('name', 'name')->all();
-        return view('usuarios.crear', compact('roles'));
+        return view('users.create', compact('roles'));
     }
 
     /**
@@ -53,7 +63,7 @@ class UsuarioController extends Controller
 
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
-        return redirect()->route('usuarios.index');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -63,13 +73,13 @@ class UsuarioController extends Controller
     {
         $user = auth()->user();
         $role = $user->roles->first();
-        return view('usuarios.account', compact('user', 'role'));
+        return view('users.account', compact('user', 'role'));
     }
     public function account_details()
     {
         $user = auth()->user();
         $role = $user->roles->first();
-        return view('usuarios.account', compact('user', 'role'));
+        return view('users.account', compact('user', 'role'));
     }
     public function show(string $id)
     {
@@ -84,7 +94,7 @@ class UsuarioController extends Controller
         $user = User::find($id);
         $roles = Role::pluck('name', 'name')->all();
         $userRole = $user->roles->pluck('name', 'name');
-        return view('usuarios.editar', compact('user', 'roles', 'userRole'));
+        return view('users.edit', compact('user', 'roles', 'userRole'));
     }
 
     /**
@@ -110,7 +120,7 @@ class UsuarioController extends Controller
         $user->update($input);
         DB::table('model_has_roles')->where('model_id', $id)->delete();
         $user->assignRole($request->input('roles'));
-        return redirect()->route('usuarios.index');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -119,6 +129,6 @@ class UsuarioController extends Controller
     public function destroy(string $id)
     {
         User::find($id)->delete();
-        return redirect()->route('usuarios.index');
+        return redirect()->route('users.index');
     }
 }

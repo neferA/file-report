@@ -27,7 +27,7 @@
                             </div>
                             @endif
 
-                            {!! Form::open(array('route'=>'usuarios.store', 'method'=>'POST')) !!}
+                            {!! Form::open(array('route'=>'users.store', 'method'=>'POST')) !!}
                             <div class="row">
                                 <div class="col-xs-12 col-sm-12 col-md-12">
                                     <div class="form-group">
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="col-xs-12 col-sm-12 col-md-12">
                                     <button type="submit" class="btn btn-primary">Guardar</button>
-                                    <a class="btn btn-danger" href="{{route('usuarios.index')}}">Cancelar</a>
+                                    <a class="btn btn-danger" href="{{route('users.index')}}">Cancelar</a>
                                 </div>
                             </div>
                             {!! Form::close() !!}
