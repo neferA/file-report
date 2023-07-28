@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'File Management')
+@section('title', 'File report')
 
 @section('content_header')
 @stop
@@ -8,7 +8,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h3 class="page__heading">Blogs</h3>
+            <h3 class="page__heading">Boleta de garantia</h3>
         </div>
         <div class="section-body">
             <div class="row">

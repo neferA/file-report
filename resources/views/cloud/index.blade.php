@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Cloud')
+@section('title', 'file report')
 
 @section('content_header')
 
@@ -9,7 +9,7 @@
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h3 class="page__heading">Cloud</h3>
+        <h3 class="page__heading">historial</h3>
     </div>
     <div class="section-body">
         <div class="row">

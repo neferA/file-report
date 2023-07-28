@@ -343,12 +343,12 @@ return [
             'can'           => 'crud-usuario',
         ],
         [
-            'text'          => 'Cloud',
+            'text'          => 'historial',
             'url'           => '/cloud',
             'icon'          => 'fa fa-download',
         ],
         [
-            'text'          => 'Blog test',
+            'text'          => 'Boletas',
             'url'           => '/blogs',
             'icon'          => 'fa fa-blog',
             // 'can'           => 'crear-blog'
