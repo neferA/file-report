@@ -24,10 +24,10 @@ class SeederTablaPermisos extends Seeder
             // tabla usuarios
             'crud-usuario',
             //tabla blogs esto es un crud de prueba
-            'ver-blog',
-            'crear-blog',
-            'editar-blog',
-            'borrar-blog',
+            'ver_tickets',
+            'crear_tickets',
+            'editar_tickets',
+            'borrar_tickets',
         ];
         foreach($permisos as $permiso){
             Permission::create(['name'=>$permiso]);

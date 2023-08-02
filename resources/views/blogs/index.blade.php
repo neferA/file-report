@@ -15,14 +15,18 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            @can('crear-blog')
-                            <a class="btn btn-warning" href="{{ route('blogs.create')}}">Nuevo</a>
+                            @can('crear_tickets')
+                            <a class="btn btn-warning" href="{{ route('tickets.create')}}">Nuevo</a>
                             @endcan
                             <table class="table table-striped mt-2">
                                 <thead style="background-color: #6777ef;">
                                     <th style="display: none;">ID</th>
-                                    <th style="display: #fff;">Titulo</th>
-                                    <th style="display: #fff;">Contenido</th>
+                                    <th style="display: #fff;">numero de boleta</th>
+                                    <th style="display: #fff;">proveedor</th>
+                                    <th style="display: #fff;">motivo</th>
+                                    <th style="display: #fff;">ejecutora</th>
+                                    <th style="display: #fff;">creado por</th>
+
                                     <th style="display: #fff;">Fecha de Creación</th>
                                     <th style="display: #fff;">Acciones</th>
                                 </thead>
@@ -30,18 +34,22 @@
                                     @foreach($blogs as $blog)
                                         <tr>
                                             <td style="display: none;">{{ $blog->id }}</td>
-                                            <td>{{ $blog->titulo }}</td>
-                                            <td>{{ $blog->contenido }}</td>
+                                            <td>{{ $blog->num_boleta }}</td>
+                                            <td>{{ $blog->proveedor }}</td>    
+                                            <td>{{ $blog->motivo }}</td>    
+                                            <td>{{ $blog->ejecutora }}</td>    
+                                            <td>{{ $blog->usuario }}</td>    
                                             <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td></td>
 
                                             <td>
-                                                @can('editar-blog')
-                                                    <a class="btn btn-info" href="{{ route('blogs.edit', $blog->id) }}">Editar</a>
+                                            <a class="btn btn-primary ml-2" href="{{ route('historial.index', $blog->id) }}">Ver Historial de {{ $blog->titulo }}</a>
+                                                @can('editar_tickets')
+                                                    <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">Editar</a>
                                                 @endcan
-                                                @can('borrar-blog')
-                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['blogs.destroy', $blog->id], 'style'=>'display:inline']) !!}
+                                                @can('borrar_tickets')
+                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['tickets.destroy', $blog->id], 'style'=>'display:inline']) !!}
                                                         {!! Form::submit('Borrar', ['class' => 'btn btn-danger']) !!}
-                                                    {!! Form::close() !!}
+                                                        {!! Form::close() !!}
                                                 @endcan
                                             </td>
                                         </tr>

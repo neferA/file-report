@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('blogs', function (Blueprint $table) {
+        Schema::create('waranty_histories', function (Blueprint $table) {
             $table->id();
-            $table->text('num_boleta');
-            $table->text('proveedor');
-            $table->text('motivo');
-            $table->text('ejecutora');
-            $table->text('usuario');
-
+            $table->unsignedBigInteger('blogs_id');
+            $table->text('titulo');
+            $table->text('contenido');
             $table->timestamps();
+
+            $table->foreign('blogs_id')->references('id')->on('blogs')->onDelete('cascade');
+        
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('blogs');
+        Schema::dropIfExists('waranty_histories');
     }
 };

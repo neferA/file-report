@@ -27,25 +27,36 @@
                                 </div>
                             @endif
 
-                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['blogs.update', $blog->id]]) !!}
+                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}
+                            @csrf
                             <div class="row">
-                                <div class="col-xs-12 col-sm-12 col-md-12">
-                                    <div class="form-group">
-                                        <label for="titulo">Titulo</label>
-                                        {!! Form::text('titulo', null, array('class' => 'form-control')) !!}
-                                    </div>
-                                </div>
-                                <div class="col-xs-12 col-sm-12 col-md-12">
-                                    <div class="form-floating">
+                            <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">Contenido</label>
-                                            {!! Form::textarea('contenido', null, array('class' => 'form-control', 'style' => 'height:100px')) !!}
+                                            <label for="titulo">numero de boleta</label>
+                                            {!! Form::text('num_boleta', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">proveedor</label>
+                                            {!! Form::text('proveedor', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el proveedor']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">motivo</label>
+                                            {!! Form::text('motivo', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el motivo']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">ejecutora</label>
+                                            {!! Form::text('ejecutora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la ejecutora']) !!}
+                                        </div>
+                                    </div>
                                 <div class="col-xs-12 col-sm-12 col-md-12">
                                     <button type="submit" class="btn btn-primary">Guardar</button>
-                                    <a class="btn btn-danger" href="{{ route('blogs.index') }}">Cancelar</a>
+                                    <a class="btn btn-danger" href="{{ route('tickets.index') }}">Cancelar</a>
                                 </div>
                             </div>
                             {!! Form::close() !!}

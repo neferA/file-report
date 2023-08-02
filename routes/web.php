@@ -4,6 +4,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\HistoryController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
@@ -52,13 +53,16 @@ Route::middleware('auth')->group(function () {
 Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RolController::class);
     Route::resource('users', UserController::class);
-    Route::resource('blogs', BlogController::class);
+    Route::resource('tickets', BlogController::class);
 });
 
 // guest/auth users enter this routes
 Route::get('/cloud', [UserController::class, 'cloud'])->name('cloud');
 Route::get('/home', [UserController::class, 'home'])->name('home');
 
-// cloud routes guest and with priviligies
+// tickets routes guest and with priviligies
+
+Route::get('historial/{id}', [HistoryController::class, 'index'])->name('historial.index');
+Route::put('tickets/{ticket}', [BlogController::class, 'update'])->name('blogs.update');
 
 require __DIR__.'/auth.php';

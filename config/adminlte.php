@@ -349,7 +349,7 @@ return [
         ],
         [
             'text'          => 'Boletas',
-            'url'           => '/blogs',
+            'url'           => '/tickets',
             'icon'          => 'fa fa-blog',
             // 'can'           => 'crear-blog'
         ],

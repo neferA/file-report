@@ -9,7 +9,15 @@ class Blog extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'titulo',
-        'contenido',
+        'num_boleta',
+        'proveedor',
+        'motivo',
+        'ejecutora',
+        'usuario',
+
     ];
+    public function history()
+    {
+        return $this->hasMany(waranty::class, 'blogs_id','titulo', 'contenido');
+    }
 }
