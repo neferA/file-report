@@ -14,10 +14,10 @@ class Blog extends Model
         'motivo',
         'ejecutora',
         'usuario',
-
     ];
+    
     public function history()
     {
-        return $this->hasMany(waranty::class, 'blogs_id','titulo', 'contenido');
+        return $this->hasMany(waranty::class, 'blogs_id');
     }
 }

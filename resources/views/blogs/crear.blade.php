@@ -53,6 +53,29 @@
                                             {!! Form::text('ejecutora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la ejecutora']) !!}
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">caracteristicas</label>
+                                            {!! Form::text('caracteristicas', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las caracteristicas']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">observaciones</label>
+                                            {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
+                                        </div>
+                                    </div> <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">fecha inicial</label>
+                                            {!! Form::text('fecha_inicio', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha inicial']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">fecha final</label>
+                                            {!! Form::text('fecha_final', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">

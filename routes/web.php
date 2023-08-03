@@ -52,7 +52,9 @@ Route::middleware('auth')->group(function () {
 
 Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RolController::class);
+
     Route::resource('users', UserController::class);
+
     Route::resource('tickets', BlogController::class);
 });
 
@@ -63,6 +65,13 @@ Route::get('/home', [UserController::class, 'home'])->name('home');
 // tickets routes guest and with priviligies
 
 Route::get('historial/{id}', [HistoryController::class, 'index'])->name('historial.index');
-Route::put('tickets/{ticket}', [BlogController::class, 'update'])->name('blogs.update');
+Route::get('blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
+Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
+
+
+
+
+
+
 
 require __DIR__.'/auth.php';

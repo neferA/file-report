@@ -27,8 +27,7 @@
                                 </div>
                             @endif
 
-                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}
-                            @csrf
+                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}                            @csrf
                             <div class="row">
                             <div class="col-md-6">
                                         <div class="form-group">
@@ -52,6 +51,35 @@
                                         <div class="form-group">
                                             <label for="contenido">ejecutora</label>
                                             {!! Form::text('ejecutora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la ejecutora']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">usuario</label>
+                                            {!! Form::text('usuario', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el usuario']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">caracteristicas</label>
+                                            {!! Form::text('caracteristicas', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las caracteristicas']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">observaciones</label>
+                                            {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
+                                        </div>
+                                    </div> <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">fecha inicial</label>
+                                            {!! Form::text('fecha_inicio', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha inicial']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">fecha final</label>
+                                            {!! Form::text('fecha_final', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
                                         </div>
                                     </div>
                                 <div class="col-xs-12 col-sm-12 col-md-12">

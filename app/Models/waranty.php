@@ -10,7 +10,15 @@ class waranty extends Model
     use HasFactory;
     protected $table = 'waranty_histories';
     
-    protected $fillable = ['blogs_id', 'titulo', 'contenido'];
+    protected $fillable = [
+        'blogs_id', 
+        'titulo', 
+        'contenido',
+        'caracteristicas',
+        'observaciones',
+        'fecha_inicio',
+        'fecha_final',
+    ];
     
     // Define la relación con el modelo Blog
     public function blog()

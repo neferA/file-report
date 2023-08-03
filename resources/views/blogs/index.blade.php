@@ -15,6 +15,14 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
+                        <form action="{{ route('tickets.index') }}" method="GET">
+                            <div class="input-group mb-3">
+                                <input type="text" name="search" class="form-control" placeholder="Buscar" value="{{ request('search') }}">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">Buscar</button>
+                                </div>
+                            </div>
+                        </form>
                             @can('crear_tickets')
                             <a class="btn btn-warning" href="{{ route('tickets.create')}}">Nuevo</a>
                             @endcan
@@ -47,9 +55,11 @@
                                                     <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">Editar</a>
                                                 @endcan
                                                 @can('borrar_tickets')
-                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['tickets.destroy', $blog->id], 'style'=>'display:inline']) !!}
-                                                        {!! Form::submit('Borrar', ['class' => 'btn btn-danger']) !!}
-                                                        {!! Form::close() !!}
+                                                <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST" style="display: inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">Eliminar</button>
+                                                </form>
                                                 @endcan
                                             </td>
                                         </tr>

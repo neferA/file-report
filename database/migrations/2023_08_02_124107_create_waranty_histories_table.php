@@ -16,6 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('blogs_id');
             $table->text('titulo');
             $table->text('contenido');
+            $table->text('caracteristicas');
+            $table->text('observaciones');
+            $table->text('fecha_inicio');
+            $table->text('fecha_final');
+
+
             $table->timestamps();
 
             $table->foreign('blogs_id')->references('id')->on('blogs')->onDelete('cascade');
