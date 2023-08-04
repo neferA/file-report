@@ -27,66 +27,62 @@
                                 </div>
                             @endif
 
-                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}                            @csrf
+                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}
+                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}
+                            @csrf
                             <div class="row">
-                            <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="titulo">numero de boleta</label>
-                                            {!! Form::text('num_boleta', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="num_boleta">Número de boleta</label>
+                                        {!! Form::text('num_boleta', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="contenido">proveedor</label>
-                                            {!! Form::text('proveedor', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el proveedor']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="titulo">motivo</label>
-                                            {!! Form::text('motivo', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el motivo']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="contenido">ejecutora</label>
-                                            {!! Form::text('ejecutora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la ejecutora']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="contenido">usuario</label>
-                                            {!! Form::text('usuario', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el usuario']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="titulo">caracteristicas</label>
-                                            {!! Form::text('caracteristicas', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las caracteristicas']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="contenido">observaciones</label>
-                                            {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
-                                        </div>
-                                    </div> <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="titulo">fecha inicial</label>
-                                            {!! Form::text('fecha_inicio', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha inicial']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="contenido">fecha final</label>
-                                            {!! Form::text('fecha_final', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
-                                        </div>
-                                    </div>
-                                <div class="col-xs-12 col-sm-12 col-md-12">
-                                    <button type="submit" class="btn btn-primary">Guardar</button>
-                                    <a class="btn btn-danger" href="{{ route('tickets.index') }}">Cancelar</a>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="num_boleta">proveedor</label>
+                                        {!! Form::text('proveedor', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="num_boleta">motivo</label>
+                                        {!! Form::text('motivo', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="num_boleta">ejecutora</label>
+                                        {!! Form::text('ejecutora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="caracteristicas">Características</label>
+                                        {!! Form::text('caracteristicas', $blog->waranty ? $blog->waranty->caracteristicas : null, ['class' => 'form-control', 'placeholder' => 'Ingrese las características']) !!}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="observaciones">Observaciones</label>
+                                        {!! Form::text('observaciones', $blog->waranty ? $blog->waranty->observaciones : null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="fecha_inicio">Fecha inicial</label>
+                                        {!! Form::text('fecha_inicio', $blog->waranty ? $blog->waranty->fecha_inicio : null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha inicial']) !!}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="fecha_final">Fecha final</label>
+                                        {!! Form::text('fecha_final', $blog->waranty ? $blog->waranty->fecha_final : null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
+                                    </div>
+                                </div>
+                                <!-- Agrega el campo oculto con el valor de blogs_id -->
+                                {!! Form::hidden('blogs_id', $blog->id) !!}
                             </div>
+                            {!! Form::submit('Actualizar', ['class' => 'btn btn-primary']) !!}
                             {!! Form::close() !!}
                         </div>
                     </div>

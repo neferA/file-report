@@ -104,71 +104,66 @@ class BlogController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Blog $blog)
+       
+    // ...
+    
+    public function update(Request $request, $id)
     {
-        request()->validate([
+        // Validar los datos recibidos del formulario de edición
+        $request->validate([
             'num_boleta' => 'required',
             'proveedor' => 'required',
             'motivo' => 'required',
             'ejecutora' => 'required',
-            'usuario' => 'required',
             'caracteristicas' => 'required',
             'observaciones' => 'required',
             'fecha_inicio' => 'required',
-            'fecha_final' => 'required'
+            'fecha_final' => 'required',
+           
         ]);
-    
-        // Actualizar el blog con los datos enviados desde el formulario
-        // $blog->update($request->all());
 
-        // Actualiza el registro en la tabla Blog
-        $blog->update([
-            
-            'num_boleta' => $request->input('num_boleta'),
-            'proveedor' => $request->input('proveedor'),
-            'motivo' => $request->input('motivo'),
-            'ejecutora' => $request->input('ejecutora'),
+        // Buscar el registro en la tabla blogs
+        $blog = Blog::findOrFail($id);
 
-            'usuario' => Auth::user()->name,
-        ]);
-        // Busca el registro relacionado en la tabla waranty
-        $waranty = waranty::where('blogs_id', $blog->id)->first();
+        // Verificar que el usuario autenticado tenga permisos para editar este registro.
+        if (Auth::user()->id === $blog->user_id) {
+            // Actualizar el registro en la tabla blogs
+            $blog->update($request->all());
 
-        // Si se encontró el registro, actualiza sus datos
-        if ($waranty) {
-            $waranty->update([
-                'caracteristicas' => $request->input('caracteristicas'),
-                'observaciones' => $request->input('observaciones'),
-                'fecha_inicio' => $request->input('fecha_inicio'),
-                'fecha_final' => $request->input('fecha_final'),
-            ]);           
+            // Obtener el modelo "waranty" asociado, si existe
+            $waranty = $blog->waranty;
+
+            // Si también deseas actualizar la tabla waranty_histories
+            if ($waranty) {
+                $waranty->update([
+                    'titulo' => $blog->num_boleta,
+                    'contenido' => $blog->motivo,
+                    'caracteristicas' => $request->input('caracteristicas'),
+                    'observaciones' => $request->input('observaciones'),
+                    'fecha_inicio' => $request->input('fecha_inicio'),
+                    'fecha_final' => $request->input('fecha_final'),
+                ]);
+            } else {
+                // Si no existe un modelo "waranty" asociado, crear uno nuevo.
+                Waranty::create([
+                    'blogs_id' => $blog->id,
+                    'titulo' => $blog->num_boleta,
+                    'contenido' => $blog->motivo,
+                    'caracteristicas' => $request->input('caracteristicas'),
+                    'observaciones' => $request->input('observaciones'),
+                    'fecha_inicio' => $request->input('fecha_inicio'),
+                    'fecha_final' => $request->input('fecha_final'),
+                ]);
+            }
+
+            // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
+            return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
         } else {
-            // Si no se encontró el registro, crea uno nuevo
-            waranty::create([
-                'titulo' => $blog->num_boleta,
-                'contenido' => $blog->motivo,
-                'blogs_id' => $blog->id,
-                'caracteristicas' => $request->input('caracteristicas'),
-                'observaciones' => $request->input('observaciones'),
-                'fecha_inicio' => $request->input('fecha_inicio'),
-                'fecha_final' => $request->input('fecha_final'),            ]);
+            // El usuario no tiene permisos para editar este registro.
+            return redirect()->back()->with('error', 'No tienes permisos para editar este blog.');
         }
-
-        // // Crear el registro en la tabla de historial después de actualizar el blog
-        // waranty::create([
-        //     'blog_id' => $blog->id,
-        //     'titulo' => $blog->num_boleta,
-        //     'contenido' => $blog->motivo,
-        //     'caracteristicas' => $request->input('caracteristicas'),
-        //     'observaciones' => $request->input('observaciones'),
-        //     'fecha_inicio' => $request->input('fecha_inicio'),
-        //     'fecha_final' => $request->input('fecha_final'),
-            
-        // ]);
-    
-        return redirect()->route('tickets.index');
     }
-
+       
     /**
      * Remove the specified resource from storage.
      */

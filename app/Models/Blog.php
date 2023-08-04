@@ -16,8 +16,8 @@ class Blog extends Model
         'usuario',
     ];
     
-    public function history()
+    public function waranty()
     {
-        return $this->hasMany(waranty::class, 'blogs_id');
+        return $this->hasOne(waranty::class, 'blogs_id');
     }
 }

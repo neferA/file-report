@@ -18,8 +18,8 @@ return new class extends Migration
             $table->text('contenido');
             $table->text('caracteristicas');
             $table->text('observaciones');
-            $table->text('fecha_inicio');
-            $table->text('fecha_final');
+            $table->date('fecha_inicio');
+            $table->date('fecha_final');
 
 
             $table->timestamps();

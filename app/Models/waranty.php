@@ -23,6 +23,6 @@ class waranty extends Model
     // Define la relación con el modelo Blog
     public function blog()
     {
-        return $this->belongsTo(Blog::class);
+        return $this->belongsTo(Blog::class,'blogs_id');
     }
 }
