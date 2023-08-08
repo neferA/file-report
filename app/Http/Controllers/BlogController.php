@@ -6,6 +6,7 @@ use App\Models\Blog;
 use App\Models\waranty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BlogController extends Controller
 {
@@ -48,7 +49,14 @@ class BlogController extends Controller
     {
         return view('blogs.crear');
     }
-
+    private function uploadPDF($request, $fieldName)
+    {
+        if ($request->hasFile($fieldName)) {
+            $pdfPath = $request->file($fieldName)->store('pdfs');
+            return $pdfPath;
+        }
+        return null;
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -61,11 +69,25 @@ class BlogController extends Controller
             'ejecutora' => 'required',
             'caracteristicas' => 'required',
             'observaciones' => 'required',
+            'monto' => 'required',
             'fecha_inicio' => 'required',
-            'fecha_final' => 'required'
+            'fecha_final' => 'required',
+            'estado' => 'required|in:' . implode(',', [
+                Blog::ESTADO_LIBERADO,
+                Blog::ESTADO_EJECUTADO,
+                Blog::ESTADO_RENOVADO,
+            ]),
+            'boleta_pdf' => 'nullable|mimes:pdf|max:2048', // Validación para el archivo PDF
+            'nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['boleta_pdf', 'nota_pdf']);
+
+        // Cargar y almacenar el archivo PDF 'boleta_pdf'
+        $data['boleta_pdf'] = $this->uploadPDF($request, 'boleta_pdf');
+
+        // Cargar y almacenar el archivo PDF 'nota_pdf'
+        $data['nota_pdf'] = $this->uploadPDF($request, 'nota_pdf');
 
         // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
         $data['usuario'] = Auth::user()->name;
@@ -77,8 +99,11 @@ class BlogController extends Controller
             'blogs_id' => $blog->id,
             'titulo' => $blog->num_boleta,
             'contenido' => $blog->motivo,
-            'caracteristicas' => $request->input('caracteristicas'),
+            'caracteristicas' => $request->input('caracteristicas'),    
             'observaciones' => $request->input('observaciones'),
+            'monto' => $request->input('monto'),
+            'boleta_pdf' => $request->input('boleta_pdf'),
+            'nota_pdf' => $request->input('nota_pdf'),
             'fecha_inicio' => $request->input('fecha_inicio'),
             'fecha_final' => $request->input('fecha_final'),
         ]);
@@ -108,62 +133,62 @@ class BlogController extends Controller
     // ...
     
     public function update(Request $request, $id)
-    {
-        // Validar los datos recibidos del formulario de edición
-        $request->validate([
-            'num_boleta' => 'required',
-            'proveedor' => 'required',
-            'motivo' => 'required',
-            'ejecutora' => 'required',
-            'caracteristicas' => 'required',
-            'observaciones' => 'required',
-            'fecha_inicio' => 'required',
-            'fecha_final' => 'required',
-           
+{
+    // Validar los datos recibidos del formulario de edición
+    $request->validate([
+        'num_boleta' => 'required',
+        'proveedor' => 'required',
+        'motivo' => 'required',
+        'ejecutora' => 'required',
+        'caracteristicas' => 'required',
+        'monto' => 'required',
+        'boleta_pdf' => 'required',
+        'nota_pdf' => 'required',
+        'observaciones' => 'required',
+        'fecha_inicio' => 'required',
+        'fecha_final' => 'required',
+    ]);
+
+    // Buscar el registro en la tabla blogs
+    $blog = Blog::findOrFail($id);
+
+    // Actualizar el registro en la tabla blogs
+    $blog->update($request->all());
+
+    // Obtener o crear el modelo "waranty" asociado
+    $waranty = Waranty::where('blogs_id', $blog->id)->first();
+    if ($waranty) {
+        $waranty->update([
+            'titulo' => $blog->num_boleta,
+            'contenido' => $blog->motivo,
+            'caracteristicas' => $request->input('caracteristicas'),
+            'observaciones' => $request->input('observaciones'),
+            'monto' => $request->input('monto'),
+            'boleta_pdf' => $request->input('boleta_pdf'),
+            'nota_pdf' => $request->input('nota_pdf'),
+            'fecha_inicio' => $request->input('fecha_inicio'),
+            'fecha_final' => $request->input('fecha_final'),
         ]);
-
-        // Buscar el registro en la tabla blogs
-        $blog = Blog::findOrFail($id);
-
-        // Verificar que el usuario autenticado tenga permisos para editar este registro.
-        if (Auth::user()->id === $blog->user_id) {
-            // Actualizar el registro en la tabla blogs
-            $blog->update($request->all());
-
-            // Obtener el modelo "waranty" asociado, si existe
-            $waranty = $blog->waranty;
-
-            // Si también deseas actualizar la tabla waranty_histories
-            if ($waranty) {
-                $waranty->update([
-                    'titulo' => $blog->num_boleta,
-                    'contenido' => $blog->motivo,
-                    'caracteristicas' => $request->input('caracteristicas'),
-                    'observaciones' => $request->input('observaciones'),
-                    'fecha_inicio' => $request->input('fecha_inicio'),
-                    'fecha_final' => $request->input('fecha_final'),
-                ]);
-            } else {
-                // Si no existe un modelo "waranty" asociado, crear uno nuevo.
-                Waranty::create([
-                    'blogs_id' => $blog->id,
-                    'titulo' => $blog->num_boleta,
-                    'contenido' => $blog->motivo,
-                    'caracteristicas' => $request->input('caracteristicas'),
-                    'observaciones' => $request->input('observaciones'),
-                    'fecha_inicio' => $request->input('fecha_inicio'),
-                    'fecha_final' => $request->input('fecha_final'),
-                ]);
-            }
-
-            // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
-            return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
-        } else {
-            // El usuario no tiene permisos para editar este registro.
-            return redirect()->back()->with('error', 'No tienes permisos para editar este blog.');
-        }
+    } else {
+        Waranty::create([
+            'blogs_id' => $blog->id,
+            'titulo' => $blog->num_boleta,
+            'contenido' => $blog->motivo,
+            'caracteristicas' => $request->input('caracteristicas'),
+            'observaciones' => $request->input('observaciones'),
+            'monto' => $request->input('monto'),
+            'boleta_pdf' => $request->input('boleta_pdf'),
+            'nota_pdf' => $request->input('nota_pdf'),
+            'fecha_inicio' => $request->input('fecha_inicio'),
+            'fecha_final' => $request->input('fecha_final'),
+        ]);
     }
-       
+
+    // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
+    return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
+}
+
+   
     /**
      * Remove the specified resource from storage.
      */

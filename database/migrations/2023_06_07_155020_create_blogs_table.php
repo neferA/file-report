@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('motivo');
             $table->text('ejecutora');
             $table->text('usuario');
+            $table->enum('estado', ['liberado', 'ejecutado', 'renovado'])->default('liberado');
 
             $table->timestamps();
         });

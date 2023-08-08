@@ -18,6 +18,9 @@ return new class extends Migration
             $table->text('contenido');
             $table->text('caracteristicas');
             $table->text('observaciones');
+            $table->text('monto');
+            $table->text('boleta_pdf');
+            $table->text('nota_pdf');
             $table->date('fecha_inicio');
             $table->date('fecha_final');
 

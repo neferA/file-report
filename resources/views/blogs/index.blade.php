@@ -34,6 +34,7 @@
                                     <th style="display: #fff;">motivo</th>
                                     <th style="display: #fff;">ejecutora</th>
                                     <th style="display: #fff;">creado por</th>
+                                    <th style="display: #fff;">estado</th>
 
                                     <th style="display: #fff;">Fecha de Creación</th>
                                     <th style="display: #fff;">Acciones</th>
@@ -46,7 +47,10 @@
                                             <td>{{ $blog->proveedor }}</td>    
                                             <td>{{ $blog->motivo }}</td>    
                                             <td>{{ $blog->ejecutora }}</td>    
-                                            <td>{{ $blog->usuario }}</td>    
+                                            <td>{{ $blog->usuario }}</td>
+                                            <td>
+                                                <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
+                                            </td>                                                                                           
                                             <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td></td>
 
                                             <td>

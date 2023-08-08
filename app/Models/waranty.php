@@ -16,6 +16,9 @@ class waranty extends Model
         'contenido',
         'caracteristicas',
         'observaciones',
+        'monto',
+        'boleta_pdf',
+        'nota_pdf',
         'fecha_inicio',
         'fecha_final',
     ];

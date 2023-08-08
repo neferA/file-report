@@ -3,20 +3,37 @@
 @section('content')
 <!-- Agregar el botón para redireccionar a la vista index de blogs -->
 
-<a class="btn btn-primary mt-3" href="{{ route('tickets.index') }}">Volver</a>
 
-    <div class="container">
-        
-        {{-- Código para mostrar la tabla de historial aquí --}}
-        <div class="container">
-        <table class="table table-striped mt-2">
+<section class="section">
+        <div class="section-header">
+            <h3 class="page__heading">Boleta- {{ $blog->num_boleta }}</h3>
+            <h1 class="btn {{ $blog->estado_color }}" style="font-size: 24px;">{{ $blog->estado }}</h1>
+        </div>
+        </div>  
+    </div>
+        <div class="section-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    
+                    <div class="card">
+                        
+                        <div class="card-body">
+                            
+                            <a class="btn btn-primary mt-3" href="{{ route('tickets.index') }}">Volver</a>
+
+                                <table class="table table-striped mt-2">
                                 <thead style="background-color: #6777ef;">
                                     <th style="display: none;">ID</th>
                                     <th style="display: #fff;">ID</th>
-                                    <th style="display: #fff;">titulo</th>
-                                    <th style="display: #fff;">contenido</th>
+                                    <th style="display: #fff;">numero de boleta</th>
+                                    <th style="display: #fff;">motivo</th>
                                     <th style="display: #fff;">caracteristicas</th>
                                     <th style="display: #fff;">observaciones</th>
+                                    <th style="display: #fff;">monto</th>
+                                    <th style="display: #fff;">boleta</th>
+                                    <th style="display: #fff;">nota</th>
+
+
                                     <th style="display: #fff;">fecha inicio</th>
                                     <th style="display: #fff;">fecha final</th>
 
@@ -30,7 +47,10 @@
                                             <td>{{ $historia->titulo }}</td>    
                                             <td>{{ $historia->contenido }}</td>
                                             <td>{{ $historia->caracteristicas }}</td>    
-                                            <td>{{ $historia->observaciones }}</td>    
+                                            <td>{{ $historia->observaciones }}</td>
+                                            <td>{{ $historia->monto }}</td>
+                                            <td>{{ $historia->boleta_pdf }}</td>    
+                                            <td>{{ $historia->nota_pdf }}</td>     
                                             <td>{{ $historia->fecha_inicio }}</td>    
                                             <td>{{ $historia->fecha_final}}</td>    
                                          
@@ -49,9 +69,14 @@
                                         </tr>
                                     @endforeach
                                 </tbody>
-                            </table>
-        <div class="pagination justify-content-end">
-            {!! $historial->links() !!}
+                                </table>
+                        </div>
+                    </div>
+                </div>
+            </div>        
+            <div class="pagination justify-content-end">
+                {!! $historial->links() !!}
+            </div>
         </div>
-    </div>
+    </section>
 @endsection

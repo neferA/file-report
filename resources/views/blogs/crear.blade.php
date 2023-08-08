@@ -27,7 +27,7 @@
                                 </div>
                             @endif
 
-                            {!! Form::open(array('route' => 'tickets.store', 'method' => 'POST')) !!}
+                            {!! Form::open(['route' => 'tickets.store', 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
                             <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -66,7 +66,34 @@
                                         </div>
                                     </div> <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="titulo">fecha inicial</label>
+                                            <label for="titulo">monto</label>
+                                            {!! Form::text('monto', null, ['class' => 'form-control', 'placeholder' => 'Ingrese monto']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="estado">Estado</label>
+                                        {!! Form::select('estado', [
+                                            \App\Models\Blog::ESTADO_LIBERADO => 'Liberado',
+                                            \App\Models\Blog::ESTADO_EJECUTADO => 'Ejecutado',
+                                            \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
+                                        ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">boleta pdf</label>
+                                            {!! Form::file('boleta_pdf', ['class' => 'form-control-file']) !!}
+                                        </div>                                        
+                                    </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">nota pdf</label>
+                                            {!! Form::file('nota_pdf', ['class' => 'form-control-file']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">fecha inicial</label>
                                             {!! Form::text('fecha_inicio', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha inicial']) !!}
                                         </div>
                                     </div>
@@ -76,6 +103,7 @@
                                             {!! Form::text('fecha_final', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
                                         </div>
                                     </div>
+                                    
                                 </div>
 
                                 <div class="row">
