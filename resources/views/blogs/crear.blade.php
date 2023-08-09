@@ -78,19 +78,20 @@
                                             \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
                                         ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
                                     </div>
+                                    
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">boleta pdf</label>
-                                            {!! Form::file('boleta_pdf', ['class' => 'form-control-file']) !!}
-                                        </div>                                        
-                                    </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="contenido">nota pdf</label>
-                                            {!! Form::file('nota_pdf', ['class' => 'form-control-file']) !!}
+                                            <label for="boleta_pdf">boleta pdf</label>
+                                            {!! Form::file('boleta_pdf', ['class' => 'form-control-file', 'id' => 'boleta_pdf']) !!}
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="nota_pdf">nota pdf</label>
+                                            {!! Form::file('nota_pdf', ['class' => 'form-control-file', 'id' => 'nota_pdf']) !!}
+                                        </div>
+                                    </div>
+                                    
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="contenido">fecha inicial</label>

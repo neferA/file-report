@@ -49,14 +49,15 @@ class BlogController extends Controller
     {
         return view('blogs.crear');
     }
-    private function uploadPDF($request, $fieldName)
-    {
-        if ($request->hasFile($fieldName)) {
-            $pdfPath = $request->file($fieldName)->store('pdfs');
-            return $pdfPath;
+    private function uploadPDF($file, $folder)
+        {
+            if ($file) {
+                $pdfPath = $file->store($folder, 'public');
+                return $pdfPath;
+            }
+            return null;
         }
-        return null;
-    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -81,13 +82,17 @@ class BlogController extends Controller
             'nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
         ]);
 
+        // Cargar y almacenar el archivo PDF 'boleta_pdf'
         $data = $request->except(['boleta_pdf', 'nota_pdf']);
 
-        // Cargar y almacenar el archivo PDF 'boleta_pdf'
-        $data['boleta_pdf'] = $this->uploadPDF($request, 'boleta_pdf');
-
-        // Cargar y almacenar el archivo PDF 'nota_pdf'
-        $data['nota_pdf'] = $this->uploadPDF($request, 'nota_pdf');
+        if ($request->hasFile('boleta_pdf')) {
+            $data['boleta_pdf'] = $this->uploadPDF($request->file('boleta_pdf'), 'boletas_pdfs');
+        }
+        
+        // Verificar si se cargó un nuevo archivo nota_pdf
+        if ($request->hasFile('nota_pdf')) {
+            $data['nota_pdf'] = $this->uploadPDF($request->file('nota_pdf'), 'notas_pdfs');
+        }
 
         // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
         $data['usuario'] = Auth::user()->name;
@@ -95,21 +100,31 @@ class BlogController extends Controller
         $blog = Blog::create($data);
 
         // Crea un nuevo registro en la tabla waranyt_Histories vinculado al registro de Blog recién creado
-        waranty::create([
+        $waranty = Waranty::create([
             'blogs_id' => $blog->id,
             'titulo' => $blog->num_boleta,
             'contenido' => $blog->motivo,
             'caracteristicas' => $request->input('caracteristicas'),    
             'observaciones' => $request->input('observaciones'),
             'monto' => $request->input('monto'),
-            'boleta_pdf' => $request->input('boleta_pdf'),
-            'nota_pdf' => $request->input('nota_pdf'),
+            'boleta_pdf' => $data['boleta_pdf'] ?? null,
+            'nota_pdf' => $data['nota_pdf'] ?? null,
             'fecha_inicio' => $request->input('fecha_inicio'),
             'fecha_final' => $request->input('fecha_final'),
         ]);
+        
+        // Verificar si se cargó un nuevo archivo boleta_pdf y actualizar si es necesario
+        if ($request->hasFile('boleta_pdf')) {
+            $waranty->update(['boleta_pdf' => $data['boleta_pdf']]);
+        }
+        
+        // Verificar si se cargó un nuevo archivo nota_pdf y actualizar si es necesario
+        if ($request->hasFile('nota_pdf')) {
+            $waranty->update(['nota_pdf' => $data['nota_pdf']]);
+        }
+        
         return redirect()->route('tickets.index');
     }
-
     /**
      * Display the specified resource.
      */
@@ -142,18 +157,45 @@ class BlogController extends Controller
         'ejecutora' => 'required',
         'caracteristicas' => 'required',
         'monto' => 'required',
-        'boleta_pdf' => 'required',
-        'nota_pdf' => 'required',
         'observaciones' => 'required',
         'fecha_inicio' => 'required',
         'fecha_final' => 'required',
+        'estado' => 'required|in:' . implode(',', [
+            Blog::ESTADO_LIBERADO,
+            Blog::ESTADO_EJECUTADO,
+            Blog::ESTADO_RENOVADO,
+        ]),
+        'new_boleta_pdf' => 'nullable|mimes:pdf|max:2048', // Validación para el archivo PDF
+        'new_nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
     ]);
 
     // Buscar el registro en la tabla blogs
     $blog = Blog::findOrFail($id);
+    $data = $request->except(['new_boleta_pdf', 'new_nota_pdf']);
+
+    // Verificar si se cargó un nuevo archivo new_boleta_pdf
+    if ($request->hasFile('new_boleta_pdf')) {
+        // Eliminar el archivo antiguo si existe
+        if ($blog->waranty && $blog->waranty->boleta_pdf) {
+            Storage::delete($blog->waranty->boleta_pdf);
+        }
+        // Subir el nuevo archivo
+        $data['boleta_pdf'] = $this->uploadPDF($request->file('new_boleta_pdf'), 'boletas_pdfs');
+
+    }
+
+    // Verificar si se cargó un nuevo archivo new_nota_pdf
+    if ($request->hasFile('new_nota_pdf')) {
+        // Eliminar el archivo antiguo si existe
+        if ($blog->waranty && $blog->waranty->nota_pdf) {
+            Storage::delete($blog->waranty->nota_pdf);
+        }
+        // Subir el nuevo archivo
+        $data['nota_pdf'] = $this->uploadPDF($request->file('new_nota_pdf'), 'notas_pdfs');
+    }
 
     // Actualizar el registro en la tabla blogs
-    $blog->update($request->all());
+    $blog->update($data);
 
     // Obtener o crear el modelo "waranty" asociado
     $waranty = Waranty::where('blogs_id', $blog->id)->first();
@@ -164,8 +206,8 @@ class BlogController extends Controller
             'caracteristicas' => $request->input('caracteristicas'),
             'observaciones' => $request->input('observaciones'),
             'monto' => $request->input('monto'),
-            'boleta_pdf' => $request->input('boleta_pdf'),
-            'nota_pdf' => $request->input('nota_pdf'),
+            'boleta_pdf' => $data['boleta_pdf'] ?? $waranty->boleta_pdf,
+            'nota_pdf' => $data['nota_pdf'] ?? $waranty->nota_pdf,
             'fecha_inicio' => $request->input('fecha_inicio'),
             'fecha_final' => $request->input('fecha_final'),
         ]);
@@ -177,8 +219,8 @@ class BlogController extends Controller
             'caracteristicas' => $request->input('caracteristicas'),
             'observaciones' => $request->input('observaciones'),
             'monto' => $request->input('monto'),
-            'boleta_pdf' => $request->input('boleta_pdf'),
-            'nota_pdf' => $request->input('nota_pdf'),
+            'boleta_pdf' => $data['boleta_pdf'] ?? null,
+            'nota_pdf' => $data['nota_pdf'] ?? null,
             'fecha_inicio' => $request->input('fecha_inicio'),
             'fecha_final' => $request->input('fecha_final'),
         ]);
@@ -188,6 +230,7 @@ class BlogController extends Controller
     return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
 }
 
+
    
     /**
      * Remove the specified resource from storage.
@@ -196,10 +239,20 @@ class BlogController extends Controller
     {
         $blog = Blog::findOrFail($id);
     
-    // Aquí puedes agregar lógica adicional antes de eliminar el registro, si es necesario
+        // Eliminar archivos PDF si existen en la relación 'waranty'
+        if ($blog->waranty) {
+            if ($blog->waranty->boleta_pdf) {
+                Storage::delete($blog->waranty->boleta_pdf);
+            }
+            if ($blog->waranty->nota_pdf) {
+                Storage::delete($blog->waranty->nota_pdf);
+            }
+        }
     
-    $blog->delete();
+        // Eliminar el registro del blog
+        $blog->delete();
     
-    return redirect()->route('tickets.index')->with('success', 'Blog eliminado exitosamente.');
-}
+        return redirect()->route('tickets.index')->with('success', 'Blog eliminado exitosamente.');
+    }
+    
 }

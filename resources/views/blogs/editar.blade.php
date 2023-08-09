@@ -74,17 +74,43 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="observaciones">boleta pdf</label>
-                                        {!! Form::text('boleta_pdf', $blog->waranty ? $blog->waranty->boleta_pdf : null, ['class' => 'form-control', 'placeholder' => 'Ingrese el nuevo pdf']) !!}
+                                    <label for="fecha_final">estado</label>
+                                    <select name="estado" class="form-control">
+                                        <option value="{{ App\Models\Blog::ESTADO_LIBERADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_LIBERADO ? 'selected' : '' }}>Liberado</option>
+                                        <option value="{{ App\Models\Blog::ESTADO_EJECUTADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_EJECUTADO ? 'selected' : '' }}>Ejecutado</option>
+                                        <option value="{{ App\Models\Blog::ESTADO_RENOVADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_RENOVADO ? 'selected' : '' }}>Renovado</option>
+                                    </select>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="observaciones">nota pdf</label>
-                                        {!! Form::text('nota_pdf', $blog->waranty ? $blog->waranty->nota_pdf : null, ['class' => 'form-control', 'placeholder' => 'Ingrese el nuevo pdf']) !!}
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="boleta_pdf">boleta pdf actual</label>
+                                            @if($blog->waranty && $blog->waranty->boleta_pdf)
+                                                <embed src="{{ Storage::url($blog->waranty->boleta_pdf) }}" type="application/pdf" width="100%" height="300px" />
+                                            @else
+                                                <p>No hay archivo adjunto.</p>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="new_boleta_pdf">Subir nuevo boleta pdf</label>
+                                            {!! Form::file('new_boleta_pdf', ['class' => 'form-control-file', 'id' => 'new_boleta_pdf']) !!}
+                                        </div>
                                     </div>
-                                </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="nota_pdf">nota pdf actual</label>
+                                            @if($blog->waranty && $blog->waranty->nota_pdf)
+                                                <embed src="{{ Storage::url($blog->waranty->nota_pdf) }}" type="application/pdf" width="100%" height="300px" />
+                                            @else
+                                                <p>No hay archivo adjunto.</p>
+                                            @endif
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="new_nota_pdf">Subir nuevo nota pdf</label>
+                                            {!! Form::file('new_nota_pdf', ['class' => 'form-control-file', 'id' => 'new_nota_pdf']) !!}
+                                        </div>
+                                    </div>
+                                    
+                                    
                                
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -98,14 +124,7 @@
                                         {!! Form::text('fecha_final', $blog->waranty ? $blog->waranty->fecha_final : null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                <label for="fecha_final">estado</label>
-                                <select name="estado" class="form-control">
-                                    <option value="{{ App\Models\Blog::ESTADO_LIBERADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_LIBERADO ? 'selected' : '' }}>Liberado</option>
-                                    <option value="{{ App\Models\Blog::ESTADO_EJECUTADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_EJECUTADO ? 'selected' : '' }}>Ejecutado</option>
-                                    <option value="{{ App\Models\Blog::ESTADO_RENOVADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_RENOVADO ? 'selected' : '' }}>Renovado</option>
-                                </select>
-                                </div>
+                                
                                 <!-- Agrega el campo oculto con el valor de blogs_id -->
                                 {!! Form::hidden('blogs_id', $blog->id) !!}
                             </div>

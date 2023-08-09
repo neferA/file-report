@@ -49,8 +49,20 @@
                                             <td>{{ $historia->caracteristicas }}</td>    
                                             <td>{{ $historia->observaciones }}</td>
                                             <td>{{ $historia->monto }}</td>
-                                            <td>{{ $historia->boleta_pdf }}</td>    
-                                            <td>{{ $historia->nota_pdf }}</td>     
+                                            <td>
+                                                @if ($historia->boleta_pdf)
+                                                    <embed src="{{ Storage::url($historia->boleta_pdf) }}" type="application/pdf" width="100%" height="300px" />
+                                                @else
+                                                    <p>No hay archivo adjunto.</p>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($historia->nota_pdf)
+                                                    <embed src="{{ Storage::url($historia->nota_pdf) }}" type="application/pdf" width="100%" height="300px" />
+                                                @else
+                                                    <p>No hay archivo adjunto.</p>
+                                                @endif
+                                            </td>  
                                             <td>{{ $historia->fecha_inicio }}</td>    
                                             <td>{{ $historia->fecha_final}}</td>    
                                          
