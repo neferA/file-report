@@ -40,4 +40,8 @@ class Blog extends Model
     {
         return $this->hasOne(waranty::class, 'blogs_id');
     }
+    public function boletaFinanciadora()
+    {
+        return $this->hasOne(BoletaFinanciadora::class);
+    }
 }

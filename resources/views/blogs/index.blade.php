@@ -3,6 +3,7 @@
 @section('title', 'File report')
 
 @section('content_header')
+
 @stop
 
 @section('content')

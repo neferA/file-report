@@ -1,10 +1,10 @@
 @extends('adminlte::page') {{-- O la plantilla que estés utilizando para las vistas --}}
-
+@section('title', 'File report')
+@section('scripts')
+<!-- Coloca el enlace a jQuery aquí -->
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} 
 @section('content')
-<!-- Agregar el botón para redireccionar a la vista index de blogs -->
-
-
-<section class="section">
+ <section class="section">
         <div class="section-header">
             <h3 class="page__heading">Boleta- {{ $blog->num_boleta }}</h3>
             <h1 class="btn {{ $blog->estado_color }}" style="font-size: 24px;">{{ $blog->estado }}</h1>
@@ -32,11 +32,8 @@
                                     <th style="display: #fff;">monto</th>
                                     <th style="display: #fff;">boleta</th>
                                     <th style="display: #fff;">nota</th>
-
-
                                     <th style="display: #fff;">fecha inicio</th>
                                     <th style="display: #fff;">fecha final</th>
-
                                     <th style="display: #fff;">Acciones</th>
                                 </thead>
                                 <tbody>
@@ -51,18 +48,18 @@
                                             <td>{{ $historia->monto }}</td>
                                             <td>
                                                 @if ($historia->boleta_pdf)
-                                                    <embed src="{{ Storage::url($historia->boleta_pdf) }}" type="application/pdf" width="100%" height="300px" />
-                                                @else
+                                                    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#pdfModal{{ $historia->id }}">Vista Previa boleta PDF</a>                                                @else
                                                     <p>No hay archivo adjunto.</p>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($historia->nota_pdf)
-                                                    <embed src="{{ Storage::url($historia->nota_pdf) }}" type="application/pdf" width="100%" height="300px" />
+                                                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#notaPdfModal{{ $historia->id }}">Vista Previa nota PDF</a>
                                                 @else
                                                     <p>No hay archivo adjunto.</p>
                                                 @endif
-                                            </td>  
+                                            </td> 
+                                
                                             <td>{{ $historia->fecha_inicio }}</td>    
                                             <td>{{ $historia->fecha_final}}</td>    
                                          
@@ -91,4 +88,53 @@
             </div>
         </div>
     </section>
-@endsection
+                <!-- Modal para la previsualización de PDF de boleta -->
+                <div class="modal fade" id="pdfModal{{ $historia->id }}" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel{{ $historia->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="pdfModalLabel{{ $historia->id }}">Vista Previa de PDF</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                @if ($historia->boleta_pdf)
+                                    <iframe src="{{ Storage::url($historia->boleta_pdf) }}" frameborder="0" width="100%" height="500px"></iframe>
+                                @else
+                                    <p>No hay archivo adjunto.</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal para la previsualización de PDF de nota -->
+                <div class="modal fade" id="notaPdfModal{{ $historia->id }}" tabindex="-1" role="dialog" aria-labelledby="notaPdfModalLabel{{ $historia->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="notaPdfModalLabel{{ $historia->id }}">Vista Previa de Nota PDF</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                @if ($historia->nota_pdf)
+                                    <iframe src="{{ Storage::url($historia->nota_pdf) }}" frameborder="0" width="100%" height="500px"></iframe>
+                                @else
+                                    <p>No hay archivo adjunto.</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    @endsection
+
+    @endsection
+   
+    
+    
+    
+    
+    
+   

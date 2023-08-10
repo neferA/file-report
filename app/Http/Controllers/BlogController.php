@@ -229,9 +229,7 @@ class BlogController extends Controller
     // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
     return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
 }
-
-
-   
+ 
     /**
      * Remove the specified resource from storage.
      */
@@ -239,14 +237,14 @@ class BlogController extends Controller
     {
         $blog = Blog::findOrFail($id);
     
-        // Eliminar archivos PDF si existen en la relación 'waranty'
         if ($blog->waranty) {
-            if ($blog->waranty->boleta_pdf) {
-                Storage::delete($blog->waranty->boleta_pdf);
-            }
-            if ($blog->waranty->nota_pdf) {
-                Storage::delete($blog->waranty->nota_pdf);
-            }
+            // Definir rutas de almacenamiento de PDFs
+            $boletaPdfPath = $blog->waranty->boleta_pdf;
+            $notaPdfPath = $blog->waranty->nota_pdf;
+    
+            // Verificar y eliminar archivos PDF si existen
+            $this->deletePDF($boletaPdfPath);
+            $this->deletePDF($notaPdfPath);
         }
     
         // Eliminar el registro del blog
@@ -255,4 +253,24 @@ class BlogController extends Controller
         return redirect()->route('tickets.index')->with('success', 'Blog eliminado exitosamente.');
     }
     
+    /**
+     * Elimina un archivo PDF del almacenamiento si existe.
+     *
+     * @param string|null $pdfPath
+     * @return void
+     */
+    protected function deletePDF($pdfPath)
+    {
+        if ($pdfPath) {
+            $fullPath = 'public/' . $pdfPath;
+            if (Storage::exists($fullPath)) {
+                Storage::delete($fullPath);
+            }
+        }
+    }
+
+   
 }
+
+    
+
