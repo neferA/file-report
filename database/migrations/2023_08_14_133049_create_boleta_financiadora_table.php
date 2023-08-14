@@ -9,21 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('boleta_financiadora', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('blogs_id'); // Clave foránea para la relación con 'blogs'
-            $table->unsignedBigInteger('financiadora_id'); // Clave foránea para la relación con 'financiadora'
-
+            $table->unsignedBigInteger('blogs_id');
+            $table->unsignedBigInteger('financiadora_id');
             // Agrega más columnas si es necesario
             $table->timestamps();
 
-            $table->foreign('blogs_id')->references('id')->on('blogs')->onDelete('cascade'); // Define la relación
-            $table->foreign('financiadora_id')->references('id')->on('financiadora')->onDelete('cascade'); // Define la relación
-
+            $table->foreign('blogs_id')->references('id')->on('blogs')->onDelete('cascade');
+            $table->foreign('financiadora_id')->references('id')->on('financiadoras')->onDelete('cascade');
         });
     }
+
 
     /**
      * Reverse the migrations.

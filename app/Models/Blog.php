@@ -9,6 +9,7 @@ class Blog extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'tipo_garantia_id',
         'num_boleta',
         'proveedor',
         'motivo',
@@ -40,8 +41,13 @@ class Blog extends Model
     {
         return $this->hasOne(waranty::class, 'blogs_id');
     }
-    public function boletaFinanciadora()
+    public function financiadoras()
     {
-        return $this->hasOne(BoletaFinanciadora::class);
+        return $this->belongsToMany(Financiadora::class, 'boleta_financiadora', 'blogs_id', 'financiadora_id');
+    }
+    
+    public function assetWaranty()
+    {
+        return $this->belongsTo(assets_waranty::class);
     }
 }

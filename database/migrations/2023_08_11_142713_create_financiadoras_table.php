@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tipo_garantia', function (Blueprint $table) {
+        Schema::create('financiadoras', function (Blueprint $table) {
             $table->id();
             $table->text('nombre');
             $table->text('descripcion');
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tipo_garantia');
+        Schema::dropIfExists('financiadoras');
     }
 };

@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('financiadora', function (Blueprint $table) {
+        Schema::create('assets_waranty', function (Blueprint $table) {
             $table->id();
-            $table->text('nombre');
-            $table->text('descripcion');
             $table->timestamps();
         });
     }
@@ -24,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('financiadora');
+        Schema::dropIfExists('assets_waranty');
     }
 };

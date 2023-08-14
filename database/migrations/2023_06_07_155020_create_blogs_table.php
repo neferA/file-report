@@ -13,14 +13,20 @@ return new class extends Migration
     {
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
+
+            $table->unsignedBigInteger('assets_waranty_id')->nullable(); 
+
             $table->text('num_boleta');
             $table->text('proveedor');
             $table->text('motivo');
             $table->text('ejecutora');
             $table->text('usuario');
             $table->enum('estado', ['liberado', 'ejecutado', 'renovado'])->default('liberado');
-
             $table->timestamps();
+            
+            $table->foreign('assets_waranty_id')->references('id')->on('assets_waranty')->onDelete('cascade');
+
+           
         });
     }
 
