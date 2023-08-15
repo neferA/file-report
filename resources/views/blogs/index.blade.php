@@ -16,14 +16,14 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                        <form action="{{ route('tickets.index') }}" method="GET">
+                            <form action="{{ route('tickets.index') }}" method="GET">
                             <div class="input-group mb-3">
                                 <input type="text" name="search" class="form-control" placeholder="Buscar" value="{{ request('search') }}">
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-primary">Buscar</button>
                                 </div>
                             </div>
-                        </form>
+                            </form>
                             @can('crear_tickets')
                             <a class="btn btn-warning" href="{{ route('tickets.create')}}">Nuevo</a>
                             @endcan

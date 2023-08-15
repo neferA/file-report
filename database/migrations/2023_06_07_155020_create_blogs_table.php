@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('assets_waranty_id')->nullable(); 
+            $table->unsignedBigInteger('tipo_garantia_id'); // Clave foránea            
 
             $table->text('num_boleta');
             $table->text('proveedor');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->enum('estado', ['liberado', 'ejecutado', 'renovado'])->default('liberado');
             $table->timestamps();
             
-            $table->foreign('assets_waranty_id')->references('id')->on('assets_waranty')->onDelete('cascade');
+            $table->foreign('tipo_garantia_id')->references('id')->on('tipo_garantia')->onDelete('cascade');        
 
            
         });

@@ -33,9 +33,9 @@ class UserController extends Controller
         return view('users.home');
     }
 
-    public function cloud()
+    public function financiers()
     {
-        return view('cloud.index');
+        return view('financiadoras.index');
     }
 
     /**

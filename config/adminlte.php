@@ -343,8 +343,8 @@ return [
             'can'           => 'crud-usuario',
         ],
         [
-            'text'          => 'historial',
-            'url'           => '/cloud',
+            'text'          => 'financiadoras',
+            'url'           => '/financiers',
             'icon'          => 'fa fa-download',
         ],
         [

@@ -78,6 +78,18 @@
                                             \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
                                         ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
                                     </div>
+                                    </div> <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">Financiadora</label>
+                                            {!! Form::text('Financiadora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la entidad']) !!}
+                                        </div>
+                                    </div>
+                                    </div> <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">garantia</label>
+                                            {!! Form::text('garantia', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la garantia']) !!}
+                                        </div>
+                                    </div>
                                     
                                     <div class="col-md-6">
                                         <div class="form-group">

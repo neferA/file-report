@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('assets_waranty', function (Blueprint $table) {
+        Schema::create('tipo_garantia', function (Blueprint $table) {
             $table->id();
+            $table->text('nombre');
+            $table->text('descripcion');
             $table->timestamps();
         });
     }
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('assets_waranty');
+        Schema::dropIfExists('tipo_garantia');
     }
 };

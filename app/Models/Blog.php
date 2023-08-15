@@ -46,8 +46,8 @@ class Blog extends Model
         return $this->belongsToMany(Financiadora::class, 'boleta_financiadora', 'blogs_id', 'financiadora_id');
     }
     
-    public function assetWaranty()
+    public function tipoGarantia()
     {
-        return $this->belongsTo(assets_waranty::class);
+        return $this->belongsTo(TipoGarantia::class, 'tipo_garantia_id');
     }
 }

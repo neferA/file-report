@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\FinanciersController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
@@ -56,10 +57,16 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('users', UserController::class);
 
     Route::resource('tickets', BlogController::class);
+    
+    // Route::resource('financiers', FinanciersController::class);
+
 });
 
 // guest/auth users enter this routes
-Route::get('/cloud', [UserController::class, 'cloud'])->name('cloud');
+Route::get('/financiers', [UserController::class, 'financiers'])->name('financiers');
+
+Route::get('/financiers', [FinanciersController::class,'index'])->name('financiers.index');
+
 Route::get('/home', [UserController::class, 'home'])->name('home');
 
 // tickets routes guest and with priviligies
