@@ -1,8 +1,6 @@
 @extends('adminlte::page') {{-- O la plantilla que estés utilizando para las vistas --}}
 @section('title', 'File report')
 @section('scripts')
-<!-- Coloca el enlace a jQuery aquí -->
-{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} 
 @section('content')
  <section class="section">
         <div class="section-header">

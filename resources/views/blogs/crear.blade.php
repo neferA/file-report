@@ -64,7 +64,8 @@
                                             <label for="contenido">observaciones</label>
                                             {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
                                         </div>
-                                    </div> <div class="col-md-6">
+                                    </div> 
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="titulo">monto</label>
                                             {!! Form::text('monto', null, ['class' => 'form-control', 'placeholder' => 'Ingrese monto']) !!}
@@ -78,12 +79,15 @@
                                             \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
                                         ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
                                     </div>
-                                    </div> <div class="col-md-6">
+                                     
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="titulo">Financiadora</label>
-                                            {!! Form::text('Financiadora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la entidad']) !!}
+                                            <label for="financiadora_id">Financiadora</label>
+                                            {!! Form::select('financiadora_id', [], null, ['class' => 'form-control select2', 'placeholder' => 'Seleccione una financiadora']) !!}
                                         </div>
                                     </div>
+
+
                                     </div> <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="titulo">garantia</label>
@@ -141,6 +145,24 @@
     <link rel="stylesheet" href="/css/admin_custom.css">
 @stop
 
-@section('js')
-    <script> console.log('Hi!'); </script>
-@stop
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: 'Seleccione una financiadora',
+            ajax: {
+                url: '{{ route("financiadoras.autocomplete") }}',
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
+        });
+    });
+</script>
+@endsection
+

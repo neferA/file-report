@@ -57,8 +57,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('users', UserController::class);
 
     Route::resource('tickets', BlogController::class);
+
+    Route::resource('financiers', FinanciersController::class);
+
     
-    // Route::resource('financiers', FinanciersController::class);
 
 });
 
@@ -66,6 +68,11 @@ Route::group(['middleware' => ['auth']], function() {
 Route::get('/financiers', [UserController::class, 'financiers'])->name('financiers');
 
 Route::get('/financiers', [FinanciersController::class,'index'])->name('financiers.index');
+
+Route::get('financiadoras/{id}/edit', [FinanciersController::class, 'edit'])->name('financiers.edit');
+Route::delete('financiadoras/{id}', [FinanciersController::class, 'destroy'])->name('financiers.destroy');
+Route::get('financiadoras/autocomplete', [FinanciersController::class, 'autocomplete'])->name('financiadoras.autocomplete');
+
 
 Route::get('/home', [UserController::class, 'home'])->name('home');
 
