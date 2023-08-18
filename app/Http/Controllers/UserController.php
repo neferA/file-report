@@ -37,6 +37,10 @@ class UserController extends Controller
     {
         return view('financiadoras.index');
     }
+    public function waranty()
+    {
+        return view('garantias.index');
+    }
 
     /**
      * Show the form for creating a new resource.

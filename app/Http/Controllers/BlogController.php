@@ -51,6 +51,15 @@ class BlogController extends Controller
         $financiadoras = Financiadora::pluck('nombre', 'id');
         return view('blogs.crear', compact('financiadoras'));
     }
+    public function searchFinanciadora(Request $request)
+    {
+        $searchTerm = $request->input('searchTerm');
+
+        $financiadoras = Financiadora::where('nombre', 'like', '%' . $searchTerm . '%')
+            ->get();
+
+        return view('blogs.autocomplete_results', compact('financiadoras'));
+    }
     private function uploadPDF($file, $folder)
         {
             if ($file) {

@@ -353,6 +353,11 @@ return [
             'icon'          => 'fa fa-blog',
             // 'can'           => 'crear-blog'
         ],
+        [
+            'text'          => 'garantia',
+            'url'           => '/waranty',
+            'icon'          => 'fa fa-download',
+        ],
         // [
         //     'text'        => 'pages',
         //     'url'         => 'admin/pages',

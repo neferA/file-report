@@ -6,6 +6,8 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\FinanciersController;
+use App\Http\Controllers\WarantyController;
+use App\Models\waranty;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
@@ -60,21 +62,22 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::resource('financiers', FinanciersController::class);
 
-    
+    Route::resource('waranty', WarantyController::class);
+
 
 });
 
 // guest/auth users enter this routes
 Route::get('/financiers', [UserController::class, 'financiers'])->name('financiers');
-
 Route::get('/financiers', [FinanciersController::class,'index'])->name('financiers.index');
 
-Route::get('financiadoras/{id}/edit', [FinanciersController::class, 'edit'])->name('financiers.edit');
-Route::delete('financiadoras/{id}', [FinanciersController::class, 'destroy'])->name('financiers.destroy');
-Route::get('financiadoras/autocomplete', [FinanciersController::class, 'autocomplete'])->name('financiadoras.autocomplete');
-
-
 Route::get('/home', [UserController::class, 'home'])->name('home');
+
+Route::get('/waranty', [UserController::class, 'waranty'])->name('waranty');
+
+Route::get('/waranty', [WarantyController::class,'index'])->name('waranty.index');
+
+
 
 // tickets routes guest and with priviligies
 

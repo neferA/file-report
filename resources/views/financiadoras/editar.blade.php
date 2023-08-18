@@ -27,7 +27,7 @@
                                 </div>
                             @endif
 
-                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}
+                            {!! Form::model($financiadora, ['method' => 'PUT', 'route' => ['financiers.update', $financiadora->id]]) !!}
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">

@@ -44,18 +44,20 @@ class FinanciersController extends Controller
         ]);
 
         $financiadora = Financiadora::findOrFail($id);
-        $financiadora->nombre = $request->input('nombre');
-        $financiadora->descripcion = $request->input('descripcion');
-        // ... actualizar otros campos si es necesario ...
-        $financiadora->save();
+        $data = $request->all();
+        
+        $financiadora->update($data);
 
         return redirect()->route('financiers.index')
-            ->with('success', 'Financiadora actualizada exitosamente');
+            ->with('success', 'Financiadora actualizada exitosamente.');
     }
     public function autocomplete(Request $request)
     {
         $search = $request->get('search');
-        $financiadoras = Financiadora::where('nombre', 'like', '%' . $search . '%')->pluck('nombre', 'id');
+
+        $financiadoras = Financiadora::select('id', 'nombre')
+            ->where('nombre', 'like', '%' . $search . '%')
+            ->get();
 
         return response()->json($financiadoras);
     }
