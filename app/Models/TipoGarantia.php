@@ -8,9 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class TipoGarantia extends Model
 {
     use HasFactory;
-
+    protected $table = 'tipo_garantia';
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+    ];
     public function blog()
     {
-        return $this->belongsTo(Blog::class, 'tipo_garantia_id');
+        return $this->hasOne(Blog::class, 'tipo_garantia_id');
     }
 }

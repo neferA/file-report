@@ -26,17 +26,18 @@
                                     <th style="display: #fff;">Acciones</th>
 
                                 <tbody>
-                                @foreach ($tiposGarantias as $tipoGarantia)<tr>
-                                            <td style="display: none;">{{ $tipoGarantia->id }}</td>
-                                            <td>{{ $tipoGarantia->nombre }}</td>
-                                            <td>{{ $tipoGarantia->descripcion }}</td>
+                                @foreach($tipos as $tipo)                               
+                                <tr>
+                                            <td style="display: none;">{{ $tipo->id }}</td>
+                                            <td>{{ $tipo->nombre }}</td>
+                                            <td>{{ $tipo->descripcion }}</td>
                                                                              
                                             <td>
                                                 @can('editar_tickets')
-                                                    <a class="btn btn-info" href="{{ route('waranty.edit', $tipoGarantia->id) }}">Editar</a>
+                                                    <a class="btn btn-info" href="{{ route('waranty.edit', $tipo->id) }}">Editar</a>
                                                 @endcan
                                                 @can('borrar_tickets')
-                                                <form action="{{ route('waranty.destroy', $tipoGarantia->id) }}" method="POST" style="display: inline;">
+                                                <form action="{{ route('waranty.destroy', $tipo->id) }}" method="POST" style="display: inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta financiadora?')">Eliminar</button>

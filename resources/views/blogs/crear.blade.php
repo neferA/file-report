@@ -79,23 +79,18 @@
                                             \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
                                         ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
                                     </div>
-                                   
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="financiadora_id">Financiadora</label>
-                                            {!! Form::text('financiadora_id', null, ['class' => 'form-control', 'id' => 'autocomplete-input', 'placeholder' => 'Buscar financiadora']) !!}
-                                            <div id="autocomplete-results">
-                                                <!-- Aquí se mostrarán los resultados del autocompletado -->
-                                            </div>
+                                            {!! Form::select('financiadora_id', $financiadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una financiadora']) !!}
                                         </div>
-                                    </div>
-                                    </div> <div class="col-md-6">
+                                    </div> 
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="titulo">garantia</label>
-                                            {!! Form::text('garantia', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la garantia']) !!}
+                                            <label for="garantia_id">Garantía</label>
+                                            {!! Form::select('garantia_id', $garantias, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una garantía']) !!}
                                         </div>
                                     </div>
-                                    
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="boleta_pdf">boleta pdf</label>
@@ -147,25 +142,6 @@
 @stop
 
 @section('scripts')
-<script>
-    $(document).ready(function() {
-        $('#autocomplete-input').on('input', function() {
-            var searchTerm = $(this).val();
 
-            if (searchTerm.length >= 3) { // Cambia a la longitud deseada para activar la búsqueda
-                $.ajax({
-                    url: '{{ route("search-financiadora") }}',
-                    method: 'POST',
-                    data: { _token: '{{ csrf_token() }}', searchTerm: searchTerm },
-                    success: function(data) {
-                        $('#autocomplete-results').html(data);
-                    }
-                });
-            } else {
-                $('#autocomplete-results').empty();
-            }
-        });
-    });
-</script>
 @endsection
 

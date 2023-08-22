@@ -74,7 +74,6 @@ Route::get('/financiers', [FinanciersController::class,'index'])->name('financie
 Route::get('/home', [UserController::class, 'home'])->name('home');
 
 Route::get('/waranty', [UserController::class, 'waranty'])->name('waranty');
-
 Route::get('/waranty', [WarantyController::class,'index'])->name('waranty.index');
 
 

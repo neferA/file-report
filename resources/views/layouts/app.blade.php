@@ -36,8 +36,17 @@
         </div>
 
         <!-- Scripts -->
-        @yield('scripts') <!-- Scripts específicos de cada vista -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        @yield('scripts') <!-- Scripts específicos de cada vista -->
+        <!-- <script>
+                $(function () {
+            $('#autocomplete-input').autocomplete({
+                source: "{{ route('financiadora.search') }}",
+                minLength: 2
+            });
+        });
+        </script> -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     </body>

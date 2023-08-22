@@ -51,14 +51,11 @@ class FinanciersController extends Controller
         return redirect()->route('financiers.index')
             ->with('success', 'Financiadora actualizada exitosamente.');
     }
-    public function autocomplete(Request $request)
-    {
-        $search = $request->get('search');
-
-        $financiadoras = Financiadora::select('id', 'nombre')
-            ->where('nombre', 'like', '%' . $search . '%')
-            ->get();
-
+    public function search(Request $request) {
+        $term = $request->input('term');
+    
+        $financiadoras = Financiadora::where('nombre', 'LIKE', '%' . $term . '%')->pluck('nombre');
+    
         return response()->json($financiadoras);
     }
 

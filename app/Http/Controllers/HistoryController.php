@@ -13,7 +13,7 @@ class HistoryController extends Controller
     public function index($id)
     {
         $blog = Blog::findOrFail($id);
-        $historial = waranty::where('blogs_id', $id)->paginate(10); // Cambia el número 10 según la cantidad de registros por página que desees mostrar
+        $historial = waranty::where('blogs_id', $id)->with(['blog.financiadora', 'blog.garantia'])->paginate(10); // Cambia el número 10 según la cantidad de registros por página que desees mostrar
         return view('historial.index', compact('blog', 'historial'));
     }
     
