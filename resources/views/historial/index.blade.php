@@ -30,7 +30,7 @@
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Número de Boleta</th>
+                                                <th>Número de Boleta</th>                                                
                                                 <th>Financiadora</th>
                                                 <th>Garantía</th>
                                                 <th>Motivo</th>
@@ -47,8 +47,12 @@
                                                 <tr>
                                                     <td>{{ $historia->id }}</td>
                                                     <td>{{ $historia->titulo }}</td>
-                                                    <td>{{ $historia->blog->financiadora->nombre }}</td>
-                                                    <td>{{ $historia->blog->garantia->nombre }}</td>
+                                                    <td>
+                                                        @foreach ($historia->blog->financiadoras as $financiadora)
+                                                            {{ $financiadora->nombre }}
+                                                        @endforeach
+                                                    </td>
+                                                    <td>{{ $historia->blog->tipoGarantia->nombre }}</td>
                                                     <td>{{ $historia->blog->motivo }}</td>
                                                     <td>{{ $historia->caracteristicas }}</td>
                                                     <td>{{ $historia->observaciones }}</td>
@@ -126,7 +130,6 @@
                 </div>
     @endsection
 
-    @endsection
    
     
     

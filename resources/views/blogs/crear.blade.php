@@ -88,7 +88,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="garantia_id">Garantía</label>
-                                            {!! Form::select('garantia_id', $garantias, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una garantía']) !!}
+                                            {!! Form::select('tipo_garantia_id', $garantias, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una garantía']) !!}
                                         </div>
                                     </div>
                                     <div class="col-md-6">

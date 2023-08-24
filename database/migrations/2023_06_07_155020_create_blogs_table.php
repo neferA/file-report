@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('tipo_garantia_id'); // Clave foránea            
-
+            $table->unsignedBigInteger('tipo_garantia_id'); // Clave foránea       
             $table->text('num_boleta');
             $table->text('proveedor');
             $table->text('motivo');

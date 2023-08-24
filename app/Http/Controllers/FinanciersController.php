@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Financiadora;
+use App\Models\Blog;
+
 
 class FinanciersController extends Controller
 {
@@ -15,22 +17,32 @@ class FinanciersController extends Controller
     }
     public function create()
     {
-        return view('financiadoras.crear');
+        $blogs = Blog::all(); // Obtén todos los blogs disponibles
+        return view('financiadoras.crear', compact('blogs'));
     }
+    
     public function store(Request $request)
-    {
-            $request->validate([
-                'nombre' => 'required',
-                'descripcion' => 'required',
-            ]);
+{
+    $request->validate([
+        'nombre' => 'required',
+        'descripcion' => 'required',
+    ]);
 
-            $data = $request->all();
+    $data = $request->all();
 
-            $financiadora = Financiadora::create($data);
+    $financiadora = Financiadora::create($data);
 
-            return redirect()->route('financiers.index')
-                ->with('success', 'Financiadora creada exitosamente');
-    }
+    // Obtén los IDs de los blogs relacionados seleccionados en el formulario
+    $blogIds = $request->input('blog_ids');
+
+    // Adjunta los IDs de los blogs relacionados a la tabla pivote
+    $financiadora->blogs()->attach($blogIds);
+
+    return redirect()->route('financiers.index')
+        ->with('success', 'Financiadora creada exitosamente');
+}
+
+    
     public function edit($id)
     {
         $financiadora = Financiadora::findOrFail($id);

@@ -41,16 +41,22 @@
                                             {!! Form::text('descripcion', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la descripcion']) !!}
                                         </div>
                                     </div>
-                                    
-                                <div class="row">
-                                    <div class="col-md-12">
+                                    <!-- esta funcion es para asignar una financiadora remotamente a una boleta desde el form create  -->
+                                    <!-- <div class="col-md-6">
                                         <div class="form-group">
-                                            <button type="submit" class="btn btn-primary">Guardar</button>
-                                            <a class="btn btn-danger" href="{{ route('financiers.index') }}">Cancelar</a>
+                                            <label for="blog_ids">Blogs</label>
+                                            {!! Form::select('blog_ids[]', $blogs->pluck('nombre', 'id'), null, ['class' => 'form-control', 'multiple' => 'multiple']) !!}
+                                        </div>
+                                    </div> -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                                <a class="btn btn-danger" href="{{ route('financiers.index') }}">Cancelar</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
+                        
                             {!! Form::close() !!}
                         </div>
                     </div>

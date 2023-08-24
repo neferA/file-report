@@ -71,6 +71,7 @@ class BlogController extends Controller
     {
         request()->validate([
             'num_boleta' => 'required',
+            'tipo_garantia_id' => 'required',
             'proveedor' => 'required',
             'motivo' => 'required',
             'ejecutora' => 'required',
@@ -104,7 +105,12 @@ class BlogController extends Controller
         $data['usuario'] = Auth::user()->name;
 
         $blog = Blog::create($data);
+         // Obtén los IDs de las financiadoras seleccionadas
+        $financiadoraIds = $request->input('financiadora_id');
 
+        // Adjunta los IDs de las financiadoras relacionadas a la tabla pivote
+        $blog->financiadoras()->attach($financiadoraIds);
+        
         // Crea un nuevo registro en la tabla waranyt_Histories vinculado al registro de Blog recién creado
         $waranty = Waranty::create([
             'blogs_id' => $blog->id,
@@ -128,7 +134,10 @@ class BlogController extends Controller
         if ($request->hasFile('nota_pdf')) {
             $waranty->update(['nota_pdf' => $data['nota_pdf']]);
         }
-        
+       // Asociar la garantía al blog creado
+        $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
+        $blog->tipoGarantia()->associate($tipoGarantia);
+
         return redirect()->route('tickets.index');
     }
     /**
