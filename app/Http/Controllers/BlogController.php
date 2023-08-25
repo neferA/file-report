@@ -9,6 +9,8 @@ use App\Models\Financiadora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+
 
 class BlogController extends Controller
 {
@@ -154,8 +156,12 @@ class BlogController extends Controller
     public function edit($id)
     {
         $blog = Blog::findOrFail($id);
-        return view('blogs.editar', compact('blog'));
+        $financiadoras = Financiadora::pluck('nombre', 'id'); // Obtener las financiadoras para el campo select
+        $garantias = TipoGarantia::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
+        
+        return view('blogs.editar', compact('blog', 'financiadoras', 'garantias'));
     }
+
     /**
      * Update the specified resource in storage.
      */
@@ -188,30 +194,64 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
         $data = $request->except(['new_boleta_pdf', 'new_nota_pdf']);
 
-        // Verificar si se cargó un nuevo archivo new_boleta_pdf
-        if ($request->hasFile('new_boleta_pdf')) {
-            // Eliminar el archivo antiguo si existe
-            if ($blog->waranty && $blog->waranty->boleta_pdf) {
-                Storage::delete($blog->waranty->boleta_pdf);
-            }
-            // Subir el nuevo archivo
-            $data['boleta_pdf'] = $this->uploadPDF($request->file('new_boleta_pdf'), 'boletas_pdfs');
+        // Almacenar los nombres de archivo antiguos
+    $oldBoletaPdf = $blog->waranty ? $blog->waranty->boleta_pdf : null;
+    $oldNotaPdf = $blog->waranty ? $blog->waranty->nota_pdf : null;
 
+    // Verificar si se cargó un nuevo archivo new_boleta_pdf
+    if ($request->hasFile('new_boleta_pdf')) {
+        if ($oldBoletaPdf) {
+            $this->deletePDF($oldBoletaPdf);
         }
+        // Subir el nuevo archivo
+        $data['boleta_pdf'] = $this->uploadPDF($request->file('new_boleta_pdf'), 'boletas_pdfs');
+    }
 
-        // Verificar si se cargó un nuevo archivo new_nota_pdf
-        if ($request->hasFile('new_nota_pdf')) {
-            // Eliminar el archivo antiguo si existe
-            if ($blog->waranty && $blog->waranty->nota_pdf) {
-                Storage::delete($blog->waranty->nota_pdf);
-            }
-            // Subir el nuevo archivo
-            $data['nota_pdf'] = $this->uploadPDF($request->file('new_nota_pdf'), 'notas_pdfs');
+    // Verificar si se cargó un nuevo archivo new_nota_pdf
+    if ($request->hasFile('new_nota_pdf')) {
+        if ($oldNotaPdf) {
+            $this->deletePDF($oldNotaPdf);
         }
+        // Subir el nuevo archivo
+        $data['nota_pdf'] = $this->uploadPDF($request->file('new_nota_pdf'), 'notas_pdfs');
+    }
 
-        // Actualizar el registro en la tabla blogs
-        $blog->update($data);
+    // Resto de la lógica para actualizar campos en el registro
 
+    // Actualizar el registro en la tabla blogs
+    $blog->update($data);
+
+    // Eliminar registros de archivos PDF que se desean reemplazar
+    if ($request->hasFile('new_boleta_pdf') && $oldBoletaPdf) {
+        $this->deletePDF($oldBoletaPdf);
+    }
+
+    if ($request->hasFile('new_nota_pdf') && $oldNotaPdf) {
+        $this->deletePDF($oldNotaPdf);
+    }
+
+    // Actualizar el registro en la tabla blogs
+    $blog->update($data);
+
+    // Verificar si hay una garantía asociada
+    if ($blog->waranty) {
+        // Actualizar boleta_pdf si es necesario
+        if (isset($data['boleta_pdf'])) {
+            $blog->waranty->update(['boleta_pdf' => $data['boleta_pdf']]);
+        }
+    
+        // Actualizar nota_pdf si es necesario
+        if (isset($data['nota_pdf'])) {
+            $blog->waranty->update(['nota_pdf' => $data['nota_pdf']]);
+        }
+    }
+     // Actualizar la asociación de financiadoras
+     $financiadoraIds = $request->input('financiadora_id');
+     $blog->financiadoras()->sync($financiadoraIds);
+ 
+     // Actualizar la asociación del tipo de garantía
+     $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
+     $blog->tipoGarantia()->associate($tipoGarantia);
         // Obtener o crear el modelo "waranty" asociado
         $waranty = Waranty::where('blogs_id', $blog->id)->first();
         if ($waranty) {
@@ -280,6 +320,8 @@ class BlogController extends Controller
             $fullPath = 'public/' . $pdfPath;
             if (Storage::exists($fullPath)) {
                 Storage::delete($fullPath);
+                 // Agrega un mensaje para verificar si el archivo se eliminó
+                Log::info("Archivo eliminado: $fullPath");
             }
         }
     }

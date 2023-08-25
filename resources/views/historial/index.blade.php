@@ -20,6 +20,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link active" data-toggle="tab" href="#historial-tab">Historial</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#historial-tab">detalles pdf</a>
+                                </li>
                                 <!-- Otras pestañas si es necesario -->
                             </ul>
 
@@ -39,6 +42,7 @@
                                                 <th>Monto</th>
                                                 <th>Fecha Inicio</th>
                                                 <th>Fecha Final</th>
+                                                <th>pdf</th>
                                                 <th>Acciones</th>
                                             </tr>
                                         </thead>
@@ -60,6 +64,10 @@
                                                     <td>{{ $historia->fecha_inicio }}</td>
                                                     <td>{{ $historia->fecha_final }}</td>
                                                     <td>
+                                                        <a href="#" data-toggle="modal" data-target="#pdfModal{{ $historia->id }}">Ver boleta</a>
+                                                        <a href="#" data-toggle="modal" data-target="#notaPdfModal{{ $historia->id }}">Ver Nota</a>
+                                                    </td>
+                                                    <td>
                                                         @can('editar_tickets')
                                                             <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">Editar</a>
                                                         @endcan
@@ -79,8 +87,6 @@
                                         {!! $historial->links() !!}
                                     </div>
                                 </div>
-
-                                <!-- Otras pestañas con contenido adicional si es necesario -->
                             </div>
                         </div>
                     </div>
@@ -93,7 +99,7 @@
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="pdfModalLabel{{ $historia->id }}">Vista Previa de PDF</h5>
+                                <h5 class="modal-title" id="pdfModalLabel{{ $historia->id }}">Vista Previa de boleta PDF</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>

@@ -10,11 +10,11 @@ use App\Models\Blog;
 class FinanciersController extends Controller
 {
     public function index()
-    {
-        $financiadoras = Financiadora::with('blogs')->get();
+{
+    $financiadoras = Financiadora::with('blogs')->paginate(10);
+    return view('financiadoras.index', compact('financiadoras'));
+}
 
-        return view('financiadoras.index', compact('financiadoras'));
-    }
     public function create()
     {
         $blogs = Blog::all(); // Obtén todos los blogs disponibles

@@ -27,8 +27,7 @@
                                 </div>
                             @endif
 
-                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}
-                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id]]) !!}
+                            {!! Form::model($blog, ['method' => 'PUT', 'route' => ['tickets.update', $blog->id], 'enctype' => 'multipart/form-data']) !!}
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">
@@ -82,6 +81,18 @@
                                     </select>
                                     </div>
                                     <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="financiadora_id">Financiadoras</label>
+                                        {!! Form::select('financiadora_id[]', $financiadoras, $blog->financiadoras->pluck('id'), ['class' => 'form-control select2', 'multiple' => 'multiple']) !!}
+                                    </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="tipo_garantia_id">Tipo de Garantía</label>
+                                        {!! Form::select('tipo_garantia_id', $garantias, $blog->tipoGarantia->id, ['class' => 'form-control']) !!}
+                                    </div>
+                                    </div>
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="boleta_pdf">boleta pdf actual</label>
                                             @if($blog->waranty && $blog->waranty->boleta_pdf)
@@ -95,6 +106,7 @@
                                             {!! Form::file('new_boleta_pdf', ['class' => 'form-control-file', 'id' => 'new_boleta_pdf']) !!}
                                         </div>
                                     </div>
+                                    
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="nota_pdf">nota pdf actual</label>
@@ -109,8 +121,7 @@
                                             {!! Form::file('new_nota_pdf', ['class' => 'form-control-file', 'id' => 'new_nota_pdf']) !!}
                                         </div>
                                     </div>
-                                    
-                                    
+                                 
                                
                                 <div class="col-md-6">
                                     <div class="form-group">
