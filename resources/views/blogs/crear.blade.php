@@ -47,12 +47,7 @@
                                             {!! Form::text('motivo', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el motivo']) !!}
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="contenido">ejecutora</label>
-                                            {!! Form::text('ejecutora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la ejecutora']) !!}
-                                        </div>
-                                    </div>
+
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="titulo">caracteristicas</label>
@@ -71,13 +66,21 @@
                                             {!! Form::text('monto', null, ['class' => 'form-control', 'placeholder' => 'Ingrese monto']) !!}
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="estado">Estado</label>
-                                        {!! Form::select('estado', [
-                                            \App\Models\Blog::ESTADO_LIBERADO => 'Liberado',
-                                            \App\Models\Blog::ESTADO_EJECUTADO => 'Ejecutado',
-                                            \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
-                                        ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estado">Estado</label>
+                                            {!! Form::select('estado', [
+                                                \App\Models\Blog::ESTADO_LIBERADO => 'Liberado',
+                                                \App\Models\Blog::ESTADO_EJECUTADO => 'Ejecutado',
+                                                \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
+                                            ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="unidad_ejecutora_id">Ejecutora</label>
+                                            {!! Form::select('unidad_ejecutora_id', $ejecutoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una ejecutora']) !!}
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">

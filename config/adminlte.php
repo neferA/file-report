@@ -358,6 +358,11 @@ return [
             'url'           => '/waranty',
             'icon'          => 'fa fa-download',
         ],
+        [
+            'text'          => 'ejecutora',
+            'url'           => '/executor',
+            'icon'          => 'fa fa-download',
+        ],
         // [
         //     'text'        => 'pages',
         //     'url'         => 'admin/pages',

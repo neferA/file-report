@@ -14,16 +14,18 @@ return new class extends Migration
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('tipo_garantia_id'); // Clave foránea       
+            $table->unsignedBigInteger('tipo_garantia_id'); // Clave foránea
+            $table->unsignedBigInteger('unidad_ejecutora_id'); // Clave foránea 
+
             $table->text('num_boleta');
             $table->text('proveedor');
             $table->text('motivo');
-            $table->text('ejecutora');
             $table->text('usuario');
             $table->enum('estado', ['liberado', 'ejecutado', 'renovado'])->default('liberado');
             $table->timestamps();
             
             $table->foreign('tipo_garantia_id')->references('id')->on('tipo_garantia')->onDelete('cascade');        
+            $table->foreign('unidad_ejecutora_id')->references('id')->on('unidad_ejecutora')->onDelete('cascade');        
 
            
         });

@@ -5,8 +5,10 @@
 @section('content')
     <section class="section">
         <div class="section-header">
+        @if(isset($blog))
             <h3 class="page__heading">Boleta- {{ $blog->num_boleta }}</h3>
             <h1 class="btn {{ $blog->estado_color }}" style="font-size: 24px;">{{ $blog->estado }}</h1>
+        @endif
         </div>
         <div class="section-body">
             <div class="row">
@@ -29,6 +31,7 @@
                             <div class="tab-content mt-3">
                                 <!-- Contenido de la pestaña Historial -->
                                 <div id="historial-tab" class="tab-pane fade show active">
+                                <div class="table-responsive">
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
@@ -48,7 +51,7 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($historial as $historia)
-                                                <tr>
+                                                <t  r>
                                                     <td>{{ $historia->id }}</td>
                                                     <td>{{ $historia->titulo }}</td>
                                                     <td>
@@ -64,8 +67,8 @@
                                                     <td>{{ $historia->fecha_inicio }}</td>
                                                     <td>{{ $historia->fecha_final }}</td>
                                                     <td>
-                                                        <a href="#" data-toggle="modal" data-target="#pdfModal{{ $historia->id }}">Ver boleta</a>
-                                                        <a href="#" data-toggle="modal" data-target="#notaPdfModal{{ $historia->id }}">Ver Nota</a>
+                                                        <a class="btn btn-info" href="#" data-toggle="modal" data-target="#pdfModal{{ $historia->id }}">Ver boleta</a>
+                                                        <a class="btn btn-info" href="#" data-toggle="modal" data-target="#notaPdfModal{{ $historia->id }}">Ver Nota</a>
                                                     </td>
                                                     <td>
                                                         @can('editar_tickets')
@@ -86,6 +89,7 @@
                                     <div class="pagination justify-content-end">
                                         {!! $historial->links() !!}
                                     </div>
+                                </div>
                                 </div>
                             </div>
                         </div>

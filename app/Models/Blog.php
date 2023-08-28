@@ -10,6 +10,7 @@ class Blog extends Model
     use HasFactory;
     protected $fillable = [
         'tipo_garantia_id',
+        'unidad_ejecutora_id',
         'num_boleta',
         'proveedor',
         'motivo',
@@ -49,5 +50,9 @@ class Blog extends Model
     public function tipoGarantia()
     {
         return $this->belongsTo(TipoGarantia::class, 'tipo_garantia_id');
+    }
+    public function unidadEjecutora()
+    {
+        return $this->belongsTo(ejecutora::class, 'unidad_ejecutora_id');
     }
 }

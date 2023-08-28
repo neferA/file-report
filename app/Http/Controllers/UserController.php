@@ -41,6 +41,10 @@ class UserController extends Controller
     {
         return view('garantias.index');
     }
+    public function executor()
+    {
+        return view('ejecutoras.index');
+    }
 
     /**
      * Show the form for creating a new resource.

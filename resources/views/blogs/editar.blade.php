@@ -48,12 +48,7 @@
                                         {!! Form::text('motivo', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="num_boleta">ejecutora</label>
-                                        {!! Form::text('ejecutora', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
-                                    </div>
-                                </div>
+                                
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="caracteristicas">Características</label>
@@ -80,6 +75,13 @@
                                         <option value="{{ App\Models\Blog::ESTADO_RENOVADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_RENOVADO ? 'selected' : '' }}>Renovado</option>
                                     </select>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="unidad_ejecutora_id">Ejecutora</label>
+                                            {!! Form::select('unidad_ejecutora_id', $ejecutoras, $blog->unidadEjecutora->id, ['class' => 'form-control', 'placeholder' => 'Seleccione una ejecutora']) !!}
+                                        </div>
+                                    </div>
+
                                     <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="financiadora_id">Financiadoras</label>

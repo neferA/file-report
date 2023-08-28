@@ -7,6 +7,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\FinanciersController;
 use App\Http\Controllers\WarantyController;
+use App\Http\Controllers\ExecutorController;
+
 use App\Models\waranty;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
@@ -64,6 +66,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::resource('waranty', WarantyController::class);
 
+    Route::resource('executor', ExecutorController::class);
 
 });
 
@@ -76,6 +79,8 @@ Route::get('/home', [UserController::class, 'home'])->name('home');
 Route::get('/waranty', [UserController::class, 'waranty'])->name('waranty');
 Route::get('/waranty', [WarantyController::class,'index'])->name('waranty.index');
 
+Route::get('/executor', [UserController::class, 'executor'])->name('executor');
+Route::get('/executor', [ExecutorController::class,'index'])->name('executor.index');
 
 
 // tickets routes guest and with priviligies

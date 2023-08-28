@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
+use App\Models\ejecutora;
 use App\Models\waranty;
 use App\Models\TipoGarantia;
 use App\Models\Financiadora;
@@ -50,12 +51,13 @@ class BlogController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
-    $financiadoras = Financiadora::pluck('nombre', 'id');
-    $garantias = TipoGarantia::pluck('nombre', 'id');
-    
-    return view('blogs.crear', compact('financiadoras', 'garantias'));
-}
+    {
+        $financiadoras = Financiadora::pluck('nombre', 'id');
+        $garantias = TipoGarantia::pluck('nombre', 'id');
+        $ejecutoras = ejecutora::pluck('nombre', 'id');
+        
+        return view('blogs.crear', compact('financiadoras','garantias','ejecutoras'));
+    }
     
     private function uploadPDF($file, $folder)
         {
@@ -74,9 +76,9 @@ class BlogController extends Controller
         request()->validate([
             'num_boleta' => 'required',
             'tipo_garantia_id' => 'required',
+            'unidad_ejecutora_id' => 'required',
             'proveedor' => 'required',
             'motivo' => 'required',
-            'ejecutora' => 'required',
             'caracteristicas' => 'required',
             'observaciones' => 'required',
             'monto' => 'required',
@@ -107,6 +109,7 @@ class BlogController extends Controller
         $data['usuario'] = Auth::user()->name;
 
         $blog = Blog::create($data);
+
          // Obtén los IDs de las financiadoras seleccionadas
         $financiadoraIds = $request->input('financiadora_id');
 
@@ -140,6 +143,10 @@ class BlogController extends Controller
         $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
         $blog->tipoGarantia()->associate($tipoGarantia);
 
+        // Asociar la ejecutora al blog creado
+        $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
+        $blog->unidadEjecutora()->associate($unidadEjecutora);
+
         return redirect()->route('tickets.index');
     }
     /**
@@ -158,8 +165,9 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
         $financiadoras = Financiadora::pluck('nombre', 'id'); // Obtener las financiadoras para el campo select
         $garantias = TipoGarantia::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
-        
-        return view('blogs.editar', compact('blog', 'financiadoras', 'garantias'));
+        $ejecutoras = ejecutora::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
+
+        return view('blogs.editar', compact('blog', 'financiadoras', 'garantias','ejecutoras'));
     }
 
     /**
@@ -175,7 +183,6 @@ class BlogController extends Controller
             'num_boleta' => 'required',
             'proveedor' => 'required',
             'motivo' => 'required',
-            'ejecutora' => 'required',
             'caracteristicas' => 'required',
             'monto' => 'required',
             'observaciones' => 'required',
@@ -252,6 +259,11 @@ class BlogController extends Controller
      // Actualizar la asociación del tipo de garantía
      $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
      $blog->tipoGarantia()->associate($tipoGarantia);
+
+     // Actualizar la ejecutora de la ejecutora
+     $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
+     $blog->unidadEjecutora()->associate($unidadEjecutora);
+     
         // Obtener o crear el modelo "waranty" asociado
         $waranty = Waranty::where('blogs_id', $blog->id)->first();
         if ($waranty) {
