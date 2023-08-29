@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+
 use App\Models\User;
+use App\Models\waranty;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +33,22 @@ class UserController extends Controller
 
     public function home()
     {
-        return view('users.home');
+        $now = now();
+        $alarms = [];
+    
+        // Obtener las garantías que están a punto de expirar
+        $expiringWarranties = Waranty::whereDate('fecha_final', '>=', $now)
+            ->whereDate('fecha_final', '<=', $now->addDays(13)) // Cambiar a 13 días si es naranja
+            ->get();
+    
+        foreach ($expiringWarranties as $warranty) {
+            $alarms[] = [
+                'warranty' => $warranty,
+                'color' => ($now->diffInDays($warranty->fecha_final) <= 11) ? 'red' : 'orange'
+            ];
+        }
+    
+        return view('users.home', compact('alarms'));
     }
 
     public function financiers()

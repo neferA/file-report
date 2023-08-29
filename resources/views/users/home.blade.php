@@ -3,7 +3,6 @@
 @section('title', 'Inicio')
 
 @section('content_header')
-
 @stop
 
 @section('content')
@@ -17,6 +16,19 @@
                 <div class="card">
                     <div class="card-body">
                         <h1> Página de Inicio </h1>
+                        
+                        <!-- Mostrar las alarmas -->
+                        @foreach($alarms as $alarm)
+                            <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] === 'red' ? 'red' : 'orange' }};">
+                                @if ($alarm['color'] === 'red')
+                                    <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }} - Fecha final: {{ $alarm['warranty']->fecha_final->format('d/m/Y') }}
+                                @elseif ($alarm['color'] === 'orange')
+                                    <strong>Alarma Naranja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }} - Fecha final: {{ $alarm['warranty']->fecha_final->format('d/m/Y') }}
+                                @endif
+                            </div>
+                        @endforeach
+
+
                     </div>
                 </div>
             </div>

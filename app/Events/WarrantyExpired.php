@@ -14,17 +14,17 @@ use App\Models\waranty;
 class WarrantyExpired
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $warranty;
+    public $waranty;
     public $alarmColor;
      /**
      * Create a new event instance.
      *
-     * @param waranty $warranty
+     * @param waranty $waranty
      * @param string $alarmColor
      */
-    public function __construct(waranty $warranty, string $alarmColor)
+    public function __construct(waranty $waranty, string $alarmColor)
     {
-        $this->warranty = $warranty;
+        $this->waranty = $waranty;
         $this->alarmColor = $alarmColor;
     }
 

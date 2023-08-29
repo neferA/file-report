@@ -23,6 +23,8 @@ class waranty extends Model
         'fecha_final',
     ];
     
+    protected $dates = ['fecha_inicio', 'fecha_final'];
+
     // Define la relación con el modelo Blog
     public function blog()
     {

@@ -11,7 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class BlogController extends Controller
 {
@@ -30,22 +31,46 @@ class BlogController extends Controller
     public function index(Request $request)
     {
         $query = Blog::query();
-
+    
+        // Filtro por estado
+        $estado = $request->input('estado');
+        if ($estado) {
+            $query->where('estado', $estado);
+        }
+    
         $search = $request->input('search');
-
-    if ($search) {
-        $query->where(function ($q) use ($search) {
-            $q->where('num_boleta', 'like', '%' . $search . '%')
-              ->orWhere('proveedor', 'like', '%' . $search . '%')
-              ->orWhere('motivo', 'like', '%' . $search . '%')
-              ->orWhere('ejecutora', 'like', '%' . $search . '%');
+    
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('num_boleta', 'like', '%' . $search . '%')
+                  ->orWhere('proveedor', 'like', '%' . $search . '%')
+                  ->orWhere('motivo', 'like', '%' . $search . '%')
+                  ->orWhere('unidad_ejecutora_id', 'like', '%' . $search . '%');
+            });
+        }
+    
+        // Ordenamiento
+        $orden = $request->input('orden');
+        $ordenColumna = 'created_at';
+        $ordenDireccion = 'desc';
+        
+        if ($orden === 'creacion_asc') {
+            $ordenDireccion = 'asc';
+        }
+        
+        $query->orderBy($ordenColumna, $ordenDireccion);
+    
+        // Cache de resultados
+        $cacheKey = 'search_results_' . $search . '_' . $estado . '_' . $orden;
+        $minutes = 60; // Tiempo de cache en minutos
+    
+        $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
+            return $query->simplePaginate(5);
         });
+    
+        return view('blogs.index', compact('blogs'));
     }
-
-    $blogs = $query->paginate(10);
-
-    return view('blogs.index', compact('blogs'));
-    }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -104,6 +129,10 @@ class BlogController extends Controller
         if ($request->hasFile('nota_pdf')) {
             $data['nota_pdf'] = $this->uploadPDF($request->file('nota_pdf'), 'notas_pdfs');
         }
+
+        // Parsear las fechas usando Carbon
+        $data['fecha_inicio'] = Carbon::parse($request->input('fecha_inicio'));
+        $data['fecha_final'] = Carbon::parse($request->input('fecha_final'));
 
         // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
         $data['usuario'] = Auth::user()->name;
@@ -202,26 +231,26 @@ class BlogController extends Controller
         $data = $request->except(['new_boleta_pdf', 'new_nota_pdf']);
 
         // Almacenar los nombres de archivo antiguos
-    $oldBoletaPdf = $blog->waranty ? $blog->waranty->boleta_pdf : null;
-    $oldNotaPdf = $blog->waranty ? $blog->waranty->nota_pdf : null;
+        $oldBoletaPdf = $blog->waranty ? $blog->waranty->boleta_pdf : null;
+        $oldNotaPdf = $blog->waranty ? $blog->waranty->nota_pdf : null;
 
-    // Verificar si se cargó un nuevo archivo new_boleta_pdf
-    if ($request->hasFile('new_boleta_pdf')) {
-        if ($oldBoletaPdf) {
-            $this->deletePDF($oldBoletaPdf);
+        // Verificar si se cargó un nuevo archivo new_boleta_pdf
+        if ($request->hasFile('new_boleta_pdf')) {
+            if ($oldBoletaPdf) {
+                $this->deletePDF($oldBoletaPdf);
+            }
+            // Subir el nuevo archivo
+            $data['boleta_pdf'] = $this->uploadPDF($request->file('new_boleta_pdf'), 'boletas_pdfs');
         }
-        // Subir el nuevo archivo
-        $data['boleta_pdf'] = $this->uploadPDF($request->file('new_boleta_pdf'), 'boletas_pdfs');
-    }
 
-    // Verificar si se cargó un nuevo archivo new_nota_pdf
-    if ($request->hasFile('new_nota_pdf')) {
-        if ($oldNotaPdf) {
-            $this->deletePDF($oldNotaPdf);
+        // Verificar si se cargó un nuevo archivo new_nota_pdf
+        if ($request->hasFile('new_nota_pdf')) {
+            if ($oldNotaPdf) {
+                $this->deletePDF($oldNotaPdf);
+            }
+            // Subir el nuevo archivo
+            $data['nota_pdf'] = $this->uploadPDF($request->file('new_nota_pdf'), 'notas_pdfs');
         }
-        // Subir el nuevo archivo
-        $data['nota_pdf'] = $this->uploadPDF($request->file('new_nota_pdf'), 'notas_pdfs');
-    }
 
     // Resto de la lógica para actualizar campos en el registro
 
@@ -252,18 +281,22 @@ class BlogController extends Controller
             $blog->waranty->update(['nota_pdf' => $data['nota_pdf']]);
         }
     }
-     // Actualizar la asociación de financiadoras
-     $financiadoraIds = $request->input('financiadora_id');
-     $blog->financiadoras()->sync($financiadoraIds);
- 
-     // Actualizar la asociación del tipo de garantía
-     $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
-     $blog->tipoGarantia()->associate($tipoGarantia);
+        // Actualizar la asociación de financiadoras
+        $financiadoraIds = $request->input('financiadora_id');
+        $blog->financiadoras()->sync($financiadoraIds);
+    
+        // Actualizar la asociación del tipo de garantía
+        $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
+        $blog->tipoGarantia()->associate($tipoGarantia);
 
-     // Actualizar la ejecutora de la ejecutora
-     $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
-     $blog->unidadEjecutora()->associate($unidadEjecutora);
-     
+        // Actualizar la ejecutora de la ejecutora
+        $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
+        $blog->unidadEjecutora()->associate($unidadEjecutora);
+
+        // Parsear las fechas usando Carbon
+        $data['fecha_inicio'] = Carbon::parse($request->input('fecha_inicio'));
+        $data['fecha_final'] = Carbon::parse($request->input('fecha_final'));
+ 
         // Obtener o crear el modelo "waranty" asociado
         $waranty = Waranty::where('blogs_id', $blog->id)->first();
         if ($waranty) {

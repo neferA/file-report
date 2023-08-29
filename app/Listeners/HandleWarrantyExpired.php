@@ -23,7 +23,7 @@ class HandleWarrantyExpired
      */
     public function handle(WarrantyExpired $event)
     {
-        $warranty = $event->warranty;
+        $waranty = $event->waranty;
         $alarmColor = $event->alarmColor;
 
         if ($alarmColor === 'red') {
@@ -34,6 +34,6 @@ class HandleWarrantyExpired
             // Por ejemplo, enviar una notificación naranja
         }
 
-        // Resto de la lógica del oyente
+        
     }
 }

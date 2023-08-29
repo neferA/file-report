@@ -16,14 +16,27 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('tickets.index') }}" method="GET">
-                                <div class="input-group mb-3">
-                                    <input type="text" name="search" class="form-control" placeholder="Buscar" value="{{ request('search') }}">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-primary">Buscar</button>
-                                    </div>
+                        <form action="{{ route('tickets.index') }}" method="GET">
+                            <div class="input-group mb-3">
+                                <input type="text" name="search" class="form-control" placeholder="Buscar" value="{{ request('search') }}">
+                                <select name="estado" class="form-control">
+                                    <option value="">Seleccionar estado</option>
+                                    <option value="liberado"{{ request('estado') === 'liberado' ? ' selected' : '' }}>Liberado</option>
+                                    <option value="ejecutado"{{ request('estado') === 'ejecutado' ? ' selected' : '' }}>Ejecutado</option>
+                                    <option value="renovado"{{ request('estado') === 'renovado' ? ' selected' : '' }}>Renovado</option>
+                                </select>
+                                <select name="orden" class="form-control">
+                                    <option value="">Ordenar por</option>
+                                    <option value="creacion_asc"{{ request('orden') === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                    <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                </select>
+
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">Buscar</button>
                                 </div>
-                            </form>
+                            </div>
+                        </form>
+
                             @can('crear_tickets')
                             <a class="btn btn-warning" href="{{ route('tickets.create')}}">Nuevo</a>
                             @endcan
