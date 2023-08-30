@@ -15,30 +15,35 @@ class HistoryController extends Controller
     public function index($id)
     {
         $blog = Blog::findOrFail($id);
-        $historial = Waranty::where('blogs_id', $id)->with(['blog.financiadoras', 'blog.tipoGarantia'])->paginate(10);
 
-        /// Agregar la lógica para crear alarmas aquí
-    foreach ($historial as $waranty) {
         $now = now();
-        $startDate = Carbon::parse($waranty->fecha_inicio);
-        $endDate = Carbon::parse($waranty->fecha_final);
+        $endDateOrange = $now->copy()->addDays(13);
+        $endDateRed = $now->copy()->addDays(11);
 
-        // Calcular las fechas para las alarmas
-        $redAlarmDate = $endDate->subDays(11);
-        $orangeAlarmDate = $endDate->subDays(13);
+        $historial = Waranty::where('blogs_id', $id)
+            ->where(function ($query) use ($endDateOrange, $endDateRed) {
+                $query->whereDate('fecha_final', $endDateOrange)
+                    ->orWhereDate('fecha_final', $endDateRed);
+            })
+            ->with(['blog.financiadoras', 'blog.tipoGarantia'])
+            ->get();
 
-        // Comprobar y disparar las alarmas
-        if ($endDate && $now->gte($redAlarmDate) && $now->lte($endDate)) {
-            event(new WarrantyExpired($waranty, 'red'));// Alarma roja
-            
-        } elseif ($endDate && $now->gte($orangeAlarmDate) && $now->lte($redAlarmDate)) {
-            event(new WarrantyExpired($waranty, 'orange')); // Alarma naranja
+        foreach ($historial as $waranty) {
+            $endDate = Carbon::parse($waranty->fecha_final);
+            $daysRemaining = $now->diffInDays($endDate, false);
+
+            if ($endDate->isSameDay($endDateOrange)) {
+                event(new WarrantyExpired($waranty, 'orange')); // Alarma naranja
+            } elseif ($endDate->isSameDay($endDateRed)) {
+                event(new WarrantyExpired($waranty, 'red')); // Alarma roja
+            }
         }
-    }
 
-    return view('historial.index', compact('blog', 'historial'));
-}
+        return view('historial.index', compact('blog', 'historial'));
+    }
+}   
+
     
-}
+
 
 

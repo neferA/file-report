@@ -23,17 +23,15 @@ class HandleWarrantyExpired
      */
     public function handle(WarrantyExpired $event)
     {
-        $waranty = $event->waranty;
+        // $waranty = $event->waranty;
         $alarmColor = $event->alarmColor;
 
         if ($alarmColor === 'red') {
-            // Acciones para la alarma roja
-            // Por ejemplo, enviar una notificación roja
+            // Enviar una notificación roja
+            // Notification::send($waranty->user, new RedWarrantyExpiredNotification($waranty));
         } elseif ($alarmColor === 'orange') {
-            // Acciones para la alarma naranja
-            // Por ejemplo, enviar una notificación naranja
+            // Enviar una notificación naranja
+            // Notification::send($waranty->user, new OrangeWarrantyExpiredNotification($waranty));
         }
-
-        
     }
 }

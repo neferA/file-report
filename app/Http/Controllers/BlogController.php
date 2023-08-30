@@ -57,7 +57,11 @@ class BlogController extends Controller
         if ($orden === 'creacion_asc') {
             $ordenDireccion = 'asc';
         }
-        
+        elseif ($orden === 'modificacion_desc') {
+            $ordenColumna = 'updated_at';
+            $ordenDireccion = 'desc';
+        }
+    
         $query->orderBy($ordenColumna, $ordenDireccion);
     
         // Cache de resultados
@@ -65,9 +69,10 @@ class BlogController extends Controller
         $minutes = 60; // Tiempo de cache en minutos
     
         $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
-            return $query->simplePaginate(5);
+            return $query->simplePaginate(10);
         });
-    
+        
+          
         return view('blogs.index', compact('blogs'));
     }
     

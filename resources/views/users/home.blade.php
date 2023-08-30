@@ -19,16 +19,15 @@
                         
                         <!-- Mostrar las alarmas -->
                         @foreach($alarms as $alarm)
-                            <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] === 'red' ? 'red' : 'orange' }};">
+                            <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] === 'red' ? 'red' : 'orange' }}">
                                 @if ($alarm['color'] === 'red')
-                                    <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }} - Fecha final: {{ $alarm['warranty']->fecha_final->format('d/m/Y') }}
+                                    <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
                                 @elseif ($alarm['color'] === 'orange')
-                                    <strong>Alarma Naranja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }} - Fecha final: {{ $alarm['warranty']->fecha_final->format('d/m/Y') }}
+                                    <strong>Alarma Naranja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
                                 @endif
+                                <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
                             </div>
                         @endforeach
-
-
                     </div>
                 </div>
             </div>

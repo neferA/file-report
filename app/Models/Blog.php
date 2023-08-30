@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Carbon\Carbon;
 class Blog extends Model
 {
     use HasFactory;
@@ -37,7 +37,8 @@ class Blog extends Model
                 return 'badge-secondary'; // Color por defecto si el estado no coincide
         }
     }
-    
+
+
     public function waranty()
     {
         return $this->hasOne(waranty::class, 'blogs_id');
