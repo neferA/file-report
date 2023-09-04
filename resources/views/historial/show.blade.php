@@ -16,15 +16,21 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Fecha y Hora</th>
+                <th>Fecha y Hora Boletas</th>
                 <th>Detalles de la Modificación</th>
+                <th>tiempo de Modificación</th>
+                <th>usuario</th>
+
             </tr>
         </thead>
         <tbody>
             @foreach ($modifications as $modification)
             <tr>
-                <td>{{ $modification->created_at }}</td>
+                <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
                 <td>{{ $modification->modification_details }}</td>
+                <td>{{ $modification->modification_time }}</td>
+                <td>{{ $modification->usuario }}</td>
+
             </tr>
             @endforeach
         </tbody>

@@ -287,8 +287,15 @@ class BlogController extends Controller
             $blog->waranty->update(['nota_pdf' => $data['nota_pdf']]);
         }
     }
+
+        // Obtiene los datos del formulario
+        $newBlogData = $request->all();
+        // Llama a la función para obtener las modificaciones
+        $modifications = $this->getModificationsArray($blog, $newBlogData);
+
         // Registrar la modificación
-        $modificationDetails = "Blog actualizado por " . Auth::user()->name . " el " . Carbon::now()->format('Y-m-d H:i:s');        //dd($modificationDetails);
+        $modificationDetails = implode(". ", $modifications);
+        //dd($modificationDetails);
         $this->registerModification($blog->id, $modificationDetails);
 
         // Actualizar la asociación de financiadoras
@@ -342,11 +349,117 @@ class BlogController extends Controller
     // Método para registrar la modificación en la base de datos
     private function registerModification($blogId, $modificationDetails)
     {
-        Modification::create([
-            'blogs_id' => $blogId,
-            'modification_details' => $modificationDetails,
-        ]);
+        // Verifica si tanto el blogId como los detalles de la modificación son válidos
+        if ($blogId && $modificationDetails) {
+            // Crear una nueva instancia del modelo Modification y asignar los valores
+            $modification = new Modification([
+                'blogs_id' => $blogId,
+                'modification_details' => $modificationDetails,
+                'modification_time' => now(),
+                'usuario' => Auth::user()->name,
+            ]);
+    
+            // Guardar la instancia en la base de datos
+            $modification->save();
+    
+            // Puedes agregar un registro en el archivo de registro (log) para rastrear
+            // cuándo se realiza una modificación, si lo deseas
+            Log::info("Modificación registrada en el blog #$blogId: $modificationDetails");
+        } else {
+            // Si los datos no son válidos, puedes registrar un mensaje de advertencia
+            // en el archivo de registro (log) o realizar alguna otra acción apropiada
+            Log::warning("Intento de registro de modificación fallido. Datos inválidos.");
+        }
     }
+    private function getModificationsArray($blog, $newBlogData)
+    {
+        $modifications = [];
+
+        foreach ($newBlogData as $field => $value) {
+            switch ($field) {
+                case 'num_boleta':
+                    if ($value !== $blog->num_boleta) {
+                        $modifications[] = "Número de boleta modificado: {$blog->num_boleta} => $value";
+                    }
+                    break;
+
+                case 'proveedor':
+                    if ($value !== $blog->proveedor) {
+                        $modifications[] = "Proveedor modificado: {$blog->proveedor} => $value";
+                    }
+                    break;
+
+                case 'motivo':
+                    if ($value !== $blog->motivo) {
+                        $modifications[] = "Motivo modificado: {$blog->motivo} => $value";
+                    }
+                    break;
+
+                case 'caracteristicas':
+                    if ($value !== $blog->waranty->caracteristicas) {
+                        $modifications[] = "Características modificadas: {$blog->waranty->caracteristicas} => $value";
+                    }
+                    break;
+
+                case 'observaciones':
+                    if ($value !== $blog->waranty->observaciones) {
+                        $modifications[] = "Observaciones modificadas: {$blog->waranty->observaciones} => $value";
+                    }
+                    break;
+
+                case 'monto':
+                    if ($value !== $blog->waranty->monto) {
+                        $modifications[] = "Monto modificado: {$blog->waranty->monto} => $value";
+                    }
+                    break;
+
+                case 'estado':
+                    if ($value !== $blog->estado) {
+                        $modifications[] = "Estado modificado: {$blog->estado} => $value";
+                    }
+                    break;
+
+                case 'unidad_ejecutora_id':
+                    if ($value !== $blog->unidadEjecutora->id) {
+                        $modifications[] = "Ejecutora modificada: {$blog->unidadEjecutora->nombre} => {$blog->unidadEjecutora->find($value)->nombre}";
+                    }
+                    break;
+
+                case 'financiadora_id':
+                    $currentFinancieras = $blog->financiadoras->pluck('id')->toArray();
+                    $modifiedFinancieras = $value;
+                    $addedFinancieras = array_diff($modifiedFinancieras, $currentFinancieras);
+                    $removedFinancieras = array_diff($currentFinancieras, $modifiedFinancieras);
+
+                    if (!empty($addedFinancieras)) {
+                        $addedFinancierasString = implode(', ', $addedFinancieras);
+                        $modifications[] = "Financieras añadidas: $addedFinancierasString";
+                    }
+
+                    if (!empty($removedFinancieras)) {
+                        $removedFinancierasString = implode(', ', $removedFinancieras);
+                        $modifications[] = "Financieras eliminadas: $removedFinancierasString";
+                    }
+                    break;
+
+                case 'tipo_garantia_id':
+                    if ($value !== $blog->tipoGarantia->id) {
+                        $modifications[] = "Tipo de Garantía modificada: {$blog->tipoGarantia->nombre} => {$blog->tipoGarantia->find($value)->nombre}";
+                    }
+                    break;
+
+                // Agregar más casos para otros campos aquí
+
+                default:
+                    break;
+            }
+        }
+
+        return $modifications;
+    }
+
+        
+
     /**
      * Remove the specified resource from storage.
      */

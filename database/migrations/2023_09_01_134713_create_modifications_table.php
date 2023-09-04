@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('blogs_id');
             $table->text('modification_details')->nullable();
+            $table->timestamp('modification_time');
+            $table->text('usuario');
             $table->timestamps();
+            
             $table->foreign('blogs_id')->references('id')->on('blogs')->onDelete('cascade');
         });
     }
