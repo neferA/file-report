@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Models\Modification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
@@ -69,7 +70,7 @@ class BlogController extends Controller
         $minutes = 60; // Tiempo de cache en minutos
     
         $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
-            return $query->simplePaginate(10);
+            return $query->simplePaginate(5);
         });
         
           
@@ -112,8 +113,8 @@ class BlogController extends Controller
             'caracteristicas' => 'required',
             'observaciones' => 'required',
             'monto' => 'required',
-            'fecha_inicio' => 'required',
-            'fecha_final' => 'required',
+            'fecha_inicio' => 'required|date_format:Y-m-d',
+            'fecha_final' => 'required|date_format:Y-m-d',
             'estado' => 'required|in:' . implode(',', [
                 Blog::ESTADO_LIBERADO,
                 Blog::ESTADO_EJECUTADO,
@@ -150,7 +151,7 @@ class BlogController extends Controller
         // Adjunta los IDs de las financiadoras relacionadas a la tabla pivote
         $blog->financiadoras()->attach($financiadoraIds);
         
-        // Crea un nuevo registro en la tabla waranyt_Histories vinculado al registro de Blog recién creado
+        // Crea un nuevo registro en la tabla waranty_Histories vinculado al registro de Blog recién creado
         $waranty = Waranty::create([
             'blogs_id' => $blog->id,
             'titulo' => $blog->num_boleta,
@@ -199,7 +200,7 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
         $financiadoras = Financiadora::pluck('nombre', 'id'); // Obtener las financiadoras para el campo select
         $garantias = TipoGarantia::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
-        $ejecutoras = ejecutora::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
+        $ejecutoras = ejecutora::pluck('nombre', 'id'); // Obtener las ejecutoras para el campo select
 
         return view('blogs.editar', compact('blog', 'financiadoras', 'garantias','ejecutoras'));
     }
@@ -286,6 +287,10 @@ class BlogController extends Controller
             $blog->waranty->update(['nota_pdf' => $data['nota_pdf']]);
         }
     }
+        // Registrar la modificación
+        $modificationDetails = "Blog actualizado por " . Auth::user()->name . " el " . Carbon::now()->format('Y-m-d H:i:s');        //dd($modificationDetails);
+        $this->registerModification($blog->id, $modificationDetails);
+
         // Actualizar la asociación de financiadoras
         $financiadoraIds = $request->input('financiadora_id');
         $blog->financiadoras()->sync($financiadoraIds);
@@ -334,7 +339,14 @@ class BlogController extends Controller
         // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
         return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
     }
- 
+    // Método para registrar la modificación en la base de datos
+    private function registerModification($blogId, $modificationDetails)
+    {
+        Modification::create([
+            'blogs_id' => $blogId,
+            'modification_details' => $modificationDetails,
+        ]);
+    }
     /**
      * Remove the specified resource from storage.
      */

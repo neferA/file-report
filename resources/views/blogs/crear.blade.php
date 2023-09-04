@@ -109,14 +109,15 @@
                                     
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">fecha inicial</label>
-                                            {!! Form::text('fecha_inicio', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha inicial']) !!}
+                                            <label for="fecha_inicio">Fecha inicial</label>
+                                            <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" placeholder="Ingrese la fecha inicial" required value="{{ now()->format('Y-m-d') }}" min="{{ now()->format('Y-m-d') }}">
                                         </div>
                                     </div>
+
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">fecha final</label>
-                                            {!! Form::text('fecha_final', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
+                                            <label for="fecha_final">Fecha final</label>
+                                            <input type="date" id="fecha_final" name="fecha_final" class="form-control" placeholder="Ingrese la fecha final" required value="{{ now()->format('Y-m-d') }}">
                                         </div>
                                     </div>
                                     

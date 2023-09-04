@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Event;
+use App\Models\Modification; 
+
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Session;
+
 use App\Models\waranty;
 use App\Models\Blog;
-use Illuminate\Support\Facades\Event;
 use App\Events\WarrantyExpired;
 use Carbon\Carbon;
 
@@ -15,33 +20,64 @@ class HistoryController extends Controller
     public function index($id)
     {
         $blog = Blog::findOrFail($id);
-
-        $now = now();
-        $endDateOrange = $now->copy()->addDays(13);
-        $endDateRed = $now->copy()->addDays(11);
-
-        $historial = Waranty::where('blogs_id', $id)
-            ->where(function ($query) use ($endDateOrange, $endDateRed) {
-                $query->whereDate('fecha_final', $endDateOrange)
-                    ->orWhereDate('fecha_final', $endDateRed);
-            })
+        $historial = waranty::where('blogs_id', $id)
             ->with(['blog.financiadoras', 'blog.tipoGarantia'])
-            ->get();
+            ->paginate(1);
 
-        foreach ($historial as $waranty) {
-            $endDate = Carbon::parse($waranty->fecha_final);
-            $daysRemaining = $now->diffInDays($endDate, false);
-
-            if ($endDate->isSameDay($endDateOrange)) {
-                event(new WarrantyExpired($waranty, 'orange')); // Alarma naranja
-            } elseif ($endDate->isSameDay($endDateRed)) {
-                event(new WarrantyExpired($waranty, 'red')); // Alarma roja
-            }
-        }
+        // Llamar al método privado para manejar las alarmas
+        $this->handleAlarms($historial);
 
         return view('historial.index', compact('blog', 'historial'));
     }
-}   
+    public function show($id = null)
+    {
+        if ($id !== null) {
+            // Mostrar detalles del recurso específico con ID $id
+            $blog = Blog::findOrFail($id);
+            $modifications = Modification::where('blogs_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+            // Tu código adicional para mostrar los detalles del recurso aquí
+            return view('historial.show', compact('blog', 'modifications'));
+        } else {
+            // Mostrar lista de recursos
+            // Otra lógica para mostrar la lista
+            return view('historial.index');
+        }
+        
+    }
+    private function handleAlarms($historial)
+    {
+        $now = now();
+
+        foreach ($historial as $history) {
+            $startDate = Carbon::parse($history->fecha_inicio);
+            $endDate = Carbon::parse($history->fecha_final);
+
+            $daysRemaining = $now->diffInDays($endDate, false);
+            $daysSinceStart = $now->diffInDays($startDate, false);
+
+            // Validar si el intervalo de tiempo es correcto y la fecha de finalización es válida
+            $validator = Validator::make([
+                'fecha_final' => $endDate,
+                'fecha_inicio' => $startDate,
+            ], [
+                'fecha_inicio' => 'required|date',
+                'fecha_final' => 'required|date',
+            ]);
+
+            if ($validator->passes()) {
+                if ($daysRemaining === 13 || ($daysSinceStart <= 13 && $daysSinceStart > 12)) {
+                    event(new WarrantyExpired($history, 'orange')); // Alarma naranja
+                } elseif ($daysRemaining === 11 || ($daysSinceStart <= 11 && $daysSinceStart > 10)) {
+                    event(new WarrantyExpired($history, 'red')); // Alarma roja
+                }
+            }
+        }
+    }
+}
+   
+   
 
     
 
