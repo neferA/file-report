@@ -49,14 +49,14 @@ class HistoryController extends Controller
     private function handleAlarms($historial)
     {
         $now = now();
-
+    
         foreach ($historial as $history) {
             $startDate = Carbon::parse($history->fecha_inicio);
             $endDate = Carbon::parse($history->fecha_final);
-
+    
             $daysRemaining = $now->diffInDays($endDate, false);
             $daysSinceStart = $now->diffInDays($startDate, false);
-
+    
             // Validar si el intervalo de tiempo es correcto y la fecha de finalización es válida
             $validator = Validator::make([
                 'fecha_final' => $endDate,
@@ -65,16 +65,36 @@ class HistoryController extends Controller
                 'fecha_inicio' => 'required|date',
                 'fecha_final' => 'required|date',
             ]);
-
+    
             if ($validator->passes()) {
-                if ($daysRemaining === 13 || ($daysSinceStart <= 13 && $daysSinceStart > 12)) {
-                    event(new WarrantyExpired($history, 'orange')); // Alarma naranja
-                } elseif ($daysRemaining === 11 || ($daysSinceStart <= 11 && $daysSinceStart > 10)) {
-                    event(new WarrantyExpired($history, 'red')); // Alarma roja
+                if ($this->isOrangeAlarm($daysSinceStart, $daysRemaining)) {
+                    $this->handleOrangeAlarm($history); // Llama al método para manejar la alarma naranja
+                } elseif ($this->isRedAlarm($daysSinceStart, $daysRemaining)) {
+                    $this->handleRedAlarm($history); // Llama al método para manejar la alarma roja
                 }
             }
         }
     }
+    
+
+    private function isOrangeAlarm($daysSinceStart, $daysRemaining)
+    {
+        return $daysRemaining === 13 || ($daysSinceStart <= 13 && $daysSinceStart > 12);
+    }
+
+    private function isRedAlarm($daysSinceStart, $daysRemaining)
+    {
+        return $daysRemaining === 11 || ($daysSinceStart <= 11 && $daysSinceStart > 10);
+    }
+    // public function getHistorial()
+    // {
+    //     // Aquí puedes poner la lógica para obtener el historial que deseas verificar para renovación.
+    //     // Por ejemplo, obtener todas las garantías que pueden ser renovadas.
+    //     $historialRenewal = Waranty::where('fecha_final', '<', now())->get();
+
+    //     return $historialRenewal;
+    // }
+
 }
    
    

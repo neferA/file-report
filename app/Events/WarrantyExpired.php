@@ -15,19 +15,22 @@ class WarrantyExpired
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $waranty;
-    public $alarmColor;
+    public $isRedAlarm;
+    public $isOrangeAlarm;
      /**
      * Create a new event instance.
      *
      * @param waranty $waranty
-     * @param string $alarmColor
+     * @param bool $isRedAlarm
+     * @param bool $isOrangeAlarm
      */
-    public function __construct(waranty $waranty, string $alarmColor)
+    public function __construct(waranty $waranty, bool $isRedAlarm, bool $isOrangeAlarm)
     {
         $this->waranty = $waranty;
-        $this->alarmColor = $alarmColor;
+        $this->isRedAlarm = $isRedAlarm;
+        $this->isOrangeAlarm = $isOrangeAlarm;
     }
-
+        
     /**
      * Get the channels the event should broadcast on.
      *

@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
+use App\Events\WarrantyExpired;
+
+
 class UserController extends Controller
 {
     function __construct()
@@ -27,30 +30,75 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::paginate(10); //Mostrar 5 registros por página
+        $users = User::paginate(5); //Mostrar 5 registros por página
         return view('users.index', compact('users'));
     }
 
     public function home()
     {
-        $now = now();
-        $alarms = [];
-    
         // Obtener las garantías que están a punto de expirar
-        $expiringWarranties = Waranty::whereDate('fecha_final', '>=', $now)
-            ->whereDate('fecha_final', '<=', $now->addDays(13)) // Cambiar a 13 días si es naranja
+        $expiringWarranties = Waranty::whereDate('fecha_final', '>=', now())
+            ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
             ->get();
-    
+
+        // Iterar a través de las garantías y manejar las alarmas
         foreach ($expiringWarranties as $warranty) {
-            $alarms[] = [
-                'warranty' => $warranty,
-                'color' => ($now->diffInDays($warranty->fecha_final) <= 11) ? 'red' : 'orange'
-            ];
+            // Lógica para determinar si es una alarma roja o naranja
+            $isRedAlarm = $this->isRedAlarm($warranty);
+            $isOrangeAlarm = $this->isOrangeAlarm($warranty);
+
+            // Crear una instancia de WarrantyExpired con los valores correctos
+            $event = new WarrantyExpired($warranty, $isRedAlarm, $isOrangeAlarm);
+            event($event); // Disparar el evento
         }
-    
+
+        // Obtener las alarmas para mostrar en la vista
+        $alarms = $this->getAlarms();
+
         return view('users.home', compact('alarms'));
     }
 
+    private function isRedAlarm($warranty)
+    {
+        $daysRemaining = now()->diffInDays($warranty->fecha_final);
+        return $daysRemaining <= 11;
+    }
+
+    private function isOrangeAlarm($warranty)
+    {
+        $daysRemaining = now()->diffInDays($warranty->fecha_final);
+        return $daysRemaining <= 13 && !$this->isRedAlarm($warranty);
+    }
+
+    private function getAlarms()
+    {
+        $alarms = [];
+    
+        // Obtener las garantías que están a punto de expirar
+        $expiringWarranties = Waranty::whereDate('fecha_final', '>=', now())
+            ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
+            ->get();
+    
+        foreach ($expiringWarranties as $warranty) {
+            // Lógica para determinar si es una alarma roja o naranja
+            $isRedAlarm = $this->isRedAlarm($warranty);
+            $isOrangeAlarm = $this->isOrangeAlarm($warranty);
+    
+            if ($isRedAlarm || $isOrangeAlarm) {
+                $alarms[] = [
+                    'warranty' => $warranty,
+                    'color' => $isRedAlarm ? 'red' : 'orange',
+                ];
+            }
+        }
+    
+        return $alarms;
+    }
+    
+
+
+
+    
     public function financiers()
     {
         return view('financiadoras.index');
