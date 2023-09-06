@@ -86,14 +86,7 @@ class HistoryController extends Controller
     {
         return $daysRemaining === 11 || ($daysSinceStart <= 11 && $daysSinceStart > 10);
     }
-    // public function getHistorial()
-    // {
-    //     // Aquí puedes poner la lógica para obtener el historial que deseas verificar para renovación.
-    //     // Por ejemplo, obtener todas las garantías que pueden ser renovadas.
-    //     $historialRenewal = Waranty::where('fecha_final', '<', now())->get();
-
-    //     return $historialRenewal;
-    // }
+   
 
 }
    

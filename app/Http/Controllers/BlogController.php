@@ -7,6 +7,7 @@ use App\Models\ejecutora;
 use App\Models\waranty;
 use App\Models\TipoGarantia;
 use App\Models\Financiadora;
+use App\Events\BlogUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -287,7 +288,6 @@ class BlogController extends Controller
             $blog->waranty->update(['nota_pdf' => $data['nota_pdf']]);
         }
     }
-
         // Obtiene los datos del formulario
         $newBlogData = $request->all();
         // Llama a la función para obtener las modificaciones
@@ -343,6 +343,9 @@ class BlogController extends Controller
             ]);
         }
 
+        // Después de actualizar el blog
+        event(new BlogUpdated($blog, $newBlogData));
+
         // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
         return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
     }
@@ -361,7 +364,7 @@ class BlogController extends Controller
     
             // Guardar la instancia en la base de datos
             $modification->save();
-    
+            
             // Puedes agregar un registro en el archivo de registro (log) para rastrear
             // cuándo se realiza una modificación, si lo deseas
             Log::info("Modificación registrada en el blog #$blogId: $modificationDetails");

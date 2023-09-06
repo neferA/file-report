@@ -18,6 +18,9 @@ class EventServiceProvider extends ServiceProvider
         WarrantyExpired::class => [
             HandleWarrantyExpired::class,
         ],
+        BlogUpdated::class => [
+            BlogUpdatedListener::class,
+        ],
     ];
     
     
