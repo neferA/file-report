@@ -66,13 +66,12 @@ class HistoryController extends Controller
                 'fecha_final' => 'required|date',
             ]);
     
-            if ($validator->passes()) {
-                if ($this->isOrangeAlarm($daysSinceStart, $daysRemaining)) {
-                    $this->handleOrangeAlarm($history); // Llama al método para manejar la alarma naranja
-                } elseif ($this->isRedAlarm($daysSinceStart, $daysRemaining)) {
-                    $this->handleRedAlarm($history); // Llama al método para manejar la alarma roja
-                }
+            if ($this->isRedAlarm($daysSinceStart, $daysRemaining)) {
+                event(new WarrantyExpired($history, true, false)); // Alarma roja
+            } elseif ($this->isOrangeAlarm($daysSinceStart, $daysRemaining)) {
+                event(new WarrantyExpired($history, false, true)); // Alarma naranja
             }
+            
         }
     }
     

@@ -94,11 +94,7 @@ class UserController extends Controller
     
         return $alarms;
     }
-    
-
-
-
-    
+        
     public function financiers()
     {
         return view('financiadoras.index');

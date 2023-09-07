@@ -260,9 +260,11 @@ class BlogController extends Controller
         }
 
     // Resto de la lógica para actualizar campos en el registro
-
+   
     // Actualizar el registro en la tabla blogs
     $blog->update($data);
+    // Llama al nuevo método para registrar las modificaciones
+    $this->Modifications($blog, $request->all());
 
     // Eliminar registros de archivos PDF que se desean reemplazar
     if ($request->hasFile('new_boleta_pdf') && $oldBoletaPdf) {
@@ -288,16 +290,6 @@ class BlogController extends Controller
             $blog->waranty->update(['nota_pdf' => $data['nota_pdf']]);
         }
     }
-        // Obtiene los datos del formulario
-        $newBlogData = $request->all();
-        // Llama a la función para obtener las modificaciones
-        $modifications = $this->getModificationsArray($blog, $newBlogData);
-
-        // Registrar la modificación
-        $modificationDetails = implode(". ", $modifications);
-        //dd($modificationDetails);
-        $this->registerModification($blog->id, $modificationDetails);
-
         // Actualizar la asociación de financiadoras
         $financiadoraIds = $request->input('financiadora_id');
         $blog->financiadoras()->sync($financiadoraIds);
@@ -342,13 +334,32 @@ class BlogController extends Controller
                 'fecha_final' => $request->input('fecha_final'),
             ]);
         }
-
-        // Después de actualizar el blog
-        event(new BlogUpdated($blog, $newBlogData));
-
+            
         // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
         return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
     }
+    private function Modifications($blog, $newData)
+    {
+        // Obtén los valores antiguos de las casillas que deseas rastrear
+        $oldData = [
+            'num_boleta' => $blog->num_boleta,
+            'proveedor' => $blog->proveedor,
+            'motivo' => $blog->motivo,
+            'caracteristicas' => $blog->waranty->caracteristicas,
+            'observaciones' => $blog->waranty->observaciones,
+            'monto' => $blog->waranty->monto,
+            'estado' => $blog->estado,
+            'unidad_ejecutora_id' => $blog->unidad_ejecutora_id,
+        ];
+
+        // Llama a la función para obtener las modificaciones
+        $modifications = $this->getModificationsArray($oldData, $newData);
+
+        // Registra las modificaciones en la tabla modifications
+        $modificationDetails = implode(". ", $modifications);
+        $this->registerModification($blog->id, $modificationDetails);
+    }
+
     // Método para registrar la modificación en la base de datos
     private function registerModification($blogId, $modificationDetails)
     {
@@ -374,94 +385,23 @@ class BlogController extends Controller
             Log::warning("Intento de registro de modificación fallido. Datos inválidos.");
         }
     }
+    
     private function getModificationsArray($blog, $newBlogData)
     {
         $modifications = [];
 
         foreach ($newBlogData as $field => $value) {
-            switch ($field) {
-                case 'num_boleta':
-                    if ($value !== $blog->num_boleta) {
-                        $modifications[] = "Número de boleta modificado: {$blog->num_boleta} => $value";
-                    }
-                    break;
+            if (is_object($blog) && property_exists($blog, $field)) {
+                $oldValue = $blog->{$field};
 
-                case 'proveedor':
-                    if ($value !== $blog->proveedor) {
-                        $modifications[] = "Proveedor modificado: {$blog->proveedor} => $value";
-                    }
-                    break;
-
-                case 'motivo':
-                    if ($value !== $blog->motivo) {
-                        $modifications[] = "Motivo modificado: {$blog->motivo} => $value";
-                    }
-                    break;
-
-                case 'caracteristicas':
-                    if ($value !== $blog->waranty->caracteristicas) {
-                        $modifications[] = "Características modificadas: {$blog->waranty->caracteristicas} => $value";
-                    }
-                    break;
-
-                case 'observaciones':
-                    if ($value !== $blog->waranty->observaciones) {
-                        $modifications[] = "Observaciones modificadas: {$blog->waranty->observaciones} => $value";
-                    }
-                    break;
-
-                case 'monto':
-                    if ($value !== $blog->waranty->monto) {
-                        $modifications[] = "Monto modificado: {$blog->waranty->monto} => $value";
-                    }
-                    break;
-
-                case 'estado':
-                    if ($value !== $blog->estado) {
-                        $modifications[] = "Estado modificado: {$blog->estado} => $value";
-                    }
-                    break;
-
-                case 'unidad_ejecutora_id':
-                    if ($value !== $blog->unidadEjecutora->id) {
-                        $modifications[] = "Ejecutora modificada: {$blog->unidadEjecutora->nombre} => {$blog->unidadEjecutora->find($value)->nombre}";
-                    }
-                    break;
-
-                case 'financiadora_id':
-                    $currentFinancieras = $blog->financiadoras->pluck('id')->toArray();
-                    $modifiedFinancieras = $value;
-                    $addedFinancieras = array_diff($modifiedFinancieras, $currentFinancieras);
-                    $removedFinancieras = array_diff($currentFinancieras, $modifiedFinancieras);
-
-                    if (!empty($addedFinancieras)) {
-                        $addedFinancierasString = implode(', ', $addedFinancieras);
-                        $modifications[] = "Financieras añadidas: $addedFinancierasString";
-                    }
-
-                    if (!empty($removedFinancieras)) {
-                        $removedFinancierasString = implode(', ', $removedFinancieras);
-                        $modifications[] = "Financieras eliminadas: $removedFinancierasString";
-                    }
-                    break;
-
-                case 'tipo_garantia_id':
-                    if ($value !== $blog->tipoGarantia->id) {
-                        $modifications[] = "Tipo de Garantía modificada: {$blog->tipoGarantia->nombre} => {$blog->tipoGarantia->find($value)->nombre}";
-                    }
-                    break;
-
-                // Agregar más casos para otros campos aquí
-
-                default:
-                    break;
+                if ($value !== $oldValue) {
+                    $modifications[] = "$field modificado: $oldValue => $value";
+                }
             }
         }
 
         return $modifications;
     }
-
-        
 
     /**
      * Remove the specified resource from storage.

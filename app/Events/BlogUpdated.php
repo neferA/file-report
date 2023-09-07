@@ -16,13 +16,17 @@ class BlogUpdated
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $blog;
     public $newData;
+    public $oldData;
+
     /**
      * Create a new event instance.
      */
-    public function __construct(Blog $blog, $newData)
+    public function __construct(Blog $blog, $newData, $oldData)
     {
         $this->blog = $blog;
         $this->newData = $newData;
+        $this->oldData = $oldData;
+
     }
 
     /**
