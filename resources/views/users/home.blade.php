@@ -28,6 +28,8 @@
                                     @endif
                                 </strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
                                 <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
+                            <!-- Agrega un botón "X" para cerrar la alarma -->
+                                <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
                             </div>
                         @endforeach
 
@@ -45,6 +47,13 @@
 
 @section('js')
 <script>
-    console.log('Hi!');
+    function closeAlarm(button) {
+        // Encuentra el elemento padre de la alarma (div.alert) y ocúltalo o elimínalo
+        const alarm = button.closest('.alert');
+        if (alarm) {
+            alarm.style.display = 'none'; // Para ocultar la alarma
+            // Opcionalmente, puedes eliminar la alarma: alarm.remove();
+        }
+    }
 </script>
 @stop

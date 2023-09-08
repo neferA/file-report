@@ -263,8 +263,12 @@ class BlogController extends Controller
    
     // Actualizar el registro en la tabla blogs
     $blog->update($data);
+
     // Llama al nuevo método para registrar las modificaciones
-    $this->Modifications($blog, $request->all());
+    $modifications = $this->Modifications($blog, $request->all());
+
+    // Dispara el evento BlogUpdated con los datos relevantes
+    event(new BlogUpdated($blog, $request->all(), $modifications));
 
     // Eliminar registros de archivos PDF que se desean reemplazar
     if ($request->hasFile('new_boleta_pdf') && $oldBoletaPdf) {
@@ -340,26 +344,50 @@ class BlogController extends Controller
     }
     private function Modifications($blog, $newData)
     {
-        // Obtén los valores antiguos de las casillas que deseas rastrear
-        $oldData = [
-            'num_boleta' => $blog->num_boleta,
-            'proveedor' => $blog->proveedor,
-            'motivo' => $blog->motivo,
-            'caracteristicas' => $blog->waranty->caracteristicas,
-            'observaciones' => $blog->waranty->observaciones,
-            'monto' => $blog->waranty->monto,
-            'estado' => $blog->estado,
-            'unidad_ejecutora_id' => $blog->unidad_ejecutora_id,
-        ];
-
-        // Llama a la función para obtener las modificaciones
-        $modifications = $this->getModificationsArray($oldData, $newData);
+        // Obtén los valores antiguos y calcula las modificaciones
+        $oldData = $this->getOldData($blog);
+        $modifications = $this->calculateModifications($oldData, $newData);
 
         // Registra las modificaciones en la tabla modifications
         $modificationDetails = implode(". ", $modifications);
         $this->registerModification($blog->id, $modificationDetails);
+
+        return $modifications;
+    }
+    private function getOldData($blog)
+    {
+        return [
+            'num_boleta' => $blog->num_boleta,
+            'proveedor' => $blog->proveedor,
+            'motivo' => $blog->motivo,
+            'estado' => $blog->estado,
+            'caracteristicas' => $blog->waranty->caracteristicas,
+            'observaciones' => $blog->waranty->observaciones,
+            'monto' => $blog->waranty->monto,
+            'unidad_ejecutora_id' => $blog->unidad_ejecutora_id,
+            'fecha_inicio' => $blog->waranty->fecha_inicio instanceof \Carbon\Carbon ? $blog->waranty->fecha_inicio->format('Y-m-d') : $blog->waranty->fecha_inicio,
+            'fecha_final' => $blog->waranty->fecha_final instanceof \Carbon\Carbon ? $blog->waranty->fecha_final->format('Y-m-d') : $blog->waranty->fecha_final,
+            'boleta_pdf' => $blog->waranty->boleta_pdf,
+            'nota_pdf' => $blog->waranty->nota_pdf,
+        ];
     }
 
+    private function calculateModifications($oldData, $newData)
+    {
+        $modifications = [];
+
+        foreach ($newData as $field => $value) {
+            if (array_key_exists($field, $oldData)) {
+                $oldValue = $oldData[$field];
+
+                if ($value !== $oldValue) {
+                    $modifications[] = "$field modificado: $oldValue => $value";
+                }
+            }
+        }
+
+    return $modifications;
+    }
     // Método para registrar la modificación en la base de datos
     private function registerModification($blogId, $modificationDetails)
     {
@@ -386,24 +414,7 @@ class BlogController extends Controller
         }
     }
     
-    private function getModificationsArray($blog, $newBlogData)
-    {
-        $modifications = [];
-
-        foreach ($newBlogData as $field => $value) {
-            if (is_object($blog) && property_exists($blog, $field)) {
-                $oldValue = $blog->{$field};
-
-                if ($value !== $oldValue) {
-                    $modifications[] = "$field modificado: $oldValue => $value";
-                }
-            }
-        }
-
-        return $modifications;
-    }
-
-    /**
+      /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)

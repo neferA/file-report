@@ -41,7 +41,7 @@ class BlogUpdatedListener
      $blogController = new BlogController();
 
      // Llama al método registerModification del controlador
-     $blogController->registerModification($blog->id, implode(". ", $modifications));
+     $blogController->Modifications($blog->id, implode(". ", $modifications));
         
     }
 }

@@ -43,6 +43,7 @@ class Blog extends Model
     {
         return $this->hasOne(waranty::class, 'blogs_id');
     }
+    
     public function financiadoras()
     {
         return $this->belongsToMany(Financiadora::class, 'boleta_financiadora', 'blogs_id', 'financiadora_id');
