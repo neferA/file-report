@@ -7,10 +7,12 @@ use App\Models\ejecutora;
 use App\Models\waranty;
 use App\Models\TipoGarantia;
 use App\Models\Financiadora;
+use App\Events\BlogUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Models\Modification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
@@ -69,7 +71,7 @@ class BlogController extends Controller
         $minutes = 60; // Tiempo de cache en minutos
     
         $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
-            return $query->simplePaginate(10);
+            return $query->simplePaginate(5);
         });
         
           
@@ -112,8 +114,8 @@ class BlogController extends Controller
             'caracteristicas' => 'required',
             'observaciones' => 'required',
             'monto' => 'required',
-            'fecha_inicio' => 'required',
-            'fecha_final' => 'required',
+            'fecha_inicio' => 'required|date_format:Y-m-d',
+            'fecha_final' => 'required|date_format:Y-m-d',
             'estado' => 'required|in:' . implode(',', [
                 Blog::ESTADO_LIBERADO,
                 Blog::ESTADO_EJECUTADO,
@@ -150,7 +152,7 @@ class BlogController extends Controller
         // Adjunta los IDs de las financiadoras relacionadas a la tabla pivote
         $blog->financiadoras()->attach($financiadoraIds);
         
-        // Crea un nuevo registro en la tabla waranyt_Histories vinculado al registro de Blog recién creado
+        // Crea un nuevo registro en la tabla waranty_Histories vinculado al registro de Blog recién creado
         $waranty = Waranty::create([
             'blogs_id' => $blog->id,
             'titulo' => $blog->num_boleta,
@@ -199,7 +201,7 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
         $financiadoras = Financiadora::pluck('nombre', 'id'); // Obtener las financiadoras para el campo select
         $garantias = TipoGarantia::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
-        $ejecutoras = ejecutora::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
+        $ejecutoras = ejecutora::pluck('nombre', 'id'); // Obtener las ejecutoras para el campo select
 
         return view('blogs.editar', compact('blog', 'financiadoras', 'garantias','ejecutoras'));
     }
@@ -258,9 +260,15 @@ class BlogController extends Controller
         }
 
     // Resto de la lógica para actualizar campos en el registro
-
+   
     // Actualizar el registro en la tabla blogs
     $blog->update($data);
+
+    // Llama al nuevo método para registrar las modificaciones
+    $modifications = $this->Modifications($blog, $request->all());
+
+    // Dispara el evento BlogUpdated con los datos relevantes
+    event(new BlogUpdated($blog, $request->all(), $modifications));
 
     // Eliminar registros de archivos PDF que se desean reemplazar
     if ($request->hasFile('new_boleta_pdf') && $oldBoletaPdf) {
@@ -330,12 +338,83 @@ class BlogController extends Controller
                 'fecha_final' => $request->input('fecha_final'),
             ]);
         }
-
+            
         // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
         return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
     }
- 
-    /**
+    private function Modifications($blog, $newData)
+    {
+        // Obtén los valores antiguos y calcula las modificaciones
+        $oldData = $this->getOldData($blog);
+        $modifications = $this->calculateModifications($oldData, $newData);
+
+        // Registra las modificaciones en la tabla modifications
+        $modificationDetails = implode(". ", $modifications);
+        $this->registerModification($blog->id, $modificationDetails);
+
+        return $modifications;
+    }
+    private function getOldData($blog)
+    {
+        return [
+            'num_boleta' => $blog->num_boleta,
+            'proveedor' => $blog->proveedor,
+            'motivo' => $blog->motivo,
+            'estado' => $blog->estado,
+            'caracteristicas' => $blog->waranty->caracteristicas,
+            'observaciones' => $blog->waranty->observaciones,
+            'monto' => $blog->waranty->monto,
+            'unidad_ejecutora_id' => $blog->unidad_ejecutora_id,
+            'fecha_inicio' => $blog->waranty->fecha_inicio instanceof \Carbon\Carbon ? $blog->waranty->fecha_inicio->format('Y-m-d') : $blog->waranty->fecha_inicio,
+            'fecha_final' => $blog->waranty->fecha_final instanceof \Carbon\Carbon ? $blog->waranty->fecha_final->format('Y-m-d') : $blog->waranty->fecha_final,
+            'boleta_pdf' => $blog->waranty->boleta_pdf,
+            'nota_pdf' => $blog->waranty->nota_pdf,
+        ];
+    }
+
+    private function calculateModifications($oldData, $newData)
+    {
+        $modifications = [];
+
+        foreach ($newData as $field => $value) {
+            if (array_key_exists($field, $oldData)) {
+                $oldValue = $oldData[$field];
+
+                if ($value !== $oldValue) {
+                    $modifications[] = "$field modificado: $oldValue => $value";
+                }
+            }
+        }
+
+    return $modifications;
+    }
+    // Método para registrar la modificación en la base de datos
+    private function registerModification($blogId, $modificationDetails)
+    {
+        // Verifica si tanto el blogId como los detalles de la modificación son válidos
+        if ($blogId && $modificationDetails) {
+            // Crear una nueva instancia del modelo Modification y asignar los valores
+            $modification = new Modification([
+                'blogs_id' => $blogId,
+                'modification_details' => $modificationDetails,
+                'modification_time' => now(),
+                'usuario' => Auth::user()->name,
+            ]);
+    
+            // Guardar la instancia en la base de datos
+            $modification->save();
+            
+            // Puedes agregar un registro en el archivo de registro (log) para rastrear
+            // cuándo se realiza una modificación, si lo deseas
+            Log::info("Modificación registrada en el blog #$blogId: $modificationDetails");
+        } else {
+            // Si los datos no son válidos, puedes registrar un mensaje de advertencia
+            // en el archivo de registro (log) o realizar alguna otra acción apropiada
+            Log::warning("Intento de registro de modificación fallido. Datos inválidos.");
+        }
+    }
+    
+      /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)

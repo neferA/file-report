@@ -9,28 +9,26 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\waranty;
+use App\Models\Blog;
 
-class WarrantyExpired
+class BlogUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $waranty;
-    public $isRedAlarm;
-    public $isOrangeAlarm;
-     /**
+    public $blog;
+    public $newData;
+    public $oldData;
+
+    /**
      * Create a new event instance.
-     *
-     * @param waranty $waranty
-     * @param bool $isRedAlarm
-     * @param bool $isOrangeAlarm
      */
-    public function __construct(waranty $waranty, bool $isRedAlarm, bool $isOrangeAlarm)
+    public function __construct(Blog $blog, $newData, $oldData)
     {
-        $this->waranty = $waranty;
-        $this->isRedAlarm = $isRedAlarm;
-        $this->isOrangeAlarm = $isOrangeAlarm;
+        $this->blog = $blog;
+        $this->newData = $newData;
+        $this->oldData = $oldData;
+
     }
-        
+
     /**
      * Get the channels the event should broadcast on.
      *

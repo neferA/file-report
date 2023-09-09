@@ -124,20 +124,25 @@
                                         </div>
                                     </div>
                                  
-                               
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="fecha_inicio">Fecha inicial</label>
-                                        {!! Form::text('fecha_inicio', $blog->waranty ? $blog->waranty->fecha_inicio : null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha inicial']) !!}
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="fecha_inicio">Fecha inicial</label>
+                                            <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" placeholder="Ingrese la fecha inicial" 
+                                                value="{{ old('fecha_inicio', $blog->waranty ? $blog->waranty->fecha_inicio : now()->format('Y-m-d')) }}" 
+                                                min="{{ $blog->waranty ? $blog->waranty->fecha_inicio : now()->format('Y-m-d') }}" 
+                                                required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="fecha_final">Fecha final</label>
-                                        {!! Form::text('fecha_final', $blog->waranty ? $blog->waranty->fecha_final : null, ['class' => 'form-control', 'placeholder' => 'Ingrese la fecha final']) !!}
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="fecha_final">Fecha final</label>
+                                            <input type="date" id="fecha_final" name="fecha_final" class="form-control" placeholder="Ingrese la fecha final" 
+                                                value="{{ old('fecha_final', $blog->waranty ? $blog->waranty->fecha_final : now()->format('Y-m-d')) }}" 
+                                                min="{{ $blog->waranty ? $blog->waranty->fecha_final : now()->format('Y-m-d') }}" 
+                                                required>
+                                        </div>
                                     </div>
-                                </div>
-                                
+
                                 <!-- Agrega el campo oculto con el valor de blogs_id -->
                                 {!! Form::hidden('blogs_id', $blog->id) !!}
                             </div>

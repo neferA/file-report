@@ -86,9 +86,11 @@ Route::get('/executor', [ExecutorController::class,'index'])->name('executor.ind
 // tickets routes guest and with priviligies
 
 Route::get('historial/{id}', [HistoryController::class, 'index'])->name('historial.index');
+Route::get('historial/{id}/show', [HistoryController::class, 'show'])->name('historial.show');
 Route::get('blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
 Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');
+
     
 
 require __DIR__.'/auth.php';

@@ -23,11 +23,12 @@
                                     <a class="nav-link active" data-toggle="tab" href="#historial-tab">Historial</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" data-toggle="tab" href="#historial-tab">detalles pdf</a>
+                                    <a class="nav-link" href="{{ route('historial.show', ['id' => $blog->id]) }}">Modificaciones</a>
                                 </li>
                                 <!-- Otras pestañas si es necesario -->
                             </ul>
-
+                           
+                            </div>
                             <div class="tab-content mt-3">
                                 <!-- Contenido de la pestaña Historial -->
                                 <div id="historial-tab" class="tab-pane fade show active">
