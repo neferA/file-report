@@ -17,6 +17,7 @@ class Blog extends Model
         'ejecutora',
         'usuario',
         'estado',
+        'alarm_color',
 
     ];
     
