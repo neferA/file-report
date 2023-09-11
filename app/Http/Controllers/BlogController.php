@@ -7,12 +7,15 @@ use App\Models\ejecutora;
 use App\Models\waranty;
 use App\Models\TipoGarantia;
 use App\Models\Financiadora;
+use App\Models\Modification;
 use App\Events\BlogUpdated;
+use App\Events\WarrantyExpired;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use App\Models\Modification;
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
@@ -71,13 +74,81 @@ class BlogController extends Controller
         $minutes = 60; // Tiempo de cache en minutos
     
         $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
+
             return $query->simplePaginate(5);
         });
         
-          
-        return view('blogs.index', compact('blogs'));
+
+        $expiringBlogs = $this->getExpiringBlogs();
+
+        // Iterar a través de los blogs y manejar las alarmas
+        foreach ($expiringBlogs as $blog) {
+            $this->handleBlogAlarm($blog);
+        }
+    
+        // Obtener las alarmas para mostrar en la vista
+        $alarms = $this->getAlarms();
+
+        $blogs = Blog::simplePaginate(5);
+        return view('blogs.index', compact('blogs', 'alarms'));
+    }
+
+    private function getExpiringBlogs()
+    {
+        return waranty::whereDate('fecha_final', '>=', now())
+            ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
+            ->get();
+    }
+    private function isRedAlarm($fechaFinal)
+    {
+        $daysRemaining = now()->diffInDays($fechaFinal);
+        return $daysRemaining <= 11;
+    }
+
+    private function isOrangeAlarm($fechaFinal)
+    {
+        $daysRemaining = now()->diffInDays($fechaFinal);
+        return $daysRemaining <= 13 && !$this->isRedAlarm($fechaFinal);
+    }
+
+    private function handleBlogAlarm($blog)
+    {
+        // Lógica para determinar si es una alarma roja o naranja
+        $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
+        $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
+
+        // Crear una instancia de WarrantyExpired con los valores correctos
+        $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm);
+        event($event); // Disparar el evento
+    }
+
+    private function getAlarms()
+    {
+        $alarms = [];
+    
+        // Obtener los blogs que están a punto de expirar
+        $expiringBlogs = waranty::whereDate('fecha_final', '>=', now())
+            ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
+            ->get();
+    
+        foreach ($expiringBlogs as $blog) {
+            // Lógica para determinar si es una alarma roja o naranja
+            $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
+            $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
+    
+            if ($isRedAlarm || $isOrangeAlarm) {
+                // Almacenar la alarma en el array asociativo usando el ID del blog como clave
+                $alarms[$blog->id] = [
+                    'color' => $isRedAlarm ? 'red' : 'orange',
+                ];
+            }
+        }
+    
+        return $alarms;
     }
     
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -454,9 +525,9 @@ class BlogController extends Controller
             }
         }
     }
-
-   
 }
+   
+
 
     
 
