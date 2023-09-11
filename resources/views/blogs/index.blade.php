@@ -61,6 +61,7 @@
                                         <th style="display: #fff;">Creado por</th>
                                         <th style="display: #fff;">Estado</th>
                                         <th style="display: #fff;">Fecha de Creación</th>
+                                        <th style="display: #fff;">Alarma</th> 
                                         <th style="display: #fff;">Acciones</th>
                                     </tr>
                                 </thead>
@@ -77,7 +78,11 @@
                                                 <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
                                             </td>                                                                                           
                                             <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
-
+                                            <td>
+                                                <span class="badge {{ $blog->alarm_color === 'red' ? 'badge-danger' : 'badge-warning' }}">
+                                                    {{ $blog->alarm_color === 'red' ? 'Roja' : 'Naranja' }}
+                                                </span>
+                                            </td> <!-- Columna que muestra el color de la alarma -->
                                             <td>
                                                 <a class="btn btn-primary ml-2" href="{{ route('historial.index', $blog->id) }}">Ver Historial de {{ $blog->titulo }}</a>
                                                 @can('editar_tickets')
@@ -95,6 +100,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            
                         </div>
                             <div class="pagination justify-content-end">
                                 {!! $blogs->links() !!}
