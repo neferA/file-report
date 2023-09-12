@@ -4,6 +4,8 @@ namespace App\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use App\Notifications\RedWarrantyExpiredNotification;
+use App\Notifications\OrangeWarrantyExpiredNotification;
 use App\Events\WarrantyExpired;
 class HandleWarrantyExpired
 {
@@ -38,13 +40,12 @@ class HandleWarrantyExpired
     {
         // Lógica para manejar la alarma roja
         // Por ejemplo, enviar una notificación roja
-        // Ejemplo: Notification::send($waranty->user, new RedWarrantyExpiredNotification($waranty));
-    }
+        $waranty->user->notify(new RedWarrantyExpiredNotification($waranty));
+    }    
 
     private function handleOrangeAlarm($waranty)
     {
         // Lógica para manejar la alarma naranja
         // Por ejemplo, enviar una notificación naranja
-        // Ejemplo: Notification::send($waranty->user, new OrangeWarrantyExpiredNotification($waranty));
-    }
+        $waranty->user->notify(new OrangeWarrantyExpiredNotification($waranty));    }
 }

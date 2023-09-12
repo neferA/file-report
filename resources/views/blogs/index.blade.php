@@ -50,7 +50,7 @@
                                 <!-- Otras pestañas si es necesario -->
                             </ul>                 
                         <div class="table-responsive">
-<<<<<<< HEAD
+                                                    
                             <table class="table table-striped mt-2">
                                 <thead>
                                     <tr>
@@ -79,11 +79,17 @@
                                                 <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
                                             </td>                                                                                           
                                             <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
+
                                             <td>
-                                                <span class="badge {{ $blog->alarm_color === 'red' ? 'badge-danger' : 'badge-warning' }}">
-                                                    {{ $blog->alarm_color === 'red' ? 'Roja' : 'Naranja' }}
-                                                </span>
-                                            </td> <!-- Columna que muestra el color de la alarma -->
+                                                @if(isset($alarms[$blog->id]))
+                                                    <div class="alert alert-{{ $alarms[$blog->id]['color'] }}" style="background-color: {{ $alarms[$blog->id]['color'] }}">
+                                                        {{ $alarms[$blog->id]['color'] === 'red' ? 'Roja' : 'Naranja' }}
+                                                    </div>
+                                                @else
+                                                    <!-- Manejar el caso en el que no hay alarma asignada -->
+                                                    <div class="alert alert-info">Sin alarma</div>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <a class="btn btn-primary ml-2" href="{{ route('historial.index', $blog->id) }}">Ver Historial de {{ $blog->titulo }}</a>
                                                 @can('editar_tickets')
@@ -101,66 +107,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            
-=======
-                        <table class="table table-striped mt-2">
-                <thead>
-                    <tr>
-                        <th style="display: none;">ID</th>
-                        <th style="display: #fff;">Número de Boleta</th>
-                        <th style="display: #fff;">Proveedor</th>
-                        <th style="display: #fff;">Motivo</th>
-                        <th style="display: #fff;">Ejecutora</th>
-                        <th style="display: #fff;">Creado por</th>
-                        <th style="display: #fff;">Estado</th>
-                        <th style="display: #fff;">Fecha de Creación</th>
-                        <th style="display: #fff;">Alarma</th> 
-                        <th style="display: #fff;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($blogs as $blog)
-                        <tr>
-                            <td style="display: none;">{{ $blog->id }}</td>
-                            <td>{{ $blog->num_boleta }}</td>
-                            <td>{{ $blog->proveedor }}</td>    
-                            <td>{{ $blog->motivo }}</td>    
-                            <td>{{ $blog->unidadEjecutora->nombre }}</td>
-                            <td>{{ $blog->usuario }}</td>
-                            <td>
-                                <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
-                            </td>                                                                                           
-                            <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
 
-                            <td>
-                                @if(isset($alarms[$blog->id]))
-                                    <div class="alert alert-{{ $alarms[$blog->id]['color'] }}" style="background-color: {{ $alarms[$blog->id]['color'] }}">
-                                        {{ $alarms[$blog->id]['color'] === 'red' ? 'Roja' : 'Naranja' }}
-                                    </div>
-                                @else
-                                    <!-- Manejar el caso en el que no hay alarma asignada -->
-                                    <div class="alert alert-info">Sin alarma</div>
-                                @endif
-                            </td>
-                            <td>
-                                <a class="btn btn-primary ml-2" href="{{ route('historial.index', $blog->id) }}">Ver Historial de {{ $blog->titulo }}</a>
-                                @can('editar_tickets')
-                                    <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">Editar</a>
-                                @endcan
-                                @can('borrar_tickets')
-                                    <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST" style="display: inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">Eliminar</button>
-                                    </form>
-                                @endcan
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
->>>>>>> 3b33ad80bb989967b281eeeee44698ecc92b7c41
                         </div>
                             <div class="pagination justify-content-end">
                                 {!! $blogs->links() !!}
