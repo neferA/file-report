@@ -35,49 +35,7 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Blog::query();
-    
-        // Filtro por estado
-        $estado = $request->input('estado');
-        if ($estado) {
-            $query->where('estado', $estado);
-        }
-    
-        $search = $request->input('search');
-    
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('num_boleta', 'like', '%' . $search . '%')
-                  ->orWhere('proveedor', 'like', '%' . $search . '%')
-                  ->orWhere('motivo', 'like', '%' . $search . '%')
-                  ->orWhere('unidad_ejecutora_id', 'like', '%' . $search . '%');
-            });
-        }
-    
-        // Ordenamiento
-        $orden = $request->input('orden');
-        $ordenColumna = 'created_at';
-        $ordenDireccion = 'desc';
-        
-        if ($orden === 'creacion_asc') {
-            $ordenDireccion = 'asc';
-        }
-        elseif ($orden === 'modificacion_desc') {
-            $ordenColumna = 'updated_at';
-            $ordenDireccion = 'desc';
-        }
-    
-        $query->orderBy($ordenColumna, $ordenDireccion);
-    
-        // Cache de resultados
-        $cacheKey = 'search_results_' . $search . '_' . $estado . '_' . $orden;
-        $minutes = 60; // Tiempo de cache en minutos
-    
-        $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
-
-            return $query->simplePaginate(5);
-        });
-        
+        $query = $this->buildQuery($request);    
 
         $expiringBlogs = $this->getExpiringBlogs();
 
@@ -88,7 +46,7 @@ class BlogController extends Controller
     
         // Obtener las alarmas para mostrar en la vista
         $alarms = $this->getAlarms();
-
+        //dd($alarms);
         $blogs = Blog::simplePaginate(5);
         return view('blogs.index', compact('blogs', 'alarms'));
     }
@@ -146,8 +104,62 @@ class BlogController extends Controller
     
         return $alarms;
     }
+    private function buildQuery(Request $request)
+    {
+        $query = Blog::query();
+        //dd($query->toSql()); // Imprime la consulta SQL generada
+        
+    // Filtro por estado
+    $estado = $request->input('estado');
+    if ($estado) {
+        $query->where('estado', $estado);
+    }
+
+    $search = $request->input('search');
+
+    //dd($search, $estado);
+
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('num_boleta', 'like', '%' . $search . '%')
+                ->orWhere('proveedor', 'like', '%' . $search . '%')
+                ->orWhere('motivo', 'like', '%' . $search . '%')
+                ->orWhere('unidad_ejecutora_id', 'like', '%' . $search . '%');
+        });
+
+        dd($query->toSql()); // Imprime la consulta SQL generada
+    }
     
 
+    $alarma = $request->input('alarma');
+    if ($alarma) {
+        // Aquí puedes aplicar tu lógica para buscar blogs con una alarma específica
+        // Esto dependerá de cómo estás manejando las alarmas en tu controlador
+        // y cómo determinas si un blog tiene una alarma en particular.
+    }
+
+    // Ordenamiento
+    $orden = $request->input('orden');
+    $ordenColumna = 'created_at';
+    $ordenDireccion = 'desc';
+
+    if ($orden === 'creacion_asc') {
+        $ordenDireccion = 'asc';
+    } elseif ($orden === 'modificacion_desc') {
+        $ordenColumna = 'updated_at';
+        $ordenDireccion = 'desc';
+    }
+
+    $query->orderBy($ordenColumna, $ordenDireccion);
+
+    // Cache de resultados
+        $cacheKey = 'search_results_' . $search . '_' . $estado . '_' . $orden;
+        $minutes = 60; // Tiempo de cache en minutos
+
+        $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
+            return $query->simplePaginate(5);
+        });
+    }
 
 
     /**

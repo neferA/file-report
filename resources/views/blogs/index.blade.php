@@ -30,8 +30,13 @@
                                     <option value="creacion_asc"{{ request('orden') === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
                                     <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
                                     <option value="modificacion_desc"{{ request('orden') === 'modificacion_desc' ? ' selected' : '' }}>Modificados recientemente</option>
+                                </select>                   
+                                <select name="alarma" class="form-control">
+                                    <option value="">Seleccionar Alarma</option>
+                                    <option value="red"{{ request('alarma') === 'red' ? ' selected' : '' }}>Roja</option>
+                                    <option value="orange"{{ request('alarma') === 'orange' ? ' selected' : '' }}>Naranja</option>
+                                    <!-- Agrega más opciones si es necesario -->
                                 </select>
-
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-primary">Buscar</button>
                                 </div>
@@ -81,15 +86,19 @@
                                             <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
 
                                             <td>
-                                                @if(isset($alarms[$blog->id]))
-                                                    <div class="alert alert-{{ $alarms[$blog->id]['color'] }}" style="background-color: {{ $alarms[$blog->id]['color'] }}">
-                                                        {{ $alarms[$blog->id]['color'] === 'red' ? 'Roja' : 'Naranja' }}
-                                                    </div>
-                                                @else
-                                                    <!-- Manejar el caso en el que no hay alarma asignada -->
-                                                    <div class="alert alert-info">Sin alarma</div>
-                                                @endif
+                                            @if(isset($alarms[$blog->id]))
+                                                <div class="alert alert-{{ $alarms[$blog->id]['color'] }}" style="background-color: {{ $alarms[$blog->id]['color'] }}">
+                                                    {{ $alarms[$blog->id]['color'] === 'red' ? 'Roja' : 'Naranja' }}
+                                                </div>
+                                            @else
+                                                <!-- Manejar el caso en el que no hay alarma asignada -->
+                                                <div class="alert alert-info">Sin alarma</div>
+                                            @endif
                                             </td>
+
+                                                <!-- Agregar mensajes de depuración -->
+                                            <!-- <td>Blog ID: {{ $blog->id }}</td>
+                                            <td>Alarmas: {{ json_encode($alarms) }}</td> -->
                                             <td>
                                                 <a class="btn btn-primary ml-2" href="{{ route('historial.index', $blog->id) }}">Ver Historial de {{ $blog->titulo }}</a>
                                                 @can('editar_tickets')
