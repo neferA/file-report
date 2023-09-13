@@ -111,6 +111,14 @@
                                                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">Eliminar</button>
                                                     </form>
                                                 @endcan
+                                                <!-- Botón para generar el informe -->
+                                                <a href="{{ route('generate-report', [
+                                                    'fecha_inicio' => request('fecha_inicio'),
+                                                    'fecha_final' => request('fecha_final'),
+                                                    'unidad_ejecutora_id' => request('unidad_ejecutora_id'),
+                                                    'funcionario_admin_id' => request('funcionario_admin_id')
+                                                ]) }}" class="btn btn-success">Generar Informe</a>
+
                                             </td>
                                         </tr>
                                     @endforeach
