@@ -15,9 +15,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
+
 
 class BlogController extends Controller
 {
@@ -47,7 +47,7 @@ class BlogController extends Controller
         // Obtener las alarmas para mostrar en la vista
         $alarms = $this->getAlarms();
         //dd($alarms);
-        $blogs = Blog::simplePaginate(5);
+        $blogs = $query->simplePaginate(5);
         return view('blogs.index', compact('blogs', 'alarms'));
     }
 
@@ -107,61 +107,52 @@ class BlogController extends Controller
     private function buildQuery(Request $request)
     {
         $query = Blog::query();
-        //dd($query->toSql()); // Imprime la consulta SQL generada
-        
-    // Filtro por estado
-    $estado = $request->input('estado');
-    if ($estado) {
-        $query->where('estado', $estado);
-    }
 
-    $search = $request->input('search');
+        // Filtro por estado
+        $estado = $request->input('estado');
+        if ($estado) {
+            $query->where('estado', $estado);
+        }
 
-    //dd($search, $estado);
+        $search = $request->input('search');
 
-    if ($search) {
-        $query->where(function ($q) use ($search) {
-            $q->where('num_boleta', 'like', '%' . $search . '%')
-                ->orWhere('proveedor', 'like', '%' . $search . '%')
-                ->orWhere('motivo', 'like', '%' . $search . '%')
-                ->orWhere('unidad_ejecutora_id', 'like', '%' . $search . '%');
-        });
+        if ($search) {
+            $columnsToSearch = ['num_boleta', 'proveedor', 'motivo', 'unidad_ejecutora_id'];
 
-        dd($query->toSql()); // Imprime la consulta SQL generada
-    }
-    
+            $query->where(function ($q) use ($search, $columnsToSearch) {
+                foreach ($columnsToSearch as $column) {
+                    $q->orWhere($column, 'like', '%' . $search . '%');
+                }
+            });
+        }
 
-    $alarma = $request->input('alarma');
-    if ($alarma) {
-        // Aquí puedes aplicar tu lógica para buscar blogs con una alarma específica
-        // Esto dependerá de cómo estás manejando las alarmas en tu controlador
-        // y cómo determinas si un blog tiene una alarma en particular.
-    }
+        $alarma = $request->input('alarma');
+        if ($alarma) {
+            // Aquí puedes aplicar tu lógica para buscar blogs con una alarma específica
+            // Esto dependerá de cómo estás manejando las alarmas en tu controlador
+            // y cómo determinas si un blog tiene una alarma en particular.
+        }
 
-    // Ordenamiento
-    $orden = $request->input('orden');
-    $ordenColumna = 'created_at';
-    $ordenDireccion = 'desc';
-
-    if ($orden === 'creacion_asc') {
-        $ordenDireccion = 'asc';
-    } elseif ($orden === 'modificacion_desc') {
-        $ordenColumna = 'updated_at';
+        // Ordenamiento
+        $orden = $request->input('orden');
+        $ordenColumna = 'created_at';
         $ordenDireccion = 'desc';
+
+        if ($orden === 'creacion_asc') {
+            $ordenDireccion = 'asc';
+        } elseif ($orden === 'modificacion_desc') {
+            $ordenColumna = 'updated_at';
+            $ordenDireccion = 'desc';
+        }
+
+        // Aplicar el ordenamiento
+        $query->orderBy($ordenColumna, $ordenDireccion);
+
+        return $query;
     }
 
-    $query->orderBy($ordenColumna, $ordenDireccion);
-
-    // Cache de resultados
-        $cacheKey = 'search_results_' . $search . '_' . $estado . '_' . $orden;
-        $minutes = 60; // Tiempo de cache en minutos
-
-        $blogs = Cache::remember($cacheKey, $minutes, function () use ($query) {
-            return $query->simplePaginate(5);
-        });
-    }
-
-
+    
+   
     /**
      * Show the form for creating a new resource.
      */
@@ -224,8 +215,8 @@ class BlogController extends Controller
         $data['fecha_inicio'] = Carbon::parse($request->input('fecha_inicio'));
         $data['fecha_final'] = Carbon::parse($request->input('fecha_final'));
 
-        // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
-        $data['usuario'] = Auth::user()->name;
+            // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
+            $data['usuario'] = Auth::user()->name;
 
         $blog = Blog::create($data);
 
@@ -274,6 +265,26 @@ class BlogController extends Controller
     public function show(string $id)
     {
         //
+    }
+    public function generateReport(Request $request)
+    {
+        // Validar los parámetros de entrada, como las fechas y otros datos proporcionados por el usuario.
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_final');
+        $unidadEjecutoraId = $request->input('unidad_ejecutora_id');
+
+        // Realizar la consulta SQL para seleccionar las Boletas de Garantía que cumplen con los criterios,
+        // incluyendo un JOIN con la tabla waranty_histories para obtener las fechas.
+        $boletas = DB::table('blogs')
+        ->select('blogs.*', 'usuarios.usuario')
+        ->leftJoin('usuarios', 'blogs.usuario_id', '=', 'usuarios.id')
+        ->join('waranty_histories', 'blogs.id', '=', 'waranty_histories.blogs_id')
+        ->whereBetween('waranty_histories.fecha_inicio', [$fechaInicio, $fechaFin])
+        ->where('blogs.unidad_ejecutora_id', $unidadEjecutoraId)
+        ->get();
+
+        return view('report', ['boletas' => $boletas]);
+
     }
 
     /**
