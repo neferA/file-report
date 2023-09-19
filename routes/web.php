@@ -89,7 +89,7 @@ Route::get('historial/{id}', [HistoryController::class, 'index'])->name('histori
 Route::get('historial/{id}/show', [HistoryController::class, 'show'])->name('historial.show');
 Route::get('blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
 Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
-Route::get('/generate-report', [BlogController::class, 'generateReport'])->name('generate-report');
+Route::get('/generate-pdf', [BlogController::class, 'generatePDF'])->name('generate-pdf');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');
 
     

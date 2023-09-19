@@ -31,7 +31,7 @@
                                     <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
                                     <option value="modificacion_desc"{{ request('orden') === 'modificacion_desc' ? ' selected' : '' }}>Modificados recientemente</option>
                                 </select>                   
-                                <select name="alarma" class="form-control">
+                                <!-- <select name="alarma" class="form-control">
                                     <option value="">Seleccionar Alarma</option>
                                     <option value="red"{{ request('alarma') === 'red' ? ' selected' : '' }}>Roja</option>
                                     <option value="orange"{{ request('alarma') === 'orange' ? ' selected' : '' }}>Naranja</option>
@@ -100,25 +100,36 @@
                                             <!-- <td>Blog ID: {{ $blog->id }}</td>
                                             <td>Alarmas: {{ json_encode($alarms) }}</td> -->
                                             <td>
-                                                <a class="btn btn-primary ml-2" href="{{ route('historial.index', $blog->id) }}">Ver Historial de {{ $blog->titulo }}</a>
-                                                @can('editar_tickets')
-                                                    <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">Editar</a>
-                                                @endcan
-                                                @can('borrar_tickets')
-                                                    <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">Eliminar</button>
-                                                    </form>
-                                                @endcan
-                                                <!-- Botón para generar el informe -->
-                                                <a href="{{ route('generate-report', [
-                                                    'fecha_inicio' => request('fecha_inicio'),
-                                                    'fecha_final' => request('fecha_final'),
-                                                    'unidad_ejecutora_id' => request('unidad_ejecutora_id'),
-                                                    'funcionario_admin_id' => request('funcionario_admin_id')
-                                                ]) }}" class="btn btn-success">Generar Informe</a>
+                                                <div class="btn-group" role="group" aria-label="Acciones">
+                                                    <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">
+                                                        <i class="fas fa-history"></i> Ver Historial
+                                                    </a>
+                                                    
+                                                    @can('editar_tickets')
+                                                        <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">
+                                                            <i class="fas fa-edit"></i> Editar
+                                                        </a>
+                                                    @endcan
+                                                    
+                                                    @can('borrar_tickets')
+                                                        <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
+                                                                <i class="fas fa-trash"></i> Eliminar
+                                                            </button>
+                                                        </form>
+                                                    @endcan
 
+                                                    <!-- Botón para generar el informe con ícono PDF -->
+                                                    <a href="{{ route('generate-pdf', [
+                                                        'fecha_inicio' => request('fecha_inicio'),
+                                                        'fecha_final' => request('fecha_final'),
+                                                        'unidad_ejecutora_id' => request('unidad_ejecutora_id'),
+                                                    ]) }}" class="btn btn-success">
+                                                        <i class="fas fa-file-pdf"></i> Generar PDF
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

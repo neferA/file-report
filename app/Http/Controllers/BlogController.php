@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+
 use Carbon\Carbon;
+use PDF;
 
 
 class BlogController extends Controller
@@ -266,25 +268,32 @@ class BlogController extends Controller
     {
         //
     }
-    public function generateReport(Request $request)
+    public function generatePDF(Request $request)
     {
-        // Validar los parámetros de entrada, como las fechas y otros datos proporcionados por el usuario.
+        // Obtener los datos que necesitas para el informe
+        $data = $this->getDataForPDF($request);
+
+        // Generar el informe en PDF usando Laravel PDF
+        $pdf = PDF::loadView('report', compact('data'));
+
+        // Descargar el PDF
+        return $pdf->download('reporte.pdf');
+    }
+
+    private function getDataForPDF(Request $request)
+    {
         $fechaInicio = $request->input('fecha_inicio');
         $fechaFin = $request->input('fecha_final');
         $unidadEjecutoraId = $request->input('unidad_ejecutora_id');
-
-        // Realizar la consulta SQL para seleccionar las Boletas de Garantía que cumplen con los criterios,
-        // incluyendo un JOIN con la tabla waranty_histories para obtener las fechas.
-        $boletas = DB::table('blogs')
-        ->select('blogs.*', 'usuarios.usuario')
-        ->leftJoin('usuarios', 'blogs.usuario_id', '=', 'usuarios.id')
-        ->join('waranty_histories', 'blogs.id', '=', 'waranty_histories.blogs_id')
-        ->whereBetween('waranty_histories.fecha_inicio', [$fechaInicio, $fechaFin])
-        ->where('blogs.unidad_ejecutora_id', $unidadEjecutoraId)
-        ->get();
-
-        return view('report', ['boletas' => $boletas]);
-
+    
+        // Consulta para obtener información de blogs que cumplan con los criterios
+        $boletas = Blog::select('num_boleta', 'usuario', 'tipo_garantia_id')
+            ->join('waranty_histories', 'blogs.id', '=', 'waranty_histories.blogs_id')
+            ->whereBetween('waranty_histories.fecha_inicio', [$fechaInicio, $fechaFin])
+            ->where('blogs.unidad_ejecutora_id', $unidadEjecutoraId)
+            ->get();
+    
+        return $boletas;
     }
 
     /**

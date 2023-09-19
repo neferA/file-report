@@ -1,26 +1,48 @@
-<!-- resources/views/report.blade.php -->
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Informe de Boletas de Garantía</title>
+    <meta charset="utf-8">
+    <title>Informe en PDF</title>
+    <style>
+        /* Estilos CSS para el PDF */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
     <h1>Informe de Boletas de Garantía</h1>
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Número de Boleta</th>
-                <!-- Otras columnas que desees mostrar -->
+                <th>Proveedor</th>
+                <th>Motivo</th>
+                <th>Estado</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($boletas as $boleta)
+            @foreach($data as $boleta)
                 <tr>
-                    <td>{{ $boleta->id }}</td>
                     <td>{{ $boleta->num_boleta }}</td>
-                    <!-- Otras celdas de datos -->
+                    <td>{{ $boleta->proveedor }}</td>
+                    <td>{{ $boleta->motivo }}</td>
+                    <td>{{ $boleta->estado }}</td>
                 </tr>
             @endforeach
         </tbody>
