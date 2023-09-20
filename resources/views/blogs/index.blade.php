@@ -43,9 +43,12 @@
                             </div>
                         </form>
 
-                            @can('crear_tickets')
-                            <a class="btn btn-warning" href="{{ route('tickets.create')}}">Nuevo</a>
-                            @endcan
+                        @can('crear_tickets')
+                            <a class="btn btn-warning" href="{{ route('tickets.create')}}">
+                                <i class="fas fa-plus"></i> Nueva boleta
+                            </a>
+                        @endcan
+
 
                             <!-- Pestañas para organizar la información -->
                             <ul class="nav nav-tabs">
@@ -86,17 +89,20 @@
                                             <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
 
                                             <td>
-                                            @if(isset($alarms[$blog->id]))
-                                                <div class="alert alert-{{ $alarms[$blog->id]['color'] }}" style="background-color: {{ $alarms[$blog->id]['color'] }}">
-                                                    {{ $alarms[$blog->id]['color'] === 'red' ? 'Roja' : 'Naranja' }}
-                                                </div>
-                                            @else
-                                                <!-- Manejar el caso en el que no hay alarma asignada -->
-                                                <div class="alert alert-info">Sin alarma</div>
-                                            @endif
+                                                @if(isset($alarms[$blog->id]))
+                                                    <div class="alert alert-{{ $alarms[$blog->id]['color'] }} text-center" style="background-color: {{ $alarms[$blog->id]['color'] }}">
+                                                        @if ($alarms[$blog->id]['color'] === 'red')
+                                                            <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
+                                                        @else
+                                                            <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Naranja</strong>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    <!-- Si no hay alarma, muestra un mensaje informativo -->
+                                                    <div class="alert alert-info text-center">Sin alarma</div>
+                                                @endif
                                             </td>
-
-                                                <!-- Agregar mensajes de depuración -->
+                                            <!-- Agregar mensajes de depuración -->
                                             <!-- <td>Blog ID: {{ $blog->id }}</td>
                                             <td>Alarmas: {{ json_encode($alarms) }}</td> -->
                                             <td>

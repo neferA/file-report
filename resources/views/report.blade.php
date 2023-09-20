@@ -31,18 +31,18 @@
         <thead>
             <tr>
                 <th>Número de Boleta</th>
-                <th>Proveedor</th>
-                <th>Motivo</th>
-                <th>Estado</th>
+                <th>Usuario</th>
+                <th>Tipo de Garantía</th>
+                <th>Monto</th>
             </tr>
         </thead>
         <tbody>
             @foreach($data as $boleta)
                 <tr>
                     <td>{{ $boleta->num_boleta }}</td>
-                    <td>{{ $boleta->proveedor }}</td>
-                    <td>{{ $boleta->motivo }}</td>
-                    <td>{{ $boleta->estado }}</td>
+                    <td>{{ $boleta->usuario }}</td>
+                    <td>{{ $boleta->tipo_garantia_id }}</td>
+                    <td>{{ $boleta->monto }}</td>
                 </tr>
             @endforeach
         </tbody>

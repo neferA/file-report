@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 use Carbon\Carbon;
 use PDF;
@@ -273,6 +274,8 @@ class BlogController extends Controller
         // Obtener los datos que necesitas para el informe
         $data = $this->getDataForPDF($request);
 
+        //dd($data); // Imprime los datos para comprobar
+
         // Generar el informe en PDF usando Laravel PDF
         $pdf = PDF::loadView('report', compact('data'));
 
@@ -280,21 +283,34 @@ class BlogController extends Controller
         return $pdf->download('reporte.pdf');
     }
 
+
     private function getDataForPDF(Request $request)
     {
-        $fechaInicio = $request->input('fecha_inicio');
-        $fechaFin = $request->input('fecha_final');
-        $unidadEjecutoraId = $request->input('unidad_ejecutora_id');
+        $validator = Validator::make($request->all(), [
+            'fecha_inicio' => 'required|date',
+            'fecha_final' => 'required|date',
+            'unidad_ejecutora_id' => 'required|numeric',
+        ]);
     
-        // Consulta para obtener información de blogs que cumplan con los criterios
-        $boletas = Blog::select('num_boleta', 'usuario', 'tipo_garantia_id')
-            ->join('waranty_histories', 'blogs.id', '=', 'waranty_histories.blogs_id')
-            ->whereBetween('waranty_histories.fecha_inicio', [$fechaInicio, $fechaFin])
-            ->where('blogs.unidad_ejecutora_id', $unidadEjecutoraId)
-            ->get();
+        if ($validator->fails()) {
+            // Manejar errores de validación aquí, por ejemplo, devolver una respuesta de error.
+        }
     
-        return $boletas;
+        try {
+            $fechaInicio = $request->input('fecha_inicio');
+            $fechaFin = $request->input('fecha_final');
+            $unidadEjecutoraId = $request->input('unidad_ejecutora_id');
+    
+            $boletas = Blog::select(/* ... */)->get();
+    
+            return $boletas;
+        } catch (\Exception $e) {
+            // Manejar el error de base de datos, por ejemplo, registrándolo o devolviendo una respuesta de error.
+        }
     }
+    
+    
+    
 
     /**
      * Show the form for editing the specified resource.

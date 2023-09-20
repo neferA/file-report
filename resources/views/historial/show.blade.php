@@ -2,7 +2,7 @@
 @section('title', 'Historial de modificaciones')
 @section('content')
 <div class="container">
-    <h1>Detalles del Blog</h1>
+    <h1>Detalles de la boleta</h1>
 
     <div class="card">
         <div class="card-body">
@@ -19,7 +19,6 @@
                 <th>Fecha y Hora</th>
                 <th>Detalles de la Modificación</th>
                 <th>Fecha y Hora Boletas</th>
-                <th>Detalles de la Modificación</th>
                 <th>tiempo de Modificación</th>
                 <th>usuario</th>
 
@@ -31,7 +30,6 @@
                 <td>{{ $modification->created_at }}</td>
                 <td>{{ $modification->modification_details }}</td>
                 <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
-                <td>{{ $modification->modification_details }}</td>
                 <td>{{ $modification->modification_time }}</td>
                 <td>{{ $modification->usuario }}</td>
 

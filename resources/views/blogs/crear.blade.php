@@ -8,7 +8,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h3 class="page__heading">Boleta de garantia</h3>
+            <h3 class="page__heading">Garantia</h3>
         </div>
         <div class="section-body">
             <div class="row">
@@ -37,7 +37,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">proveedor</label>
+                                            <label for="contenido">afianzado</label>
                                             {!! Form::text('proveedor', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el proveedor']) !!}
                                         </div>
                                     </div>
@@ -56,7 +56,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">observaciones</label>
+                                            <label for="contenido">observaciones</label> //abajo
                                             {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
                                         </div>
                                     </div> 
@@ -90,7 +90,7 @@
                                     </div> 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="garantia_id">Garantía</label>
+                                            <label for="garantia_id">tipo de garantía</label>
                                             {!! Form::select('tipo_garantia_id', $garantias, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una garantía']) !!}
                                         </div>
                                     </div>
