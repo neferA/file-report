@@ -18,21 +18,52 @@
                         <h1> Página de Inicio </h1>
                         
                         <!-- Mostrar las alarmas -->
-                        @foreach($alarms as $alarm)
-                            <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] }}">
-                                <strong>
-                                    @if ($alarm['color'] === 'red')
-                                        Alarma Roja:
-                                    @elseif ($alarm['color'] === 'orange')
-                                        Alarma Naranja:
-                                    @endif
-                                </strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
-                                <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
-                            <!-- Agrega un botón "X" para cerrar la alarma -->
-                                <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
+                        <div>
+                            <h2>Alarmas Rojas</h2>
+                            <!-- Agregar un campo de búsqueda para las alarmas rojas -->
+                            <div class="input-group mb-3">
+                                <input type="hidden" name="orden" value="{{ request('orden') }}">
+                                <input type="hidden" name="alarm_color" value="red">
+                                <input type="text" id="searchRedAlarm" class="form-control" placeholder="Buscar en alarmas rojas" value="{{ request('search') }}">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-primary" onclick="searchAlarm('red')">Buscar</button>
+                                </div>
                             </div>
-                        @endforeach
-
+                            @foreach($alarms as $alarm)
+                                @if($alarm['color'] === 'red')
+                                    <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] }}">
+                                        <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
+                                        <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
+                                        <!-- Agrega un botón "X" para cerrar la alarma -->
+                                        <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                @endif
+                            @endforeach
+                            {{$alarmsPaginator->links()}}                        
+                        </div>
+                        <div>
+                            <h2>Alarmas Naranjas</h2>
+                             <!-- Agregar un campo de búsqueda para las alarmas naranjas -->
+                            <div class="input-group mb-3">
+                                <input type="hidden" name="orden" value="{{ request('orden') }}">
+                                <input type="hidden" name="alarm_color" value="orange">
+                                <input type="text" id="searchOrangeAlarm" class="form-control" placeholder="Buscar en alarmas naranjas" value="{{ request('search') }}">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-primary" onclick="searchAlarm('orange')">Buscar</button>
+                                </div>
+                            </div>
+                            @foreach($alarms as $alarm)
+                                @if($alarm['color'] === 'orange')
+                                    <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] }}">
+                                        <strong>Alarma Naranja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
+                                        <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
+                                        <!-- Agrega un botón "X" para cerrar la alarma -->
+                                        <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                @endif
+                            @endforeach
+                            {{$alarmsPaginator->links()}}
+                        </div>    
                     </div>
                 </div>
             </div>
@@ -54,6 +85,19 @@
             alarm.style.display = 'none'; // Para ocultar la alarma
             // Opcionalmente, puedes eliminar la alarma: alarm.remove();
         }
+    }
+    function searchAlarm(color) {
+        const searchTerm = document.querySelector(`#search${color.charAt(0).toUpperCase() + color.slice(1)}Alarm`).value.toLowerCase();
+        const alarmContainers = document.querySelectorAll(`.alert-${color}`);
+
+        alarmContainers.forEach((alarmContainer) => {
+            const alarmText = alarmContainer.textContent.toLowerCase();
+            if (alarmText.includes(searchTerm)) {
+                alarmContainer.style.display = 'block';
+            } else {
+                alarmContainer.style.display = 'none';
+            }
+        });
     }
 </script>
 @stop
