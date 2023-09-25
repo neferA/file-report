@@ -92,6 +92,7 @@ Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.d
 Route::get('/generate-pdf', [BlogController::class, 'generatePDF'])->name('generate-pdf');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');
 
+
     
 
 require __DIR__.'/auth.php';

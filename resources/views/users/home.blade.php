@@ -22,16 +22,20 @@
                             <h2>Alarmas Rojas</h2>
                             <!-- Agregar un campo de búsqueda para las alarmas rojas -->
                             <div class="input-group mb-3">
-                                <input type="hidden" name="orden" value="{{ request('orden') }}">
                                 <input type="hidden" name="alarm_color" value="red">
                                 <input type="text" id="searchRedAlarm" class="form-control" placeholder="Buscar en alarmas rojas" value="{{ request('search') }}">
+                                <select name="orden" id="orderRedAlarm" class="form-control" onchange="changeSorting('red', this.value)">
+                                    <option value="">Ordenar por</option>
+                                    <option value="creacion_asc"{{ request('orden') === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                    <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                </select>
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-primary" onclick="searchAlarm('red')">Buscar</button>
                                 </div>
                             </div>
-                            @foreach($alarms as $alarm)
+                            @foreach($redAlarmsPaginator->items() as $alarm)
                                 @if($alarm['color'] === 'red')
-                                    <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] }}">
+                                    <div class="alert alert-{{ $alarm['color'] }} alert-{{ $alarm['orden'] }}" style="background-color: {{ $alarm['color'] }}">
                                         <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
                                         <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
                                         <!-- Agrega un botón "X" para cerrar la alarma -->
@@ -39,22 +43,26 @@
                                     </div>
                                 @endif
                             @endforeach
-                            {{$alarmsPaginator->links()}}                        
+                            {{ $redAlarmsPaginator->links() }}
                         </div>
                         <div>
                             <h2>Alarmas Naranjas</h2>
-                             <!-- Agregar un campo de búsqueda para las alarmas naranjas -->
+                            <!-- Agregar un campo de búsqueda para las alarmas naranjas -->
                             <div class="input-group mb-3">
-                                <input type="hidden" name="orden" value="{{ request('orden') }}">
                                 <input type="hidden" name="alarm_color" value="orange">
                                 <input type="text" id="searchOrangeAlarm" class="form-control" placeholder="Buscar en alarmas naranjas" value="{{ request('search') }}">
+                                <select name="orden" id="orderOrangeAlarm" class="form-control" onchange="changeSorting('orange', this.value)">
+                                    <option value="">Ordenar por</option>
+                                    <option value="creacion_asc"{{ request('orden') === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                    <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                </select>
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-primary" onclick="searchAlarm('orange')">Buscar</button>
                                 </div>
                             </div>
-                            @foreach($alarms as $alarm)
+                            @foreach($orangeAlarmsPaginator->items() as $alarm)
                                 @if($alarm['color'] === 'orange')
-                                    <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] }}">
+                                    <div class="alert alert-{{ $alarm['color'] }} alert-{{ $alarm['orden'] }}" style="background-color: {{ $alarm['color'] }}">
                                         <strong>Alarma Naranja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
                                         <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
                                         <!-- Agrega un botón "X" para cerrar la alarma -->
@@ -62,8 +70,8 @@
                                     </div>
                                 @endif
                             @endforeach
-                            {{$alarmsPaginator->links()}}
-                        </div>    
+                            {{ $orangeAlarmsPaginator->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -86,13 +94,25 @@
             // Opcionalmente, puedes eliminar la alarma: alarm.remove();
         }
     }
+    function changeSorting(color, order) {
+        const orderField = document.querySelector(`#order${color.charAt(0).toUpperCase() + color.slice(1)}Alarm`);
+        if (orderField) {
+            orderField.value = order;
+            // Llamar a la función de búsqueda después de cambiar el orden
+            searchAlarm(color);
+        }
+    }
+
     function searchAlarm(color) {
         const searchTerm = document.querySelector(`#search${color.charAt(0).toUpperCase() + color.slice(1)}Alarm`).value.toLowerCase();
+        const orderField = document.querySelector(`#order${color.charAt(0).toUpperCase() + color.slice(1)}Alarm`);
+        const selectedOrder = orderField ? orderField.value : '';
+
         const alarmContainers = document.querySelectorAll(`.alert-${color}`);
 
         alarmContainers.forEach((alarmContainer) => {
             const alarmText = alarmContainer.textContent.toLowerCase();
-            if (alarmText.includes(searchTerm)) {
+            if ((selectedOrder === '' || alarmText.includes(selectedOrder)) && alarmText.includes(searchTerm)) {
                 alarmContainer.style.display = 'block';
             } else {
                 alarmContainer.style.display = 'none';

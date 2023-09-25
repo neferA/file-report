@@ -59,31 +59,12 @@ class UserController extends Controller
         
         // Aplica el filtro de orden si se ha seleccionado
         $orden = $request->input('orden');
-        $alarms = $this->applySorting($alarms, $orden);
-       
-  
-        // Convierte el array de alarmas en una colección
-        $alarmsCollection = collect($alarms);
 
-        // Divide las alarmas en grupos paginados
-        $perPage = 2; // Número de alarmas por página
-        $currentPage = $request->input('page', 1); // Obtiene la página actual de la solicitud
+        //paginación de alarmas
+        list($redAlarmsPaginator, $orangeAlarmsPaginator) = $this->paginateAlarms($alarms, $request);
 
-        $slicedAlarms = $alarmsCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator'));
 
-        $total = count($alarms); // Obtener el número total de alarmas
-
-        // Crea una instancia de LengthAwarePaginator
-        $alarmsPaginator = new LengthAwarePaginator(
-            $slicedAlarms,
-            $total,
-            $perPage,
-            $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
-
-
-        return view('users.home', compact('alarms','alarmsPaginator'));
     }
 
     private function isRedAlarm($warranty)
@@ -122,25 +103,57 @@ class UserController extends Controller
     
         return $alarms;
     }
-    private function applySorting($alarms, $orden)
+   
+  
+    private function paginateAlarms($alarms, Request $request)
     {
-        switch ($orden) {
-            case 'creacion_asc':
-                usort($alarms, function ($a, $b) {
-                    return $a['warranty']->created_at <=> $b['warranty']->created_at;
-                });
-                break;
-            case 'creacion_desc':
-                usort($alarms, function ($a, $b) {
-                    return $b['warranty']->created_at <=> $a['warranty']->created_at;
-                });
-                break;
-            // Agrega más casos para otros tipos de orden si es necesario
+        // Convierte el array de alarmas en una colección
+        $alarmsCollection = collect($alarms);
+    
+        // Número de alarmas por página para cada tipo de alarma
+        $perPageRed = 3; // Número de alarmas rojas por página
+        $perPageOrange = 3; // Número de alarmas naranjas por página
+    
+        $currentPage = $request->input('page', 1);
+    
+        // Separa las alarmas en dos variables: $redAlarms y $orangeAlarms
+        $redAlarms = [];
+        $orangeAlarms = [];
+    
+        foreach ($alarmsCollection as $alarm) {
+            if ($alarm['color'] === 'red') {
+                $redAlarms[] = $alarm;
+            } elseif ($alarm['color'] === 'orange') {
+                $orangeAlarms[] = $alarm;
+            }
         }
-
-        return $alarms;
+    
+        // Crea una instancia de LengthAwarePaginator para cada conjunto de alarmas
+        $redAlarmsPaginator = new LengthAwarePaginator(
+            collect($redAlarms)->forPage($currentPage, $perPageRed),
+            count($redAlarms),
+            $perPageRed,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+    
+        $orangeAlarmsPaginator = new LengthAwarePaginator(
+            collect($orangeAlarms)->forPage($currentPage, $perPageOrange),
+            count($orangeAlarms),
+            $perPageOrange,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+    
+        return [
+            $redAlarmsPaginator,
+            $orangeAlarmsPaginator,
+        ];
     }
     
+
+    
+
     public function financiers()
     {
         return view('financiadoras.index');
