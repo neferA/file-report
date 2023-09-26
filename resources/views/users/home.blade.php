@@ -18,44 +18,48 @@
                         <h1> Página de Inicio </h1>
                         
                         <!-- Mostrar las alarmas -->
-                        <div>
-                            <h2>Alarmas Rojas</h2>
-                            <!-- Agregar un campo de búsqueda para las alarmas rojas -->
-                            <div class="input-group mb-3">
+                        <h2>Alarmas Rojas</h2>
+                        <!-- Agregar un campo de búsqueda para las alarmas rojas -->
+                        <div class="input-group mb-3">
+                            <input type="hidden" name="alarm_color" value="red">
+                            <input type="text" class="form-control search-alarm" data-color="red" placeholder="Buscar en alarmas rojas" value="{{ request('search') }}">
+                            <form id="redAlarmsOrderForm" method="get" action="{{ route('home') }}">
                                 <input type="hidden" name="alarm_color" value="red">
-                                <input type="text" id="searchRedAlarm" class="form-control" placeholder="Buscar en alarmas rojas" value="{{ request('search') }}">
-                                <select name="orden" id="orderRedAlarm" class="form-control" onchange="changeSorting('red', this.value)">
+                                <select name="orden" id="orderRedAlarm" class="form-control" onchange="document.getElementById('redAlarmsOrderForm').submit()">
                                     <option value="">Ordenar por</option>
-                                    <option value="creacion_asc"{{ request('orden') === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
-                                    <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                    <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                    <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
                                 </select>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-primary" onclick="searchAlarm('red')">Buscar</button>
-                                </div>
+                            </form>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary" onclick="searchAlarm('red')">Buscar</button>
                             </div>
-                            @foreach($redAlarmsPaginator->items() as $alarm)
-                                @if($alarm['color'] === 'red')
-                                    <div class="alert alert-{{ $alarm['color'] }} alert-{{ $alarm['orden'] }}" style="background-color: {{ $alarm['color'] }}">
-                                        <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
-                                        <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
-                                        <!-- Agrega un botón "X" para cerrar la alarma -->
-                                        <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
-                                    </div>
-                                @endif
-                            @endforeach
-                            {{ $redAlarmsPaginator->links() }}
                         </div>
+                        @foreach($redAlarmsPaginator->items() as $alarm)
+                            @if($alarm['color'] === 'red')
+                                <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] }}">
+                                    <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
+                                    <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
+                                    <!-- Agrega un botón "X" para cerrar la alarma -->
+                                    <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
+                                </div>
+                            @endif
+                        @endforeach
+                        {{ $redAlarmsPaginator->links() }}
+                    </div>
                         <div>
                             <h2>Alarmas Naranjas</h2>
                             <!-- Agregar un campo de búsqueda para las alarmas naranjas -->
                             <div class="input-group mb-3">
                                 <input type="hidden" name="alarm_color" value="orange">
-                                <input type="text" id="searchOrangeAlarm" class="form-control" placeholder="Buscar en alarmas naranjas" value="{{ request('search') }}">
-                                <select name="orden" id="orderOrangeAlarm" class="form-control" onchange="changeSorting('orange', this.value)">
-                                    <option value="">Ordenar por</option>
-                                    <option value="creacion_asc"{{ request('orden') === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
-                                    <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
-                                </select>
+                                <input type="text" class="form-control search-alarm" data-color="orange" placeholder="Buscar en alarmas naranjas" value="{{ request('search') }}">                                <form id="orangeAlarmsOrderForm" method="get" action="{{ route('home') }}">
+                                    <input type="hidden" name="alarm_color" value="orange">
+                                    <select name="orden" id="orderOrangeAlarm" class="form-control" onchange="document.getElementById('orangeAlarmsOrderForm').submit()">
+                                        <option value="">Ordenar por</option>
+                                        <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                        <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                    </select>
+                                </form>
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-primary" onclick="searchAlarm('orange')">Buscar</button>
                                 </div>
@@ -104,20 +108,20 @@
     }
 
     function searchAlarm(color) {
-        const searchTerm = document.querySelector(`#search${color.charAt(0).toUpperCase() + color.slice(1)}Alarm`).value.toLowerCase();
-        const orderField = document.querySelector(`#order${color.charAt(0).toUpperCase() + color.slice(1)}Alarm`);
-        const selectedOrder = orderField ? orderField.value : '';
+    const searchField = document.querySelector(`.search-alarm[data-color="${color}"]`);
+    const searchTerm = searchField.value.toLowerCase();
 
-        const alarmContainers = document.querySelectorAll(`.alert-${color}`);
+    const alarmContainers = document.querySelectorAll(`.alert-${color}`);
 
-        alarmContainers.forEach((alarmContainer) => {
-            const alarmText = alarmContainer.textContent.toLowerCase();
-            if ((selectedOrder === '' || alarmText.includes(selectedOrder)) && alarmText.includes(searchTerm)) {
-                alarmContainer.style.display = 'block';
-            } else {
-                alarmContainer.style.display = 'none';
-            }
-        });
-    }
+    alarmContainers.forEach((alarmContainer) => {
+        const alarmText = alarmContainer.textContent.toLowerCase();
+        if (alarmText.includes(searchTerm)) {
+            alarmContainer.style.display = 'block';
+        } else {
+            alarmContainer.style.display = 'none';
+        }
+    });
+}
+
 </script>
 @stop

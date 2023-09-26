@@ -57,15 +57,40 @@ class UserController extends Controller
         // Obtener las alarmas para mostrar en la vista
         $alarms = $this->getAlarms();
         
-        // Aplica el filtro de orden si se ha seleccionado
-        $orden = $request->input('orden');
+           // Aplicar el filtro de orden si se ha seleccionado
+    $orden = $request->input('orden');
 
-        //paginación de alarmas
-        list($redAlarmsPaginator, $orangeAlarmsPaginator) = $this->paginateAlarms($alarms, $request);
-
-        return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator'));
-
+    if ($orden === 'creacion_asc') {
+        $alarms = $this->ordenarAlarmasPorFechaAsc($alarms);
+    } elseif ($orden === 'creacion_desc') {
+        $alarms = $this->ordenarAlarmasPorFechaDesc($alarms);
     }
+
+    //paginación de alarmas
+    list($redAlarmsPaginator, $orangeAlarmsPaginator) = $this->paginateAlarms($alarms, $request);
+
+    return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator', 'orden'));
+}
+
+private function ordenarAlarmasPorFechaAsc($alarms)
+{
+    // Utiliza la función usort para ordenar las alarmas por fecha de forma ascendente
+    usort($alarms, function ($a, $b) {
+        return strtotime($a['warranty']->fecha_final) - strtotime($b['warranty']->fecha_final);
+    });
+
+    return $alarms;
+}
+
+private function ordenarAlarmasPorFechaDesc($alarms)
+{
+    // Utiliza la función usort para ordenar las alarmas por fecha de forma descendente
+    usort($alarms, function ($a, $b) {
+        return strtotime($b['warranty']->fecha_final) - strtotime($a['warranty']->fecha_final);
+    });
+
+    return $alarms;
+}
 
     private function isRedAlarm($warranty)
     {
