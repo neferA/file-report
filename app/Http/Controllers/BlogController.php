@@ -121,19 +121,34 @@ class BlogController extends Controller
 
         if ($search) {
             $columnsToSearch = ['num_boleta', 'proveedor', 'motivo', 'unidad_ejecutora_id'];
-
+        
             $query->where(function ($q) use ($search, $columnsToSearch) {
                 foreach ($columnsToSearch as $column) {
-                    $q->orWhere($column, 'like', '%' . $search . '%');
+                    if ($column === 'unidad_ejecutora_id') {
+                        // Convierte el valor de búsqueda a tipo bigint y compara directamente
+                        $q->orWhere($column, '=', (int)$search);
+                    } else {
+                        $q->orWhere($column, 'like', '%' . $search . '%');
+                    }
                 }
             });
         }
+        
+        
 
         $alarma = $request->input('alarma');
-        if ($alarma) {
-            // Aquí puedes aplicar tu lógica para buscar blogs con una alarma específica
-            // Esto dependerá de cómo estás manejando las alarmas en tu controlador
-            // y cómo determinas si un blog tiene una alarma en particular.
+        if ($alarma && in_array($alarma, ['red', 'orange'])) {
+            // Aplicar el filtro de alarma en función del color en tus blogs
+            $query->whereHas('waranty', function ($q) use ($alarma) {
+                $q->where(function ($subq) use ($alarma) {
+                    if ($alarma === 'red') {
+                        $subq->where('fecha_final', '<=', now()->addDays(11));
+                    } elseif ($alarma === 'orange') {
+                        $subq->where('fecha_final', '>', now()->addDays(11))
+                            ->where('fecha_final', '<=', now()->addDays(13));
+                    }
+                });
+            });
         }
 
         // Ordenamiento

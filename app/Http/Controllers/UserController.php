@@ -58,39 +58,39 @@ class UserController extends Controller
         $alarms = $this->getAlarms();
         
            // Aplicar el filtro de orden si se ha seleccionado
-    $orden = $request->input('orden');
+        $orden = $request->input('orden');
 
-    if ($orden === 'creacion_asc') {
-        $alarms = $this->ordenarAlarmasPorFechaAsc($alarms);
-    } elseif ($orden === 'creacion_desc') {
-        $alarms = $this->ordenarAlarmasPorFechaDesc($alarms);
+        if ($orden === 'creacion_asc') {
+            $alarms = $this->ordenarAlarmasPorFechaAsc($alarms);
+        } elseif ($orden === 'creacion_desc') {
+            $alarms = $this->ordenarAlarmasPorFechaDesc($alarms);
+        }
+
+        //paginación de alarmas
+        list($redAlarmsPaginator, $orangeAlarmsPaginator) = $this->paginateAlarms($alarms, $request);
+
+        return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator', 'orden'));
     }
 
-    //paginación de alarmas
-    list($redAlarmsPaginator, $orangeAlarmsPaginator) = $this->paginateAlarms($alarms, $request);
+    private function ordenarAlarmasPorFechaAsc($alarms)
+    {
+        // Utiliza la función usort para ordenar las alarmas por fecha de forma ascendente
+        usort($alarms, function ($a, $b) {
+            return strtotime($a['warranty']->fecha_final) - strtotime($b['warranty']->fecha_final);
+        });
 
-    return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator', 'orden'));
-}
+        return $alarms;
+    }
 
-private function ordenarAlarmasPorFechaAsc($alarms)
-{
-    // Utiliza la función usort para ordenar las alarmas por fecha de forma ascendente
-    usort($alarms, function ($a, $b) {
-        return strtotime($a['warranty']->fecha_final) - strtotime($b['warranty']->fecha_final);
-    });
+    private function ordenarAlarmasPorFechaDesc($alarms)
+    {
+        // Utiliza la función usort para ordenar las alarmas por fecha de forma descendente
+        usort($alarms, function ($a, $b) {
+            return strtotime($b['warranty']->fecha_final) - strtotime($a['warranty']->fecha_final);
+        });
 
-    return $alarms;
-}
-
-private function ordenarAlarmasPorFechaDesc($alarms)
-{
-    // Utiliza la función usort para ordenar las alarmas por fecha de forma descendente
-    usort($alarms, function ($a, $b) {
-        return strtotime($b['warranty']->fecha_final) - strtotime($a['warranty']->fecha_final);
-    });
-
-    return $alarms;
-}
+        return $alarms;
+    }
 
     private function isRedAlarm($warranty)
     {

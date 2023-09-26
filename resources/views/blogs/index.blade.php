@@ -31,7 +31,7 @@
                                     <option value="creacion_desc"{{ request('orden') === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
                                     <option value="modificacion_desc"{{ request('orden') === 'modificacion_desc' ? ' selected' : '' }}>Modificados recientemente</option>
                                 </select>                   
-                                <!-- <select name="alarma" class="form-control">
+                                <select name="alarma" class="form-control">
                                     <option value="">Seleccionar Alarma</option>
                                     <option value="red"{{ request('alarma') === 'red' ? ' selected' : '' }}>Roja</option>
                                     <option value="orange"{{ request('alarma') === 'orange' ? ' selected' : '' }}>Naranja</option>
