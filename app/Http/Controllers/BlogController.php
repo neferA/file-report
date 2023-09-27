@@ -133,8 +133,6 @@ class BlogController extends Controller
                 }
             });
         }
-        
-        
 
         $alarma = $request->input('alarma');
         if ($alarma && in_array($alarma, ['red', 'orange'])) {
@@ -168,6 +166,25 @@ class BlogController extends Controller
 
         return $query;
     }
+    public function filterByDate(Request $request)
+{
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
+
+    // Realiza la consulta para obtener blogs en el rango de fechas especificado
+    $blogs = Blog::whereBetween('fecha_final', [$startDate, $endDate])
+        ->orderBy('fecha_final', 'asc') // Ordenar por fecha_final en orden ascendente
+        ->simplePaginate(5);
+
+    // Obtén las alarmas para mostrar en la vista
+    $alarms = $this->getAlarms();
+
+    // Renderiza la vista antes de la depuración
+    return view('blogs.index', compact('blogs', 'alarms'));
+
+    // Agrega un dd() para depurar los resultados después de renderizar la vista
+    dd($blogs, $alarms);
+}
 
     
    

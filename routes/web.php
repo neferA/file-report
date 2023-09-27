@@ -88,9 +88,11 @@ Route::get('/executor', [ExecutorController::class,'index'])->name('executor.ind
 Route::get('historial/{id}', [HistoryController::class, 'index'])->name('historial.index');
 Route::get('historial/{id}/show', [HistoryController::class, 'show'])->name('historial.show');
 Route::get('blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
+Route::post('/blogs/filter', [BlogController::class, 'filterByDate'])->name('blogs.filterByDate');
 Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
 Route::get('/generate-pdf', [BlogController::class, 'generatePDF'])->name('generate-pdf');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');
+
 
 
     

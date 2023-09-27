@@ -17,68 +17,86 @@
                     <div class="card-body">
                         <h1> Página de Inicio </h1>
                         
-                        <!-- Mostrar las alarmas -->
-                        <h2>Alarmas Rojas</h2>
-                        <!-- Agregar un campo de búsqueda para las alarmas rojas -->
-                        <div class="input-group mb-3">
-                            <input type="hidden" name="alarm_color" value="red">
-                            <input type="text" class="form-control search-alarm" data-color="red" placeholder="Buscar en alarmas rojas" value="{{ request('search') }}">
-                            <form id="redAlarmsOrderForm" method="get" action="{{ route('home') }}">
-                                <input type="hidden" name="alarm_color" value="red">
-                                <select name="orden" id="orderRedAlarm" class="form-control" onchange="document.getElementById('redAlarmsOrderForm').submit()">
-                                    <option value="">Ordenar por</option>
-                                    <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
-                                    <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
-                                </select>
-                            </form>
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-primary" onclick="searchAlarm('red')">Buscar</button>
+                        <div>
+                            <h2>Alarmas Rojas</h2>
+                            <!-- Agrupa elementos relacionados en un contenedor -->
+                            <div class="filter-container">
+                                <form id="redAlarmsFilterForm" method="get" action="{{ route('home') }}">
+                                    <input type="hidden" name="alarm_color" value="red">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control search-alarm" data-color="red" placeholder="Buscar en alarmas rojas" value="{{ request('search') }}">
+                                        <select name="orden" id="orderRedAlarm" class="form-control">
+                                            <option value="">Ordenar por</option>
+                                            <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                            <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary search-button">Buscar</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
+                            <div>
+                                @foreach($redAlarmsPaginator->items() as $alarm)
+                                    @if($alarm['color'] === 'red')
+                                        <div class="card alarm-card" style="border: 2px solid #FF0000; background-color: #FFEAEA;">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h5 class="card-title"><i class="fas fa-exclamation-circle" style="color: #FF0000;"></i> Alarma Roja</h5>
+                                                    {{-- <span class="text-muted">{{ $alarm['timestamp'] }}</span> <!-- Agrega la hora y fecha de la alarma --> --}}
+                                                </div>
+                                                <p class="card-text"><strong>Garantía a punto de expirar:</strong> {{ $alarm['warranty']->titulo }}</p>
+                                                <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
+                                                <button class="btn btn-danger alarm-close-button" onclick="closeAlarm(this)" style="transition: opacity 0.3s;">Cerrar</button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                            {{ $redAlarmsPaginator->links() }}
                         </div>
-                        @foreach($redAlarmsPaginator->items() as $alarm)
-                            @if($alarm['color'] === 'red')
-                                <div class="alert alert-{{ $alarm['color'] }}" style="background-color: {{ $alarm['color'] }}">
-                                    <strong>Alarma Roja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
-                                    <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
-                                    <!-- Agrega un botón "X" para cerrar la alarma -->
-                                    <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
-                                </div>
-                            @endif
-                        @endforeach
-                        {{ $redAlarmsPaginator->links() }}
-                    </div>
+                        
                         <div>
                             <h2>Alarmas Naranjas</h2>
-                            <!-- Agregar un campo de búsqueda para las alarmas naranjas -->
-                            <div class="input-group mb-3">
-                                <input type="hidden" name="alarm_color" value="orange">
-                                <input type="text" class="form-control search-alarm" data-color="orange" placeholder="Buscar en alarmas naranjas" value="{{ request('search') }}">                                <form id="orangeAlarmsOrderForm" method="get" action="{{ route('home') }}">
+                            <!-- Agrupa elementos relacionados en un contenedor -->
+                            <div class="filter-container">
+                                <form id="orangeAlarmsFilterForm" method="get" action="{{ route('home') }}">
                                     <input type="hidden" name="alarm_color" value="orange">
-                                    <select name="orden" id="orderOrangeAlarm" class="form-control" onchange="document.getElementById('orangeAlarmsOrderForm').submit()">
-                                        <option value="">Ordenar por</option>
-                                        <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
-                                        <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
-                                    </select>
-                                </form>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-primary" onclick="searchAlarm('orange')">Buscar</button>
-                                </div>
-                            </div>
-                            @foreach($orangeAlarmsPaginator->items() as $alarm)
-                                @if($alarm['color'] === 'orange')
-                                    <div class="alert alert-{{ $alarm['color'] }} alert-{{ $alarm['orden'] }}" style="background-color: {{ $alarm['color'] }}">
-                                        <strong>Alarma Naranja:</strong> Garantía a punto de expirar: {{ $alarm['warranty']->titulo }}
-                                        <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
-                                        <!-- Agrega un botón "X" para cerrar la alarma -->
-                                        <button class="close" data-dismiss="alert" aria-label="Cerrar" onclick="closeAlarm(this)"><span aria-hidden="true">&times;</span></button>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control search-alarm" data-color="orange" placeholder="Buscar en alarmas naranjas" value="{{ request('search') }}">
+                                        <select name="orden" id="orderOrangeAlarm" class="form-control">
+                                            <option value="">Ordenar por</option>
+                                            <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                            <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary search-button" onclick="searchAlarm('orange')">Buscar</button>
+                                        </div>
                                     </div>
-                                @endif
-                            @endforeach
+                                </form>
+                            </div>
+                            <div>
+                                @foreach($orangeAlarmsPaginator->items() as $alarm)
+                                    @if($alarm['color'] === 'orange')
+                                        <div class="card alarm-card" style="border: 2px solid #FFA500; background-color: #FFF3E0;">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h5 class="card-title"><i class="fas fa-exclamation-circle" style="color: #FFA500;"></i> Alarma Naranja</h5>
+                                                    {{-- <span class="text-muted">{{ $alarm['timestamp'] }}</span> <!-- Agrega la hora y fecha de la alarma --> --}}
+                                                </div>
+                                                <p class="card-text"><strong>Garantía a punto de expirar:</strong> {{ $alarm['warranty']->titulo }}</p>
+                                                <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
+                                                <button class="btn btn-danger alarm-close-button" onclick="closeAlarm(this)" style="transition: opacity 0.3s;">Cerrar</button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
                             {{ $orangeAlarmsPaginator->links() }}
-                        </div>
+                        </div>               
                     </div>
                 </div>
-            </div>
+            </div>  
         </div>
     </div>
 </section>
