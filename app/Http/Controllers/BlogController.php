@@ -38,10 +38,27 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        $query = $this->buildQuery($request);    
+        $query = $this->buildQuery($request); 
 
+        // Verifica si se han proporcionado fechas de inicio y final en la solicitud
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Aplica el filtro si se proporcionaron fechas
+        if ($startDate && $endDate) {
+            $blogs = Blog::whereHas('warranty', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('fecha_final', [$startDate, $endDate]);
+            })
+            ->orderBy('fecha_final', 'asc')
+            ->simplePaginate(5);
+        } else {
+            // Si no se proporcionaron fechas, muestra todos los blogs
+            $blogs = Blog::orderBy('fecha_final', 'asc')->simplePaginate(5);
+        }
+        
         $expiringBlogs = $this->getExpiringBlogs();
 
+        
         // Iterar a través de los blogs y manejar las alarmas
         foreach ($expiringBlogs as $blog) {
             $this->handleBlogAlarm($blog);
@@ -51,9 +68,20 @@ class BlogController extends Controller
         $alarms = $this->getAlarms();
         //dd($alarms);
         $blogs = $query->simplePaginate(5);
-        return view('blogs.index', compact('blogs', 'alarms'));
+
+        return view('blogs.index', compact('blogs', 'alarms','filteredBlogs'));
     }
 
+    private function filterByDate($startDate, $endDate)
+    {
+        // Realiza la consulta para obtener garantías en el rango de fechas especificado
+        $filteredWarranties = waranty::whereBetween('fecha_final', [$startDate, $endDate])
+            ->orderBy('fecha_final', 'desc')
+            ->simplePaginate(2);
+
+        return $filteredWarranties;
+    }
+    
     private function getExpiringBlogs()
     {
         return waranty::whereDate('fecha_final', '>=', now())
@@ -166,25 +194,6 @@ class BlogController extends Controller
 
         return $query;
     }
-    public function filterByDate(Request $request)
-{
-    $startDate = $request->input('start_date');
-    $endDate = $request->input('end_date');
-
-    // Realiza la consulta para obtener blogs en el rango de fechas especificado
-    $blogs = Blog::whereBetween('fecha_final', [$startDate, $endDate])
-        ->orderBy('fecha_final', 'asc') // Ordenar por fecha_final en orden ascendente
-        ->simplePaginate(5);
-
-    // Obtén las alarmas para mostrar en la vista
-    $alarms = $this->getAlarms();
-
-    // Renderiza la vista antes de la depuración
-    return view('blogs.index', compact('blogs', 'alarms'));
-
-    // Agrega un dd() para depurar los resultados después de renderizar la vista
-    dd($blogs, $alarms);
-}
 
     
    
