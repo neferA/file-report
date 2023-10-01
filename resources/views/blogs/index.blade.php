@@ -116,8 +116,8 @@
                                                 @endif
                                             </td>
                                             <!-- Agregar mensajes de depuración -->
-                                            <!-- <td>Blog ID: {{ $blog->id }}</td>
-                                            <td>Alarmas: {{ json_encode($alarms) }}</td> -->
+                                            {{-- <!-- <td>Blog ID: {{ $blog->id }}</td> --}}
+                                            {{-- <td>Alarmas: {{ json_encode($alarms) }}</td> --> --}}
                                             <td>
                                                 <div class="btn-group" role="group" aria-label="Acciones">
                                                     <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">
@@ -141,13 +141,10 @@
                                                     @endcan
 
                                                     <!-- Botón para generar el informe con ícono PDF -->
-                                                    <a href="{{ route('generate-pdf', [
-                                                        'fecha_inicio' => request('fecha_inicio'),
-                                                        'fecha_final' => request('fecha_final'),
-                                                        'unidad_ejecutora_id' => request('unidad_ejecutora_id'),
-                                                    ]) }}" class="btn btn-success">
-                                                        <i class="fas fa-file-pdf"></i> Generar PDF
+                                                    <a href="{{ route('blogs.generarpdf', ['id' => $blog->id]) }}" class="btn btn-success">
+                                                        Generar PDF
                                                     </a>
+                                                    
                                                 </div>
                                             </td>
                                         </tr>

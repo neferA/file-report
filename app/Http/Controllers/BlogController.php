@@ -38,51 +38,37 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        $query = $this->buildQuery($request); 
-
-        // Verifica si se han proporcionado fechas de inicio y final en la solicitud
+        $baseQuery = $this->buildQuery($request); // Construye la consulta base
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-
-        // Aplica el filtro si se proporcionaron fechas
-        if ($startDate && $endDate) {
-            $blogs = Blog::whereHas('warranty', function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('fecha_final', [$startDate, $endDate]);
-            })
-            ->orderBy('fecha_final', 'asc')
-            ->simplePaginate(5);
-        } else {
-            // Si no se proporcionaron fechas, muestra todos los blogs
-            $blogs = Blog::orderBy('fecha_final', 'asc')->simplePaginate(5);
-        }
         
+        $dateFilteredQuery = clone $baseQuery; // Clona la consulta base para aplicar el filtro de fechas
+        $this->applyDateFilter($dateFilteredQuery, $startDate, $endDate); // Aplica el filtro de fechas
+        
+        $blogs = $dateFilteredQuery->orderBy('created_at', 'asc')->simplePaginate(5); // Ejecuta la consulta filtrada por fechas
+                
         $expiringBlogs = $this->getExpiringBlogs();
-
-        
         // Iterar a través de los blogs y manejar las alarmas
-        foreach ($expiringBlogs as $blog) {
+        foreach ($expiringBlogs as $blog) { 
             $this->handleBlogAlarm($blog);
         }
     
         // Obtener las alarmas para mostrar en la vista
         $alarms = $this->getAlarms();
-        //dd($alarms);
-        $blogs = $query->simplePaginate(5);
-
-        return view('blogs.index', compact('blogs', 'alarms','filteredBlogs'));
+        
+        return view('blogs.index', compact('blogs', 'alarms'));
     }
 
-    private function filterByDate($startDate, $endDate)
+    private function applyDateFilter($query, $startDate, $endDate)
     {
-        // Realiza la consulta para obtener garantías en el rango de fechas especificado
-        $filteredWarranties = waranty::whereBetween('fecha_final', [$startDate, $endDate])
-            ->orderBy('fecha_final', 'desc')
-            ->simplePaginate(2);
-
-        return $filteredWarranties;
+        if ($startDate && $endDate) {
+            $query->whereHas('waranty', function ($subquery) use ($startDate, $endDate) {
+                $subquery->whereBetween('fecha_final', [$startDate, $endDate]);
+            });
+        }
     }
-    
-    private function getExpiringBlogs()
+
+    private function getExpiringBlogs() 
     {
         return waranty::whereDate('fecha_final', '>=', now())
             ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
@@ -145,11 +131,10 @@ class BlogController extends Controller
             $query->where('estado', $estado);
         }
 
+        // Filtro de búsqueda
         $search = $request->input('search');
-
         if ($search) {
             $columnsToSearch = ['num_boleta', 'proveedor', 'motivo', 'unidad_ejecutora_id'];
-        
             $query->where(function ($q) use ($search, $columnsToSearch) {
                 foreach ($columnsToSearch as $column) {
                     if ($column === 'unidad_ejecutora_id') {
@@ -162,6 +147,7 @@ class BlogController extends Controller
             });
         }
 
+        // Filtro por alarma
         $alarma = $request->input('alarma');
         if ($alarma && in_array($alarma, ['red', 'orange'])) {
             // Aplicar el filtro de alarma en función del color en tus blogs
@@ -194,6 +180,7 @@ class BlogController extends Controller
 
         return $query;
     }
+
 
     
    
@@ -235,9 +222,11 @@ class BlogController extends Controller
             'fecha_inicio' => 'required|date_format:Y-m-d',
             'fecha_final' => 'required|date_format:Y-m-d',
             'estado' => 'required|in:' . implode(',', [
+                Blog::ESTADO_VIGENTE, 
                 Blog::ESTADO_LIBERADO,
                 Blog::ESTADO_EJECUTADO,
                 Blog::ESTADO_RENOVADO,
+                Blog::ESTADO_VENCIDO,
             ]),
             'boleta_pdf' => 'nullable|mimes:pdf|max:2048', // Validación para el archivo PDF
             'nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
@@ -310,48 +299,40 @@ class BlogController extends Controller
     {
         //
     }
-    public function generatePDF(Request $request)
+    public function generarPDF($id)
     {
-        // Obtener los datos que necesitas para el informe
-        $data = $this->getDataForPDF($request);
+        // dd("ID recibido: " . $id);
+        // Obtener el blog basado en el ID proporcionado
+        $blog = Blog::with('waranty', 'unidadEjecutora')->find($id);
 
-        //dd($data); // Imprime los datos para comprobar
+        // Verificar si el blog existe
+        // Verifica si el blog existe
+    if (!$blog) {
+        abort(404); // Muestra una página 404 si el blog no se encuentra
+    }
+    
+        // Obtener los valores necesarios del blog
+        $fechaInicio = $blog->waranty->fecha_inicio;
+        $fechaFinal = $blog->waranty->fecha_final;
+        $unidadEjecutoraId = $blog->unidad_ejecutora_id;
+        $warantyMonto = $blog->waranty->monto;
+        $unidadEjecutoraNombre = $blog->unidadEjecutora->nombre;
 
+        // Obtener los datos necesarios para el informe en PDF (puedes utilizar tus propios métodos para obtener estos datos)
+        $data = [
+            'num_boleta' => $blog->num_boleta,
+            'usuario' => $blog->usuario,
+            'tipo_garantia' => $blog->tipoGarantia->nombre, 
+            'monto' => $blog->waranty->monto,
+            'unidad_ejecutora' => $blog->unidadEjecutora->nombre, 
+        ];
+    
         // Generar el informe en PDF usando Laravel PDF
         $pdf = PDF::loadView('report', compact('data'));
-
+    
         // Descargar el PDF
-        return $pdf->download('reporte.pdf');
+        return $pdf->download('informe.pdf');
     }
-
-
-    private function getDataForPDF(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'fecha_inicio' => 'required|date',
-            'fecha_final' => 'required|date',
-            'unidad_ejecutora_id' => 'required|numeric',
-        ]);
-    
-        if ($validator->fails()) {
-            // Manejar errores de validación aquí, por ejemplo, devolver una respuesta de error.
-        }
-    
-        try {
-            $fechaInicio = $request->input('fecha_inicio');
-            $fechaFin = $request->input('fecha_final');
-            $unidadEjecutoraId = $request->input('unidad_ejecutora_id');
-    
-            $boletas = Blog::select(/* ... */)->get();
-    
-            return $boletas;
-        } catch (\Exception $e) {
-            // Manejar el error de base de datos, por ejemplo, registrándolo o devolviendo una respuesta de error.
-        }
-    }
-    
-    
-    
 
     /**
      * Show the form for editing the specified resource.
@@ -388,6 +369,7 @@ class BlogController extends Controller
                 Blog::ESTADO_LIBERADO,
                 Blog::ESTADO_EJECUTADO,
                 Blog::ESTADO_RENOVADO,
+                Blog::ESTADO_VENCIDO,
             ]),
             'new_boleta_pdf' => 'nullable|mimes:pdf|max:2048', // Validación para el archivo PDF
             'new_nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF

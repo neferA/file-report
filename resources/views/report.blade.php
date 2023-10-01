@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-    <h1>Informe de Boletas de Garantía</h1>
+    <h1>Informe de Boleta de Garantía</h1>
     <table>
         <thead>
             <tr>
@@ -34,18 +34,20 @@
                 <th>Usuario</th>
                 <th>Tipo de Garantía</th>
                 <th>Monto</th>
+                <th>Unidad Ejecutora</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($data as $boleta)
-                <tr>
-                    <td>{{ $boleta->num_boleta }}</td>
-                    <td>{{ $boleta->usuario }}</td>
-                    <td>{{ $boleta->tipo_garantia_id }}</td>
-                    <td>{{ $boleta->monto }}</td>
-                </tr>
-            @endforeach
+            <tr>
+                <td>{{ $data['num_boleta'] }}</td>
+                <td>{{ $data['usuario'] }}</td>
+                <td>{{ $data['tipo_garantia'] }}</td> <!-- Asegúrate de que la clave sea correcta según cómo la pasas desde el controlador -->
+                <td>{{ $data['monto'] }}</td> <!-- Accede al monto directamente desde el array de datos -->
+                <td>{{ $data['unidad_ejecutora'] }}</td> <!-- Accede al nombre de la unidad ejecutora desde el array de datos -->
+            </tr>
         </tbody>
     </table>
 </body>
+
+
 </html>

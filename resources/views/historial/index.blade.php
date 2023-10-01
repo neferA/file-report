@@ -52,7 +52,7 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($historial as $historia)
-                                                <t  r>
+                                                <tr>
                                                     <td>{{ $historia->id }}</td>
                                                     <td>{{ $historia->titulo }}</td>
                                                     <td>

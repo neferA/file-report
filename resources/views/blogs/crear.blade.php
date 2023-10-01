@@ -70,11 +70,14 @@
                                         <div class="form-group">
                                             <label for="estado">Estado</label>
                                             {!! Form::select('estado', [
-                                                \App\Models\Blog::ESTADO_LIBERADO => 'Liberado',
-                                                \App\Models\Blog::ESTADO_EJECUTADO => 'Ejecutado',
-                                                \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
+                                                \App\Models\Blog::ESTADO_VIGENTE => 'Vigente', 
+                                                // \App\Models\Blog::ESTADO_EJECUTADO => 'Ejecutado',
+                                                // \App\Models\Blog::ESTADO_LIBERADO => 'Liberado',
+                                                // \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
+                                                // \App\Models\Blog::ESTADO_VENCIDO => 'Vencido',
                                             ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
                                         </div>
+                                        
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">

@@ -24,19 +24,26 @@ class Blog extends Model
     const ESTADO_LIBERADO = 'liberado';
     const ESTADO_EJECUTADO = 'ejecutado';
     const ESTADO_RENOVADO = 'renovado';
+    const ESTADO_VIGENTE = 'vigente'; 
+    const ESTADO_VENCIDO = 'vencido';
     
     public function getEstadoColorAttribute()
     {
         switch ($this->estado) {
+            case self::ESTADO_VIGENTE:
+                return 'badge-primary'; // Color para el estado "vigente"
             case self::ESTADO_LIBERADO:
                 return 'badge-success'; // Cambia esto al color que desees
             case self::ESTADO_EJECUTADO:
                 return 'badge-warning'; // Cambia esto al color que desees
             case self::ESTADO_RENOVADO:
                 return 'badge-info'; // Cambia esto al color que desees
+            case self::ESTADO_VENCIDO:
+                return 'badge-danger'; // Color para el estado "vencido"
             default:
                 return 'badge-secondary'; // Color por defecto si el estado no coincide
         }
+        
     }
 
 
