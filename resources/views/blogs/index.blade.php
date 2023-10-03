@@ -106,8 +106,10 @@
                                                     <div class="alert alert-{{ $alarms[$blog->id]['color'] }} text-center" style="background-color: {{ $alarms[$blog->id]['color'] }}">
                                                         @if ($alarms[$blog->id]['color'] === 'red')
                                                             <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
-                                                        @else
+                                                        @elseif ($alarms[$blog->id]['color'] === 'orange')
                                                             <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Naranja</strong>
+                                                        @else
+                                                            <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Negra</strong>
                                                         @endif
                                                     </div>
                                                 @else
@@ -115,9 +117,10 @@
                                                     <div class="alert alert-info text-center">Sin alarma</div>
                                                 @endif
                                             </td>
+
                                             <!-- Agregar mensajes de depuración -->
-                                            {{-- <!-- <td>Blog ID: {{ $blog->id }}</td> --}}
-                                            {{-- <td>Alarmas: {{ json_encode($alarms) }}</td> --> --}}
+                                            <td>Blog ID: {{ $blog->id }}</td>
+                                            <td>Alarmas: {{ json_encode($alarms) }}</td>
                                             <td>
                                                 <div class="btn-group" role="group" aria-label="Acciones">
                                                     <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">

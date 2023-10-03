@@ -74,10 +74,15 @@ class BlogController extends Controller
             ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
             ->get();
     }
+    private function isBlackAlarm($fechaFinal)
+    {
+        $daysRemaining = now()->diffInDays($fechaFinal);
+        return $daysRemaining === 0;
+    }
     private function isRedAlarm($fechaFinal)
     {
         $daysRemaining = now()->diffInDays($fechaFinal);
-        return $daysRemaining <= 11;
+        return $daysRemaining <= 11 && $daysRemaining > 0;
     }
 
     private function isOrangeAlarm($fechaFinal)
@@ -91,9 +96,10 @@ class BlogController extends Controller
         // Lógica para determinar si es una alarma roja o naranja
         $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
         $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
+        $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final);
 
         // Crear una instancia de WarrantyExpired con los valores correctos
-        $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm);
+        $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
         event($event); // Disparar el evento
     }
 
@@ -106,15 +112,17 @@ class BlogController extends Controller
             ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
             ->get();
     
+       
         foreach ($expiringBlogs as $blog) {
-            // Lógica para determinar si es una alarma roja o naranja
+            // Lógica para determinar si es una alarma roja, naranja o negra
             $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
             $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
-    
-            if ($isRedAlarm || $isOrangeAlarm) {
+            $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final);
+
+            if ($isRedAlarm || $isOrangeAlarm || $isBlackAlarm) {
                 // Almacenar la alarma en el array asociativo usando el ID del blog como clave
                 $alarms[$blog->id] = [
-                    'color' => $isRedAlarm ? 'red' : 'orange',
+                    'color' => $isRedAlarm ? 'red' : ($isOrangeAlarm ? 'orange' : 'black'),
                 ];
             }
         }
@@ -223,10 +231,10 @@ class BlogController extends Controller
             'fecha_final' => 'required|date_format:Y-m-d',
             'estado' => 'required|in:' . implode(',', [
                 Blog::ESTADO_VIGENTE, 
-                Blog::ESTADO_LIBERADO,
-                Blog::ESTADO_EJECUTADO,
-                Blog::ESTADO_RENOVADO,
-                Blog::ESTADO_VENCIDO,
+                // Blog::ESTADO_LIBERADO,
+                // Blog::ESTADO_EJECUTADO,
+                // Blog::ESTADO_RENOVADO,
+                // Blog::ESTADO_VENCIDO,
             ]),
             'boleta_pdf' => 'nullable|mimes:pdf|max:2048', // Validación para el archivo PDF
             'nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
@@ -248,8 +256,8 @@ class BlogController extends Controller
         $data['fecha_inicio'] = Carbon::parse($request->input('fecha_inicio'));
         $data['fecha_final'] = Carbon::parse($request->input('fecha_final'));
 
-            // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
-            $data['usuario'] = Auth::user()->name;
+        // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
+        $data['usuario'] = Auth::user()->name;
 
         $blog = Blog::create($data);
 
@@ -306,7 +314,6 @@ class BlogController extends Controller
         $blog = Blog::with('waranty', 'unidadEjecutora')->find($id);
 
         // Verificar si el blog existe
-        // Verifica si el blog existe
     if (!$blog) {
         abort(404); // Muestra una página 404 si el blog no se encuentra
     }
@@ -379,6 +386,7 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
         $data = $request->except(['new_boleta_pdf', 'new_nota_pdf']);
 
+        
         // Almacenar los nombres de archivo antiguos
         $oldBoletaPdf = $blog->waranty ? $blog->waranty->boleta_pdf : null;
         $oldNotaPdf = $blog->waranty ? $blog->waranty->nota_pdf : null;

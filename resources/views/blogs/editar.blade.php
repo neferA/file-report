@@ -73,6 +73,7 @@
                                         <option value="{{ App\Models\Blog::ESTADO_LIBERADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_LIBERADO ? 'selected' : '' }}>Liberado</option>
                                         <option value="{{ App\Models\Blog::ESTADO_EJECUTADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_EJECUTADO ? 'selected' : '' }}>Ejecutado</option>
                                         <option value="{{ App\Models\Blog::ESTADO_RENOVADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_RENOVADO ? 'selected' : '' }}>Renovado</option>
+                                        <option value="{{ App\Models\Blog::ESTADO_VENCIDO }}" {{ $blog->estado === App\Models\Blog::ESTADO_VENCIDO ? 'selected' : '' }}>vencido</option>
                                     </select>
                                     </div>
                                     <div class="col-md-6">

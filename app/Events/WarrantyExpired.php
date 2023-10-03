@@ -17,18 +17,21 @@ class WarrantyExpired
     public $waranty;
     public $isRedAlarm;
     public $isOrangeAlarm;
+    public $isBlackAlarm;
      /**
      * Create a new event instance.
      *
      * @param waranty $waranty
      * @param bool $isRedAlarm
      * @param bool $isOrangeAlarm
+     * @param bool $isBlackAlarm
      */
-    public function __construct(waranty $waranty, bool $isRedAlarm, bool $isOrangeAlarm)
+    public function __construct(waranty $waranty, bool $isRedAlarm, bool $isOrangeAlarm, bool $isBlackAlarm)
     {
         $this->waranty = $waranty;
         $this->isRedAlarm = $isRedAlarm;
         $this->isOrangeAlarm = $isOrangeAlarm;
+        $this->isBlackAlarm = $isBlackAlarm;
     }
         
     /**
