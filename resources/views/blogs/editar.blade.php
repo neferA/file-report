@@ -70,6 +70,7 @@
                                 <div class="col-md-6">
                                     <label for="fecha_final">estado</label>
                                     <select name="estado" class="form-control">
+                                        <option value="{{ App\Models\Blog::ESTADO_VIGENTE }}" {{ $blog->estado === App\Models\Blog::ESTADO_VIGENTE ? 'selected' : '' }}>vigente</option>
                                         <option value="{{ App\Models\Blog::ESTADO_LIBERADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_LIBERADO ? 'selected' : '' }}>Liberado</option>
                                         <option value="{{ App\Models\Blog::ESTADO_EJECUTADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_EJECUTADO ? 'selected' : '' }}>Ejecutado</option>
                                         <option value="{{ App\Models\Blog::ESTADO_RENOVADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_RENOVADO ? 'selected' : '' }}>Renovado</option>

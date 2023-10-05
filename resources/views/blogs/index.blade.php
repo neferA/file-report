@@ -21,9 +21,11 @@
                                 <input type="text" name="search" class="form-control" placeholder="Buscar" value="{{ request('search') }}">
                                 <select name="estado" class="form-control">
                                     <option value="">Seleccionar estado</option>
+                                    <option value="vigente"{{ request('estado') === 'vigente' ? ' selected' : '' }}>vigente</option>
                                     <option value="liberado"{{ request('estado') === 'liberado' ? ' selected' : '' }}>Liberado</option>
                                     <option value="ejecutado"{{ request('estado') === 'ejecutado' ? ' selected' : '' }}>Ejecutado</option>
                                     <option value="renovado"{{ request('estado') === 'renovado' ? ' selected' : '' }}>Renovado</option>
+                                    <option value="vencido"{{ request('estado') === 'vencido' ? ' selected' : '' }}>vencido</option>
                                 </select>
                                 <select name="orden" class="form-control">
                                     <option value="">Ordenar por</option>
@@ -35,6 +37,7 @@
                                     <option value="">Seleccionar Alarma</option>
                                     <option value="red"{{ request('alarma') === 'red' ? ' selected' : '' }}>Roja</option>
                                     <option value="orange"{{ request('alarma') === 'orange' ? ' selected' : '' }}>Naranja</option>
+                                    <option value="black"{{ request('alarma') === 'black' ? ' selected' : '' }}>negra</option>
                                     <!-- Agrega más opciones si es necesario -->
                                 </select>
                                 <div class="input-group-append">
@@ -118,8 +121,8 @@
                                                 @endif
                                             </td>
                                             <!-- Agregar mensajes de depuración -->
-                                            {{-- <td>Blog ID: {{ $blog->id }}</td>
-                                            <td>Alarmas: {{ json_encode($alarms) }}</td> --}}
+                                            <!-- <td>Blog ID: {{ $blog->id }}</td>
+                                            <td>Alarmas: {{ json_encode($alarms) }}</td>  -->
                                             <td>
                                                 <div class="btn-group" role="group" aria-label="Acciones">
                                                     <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">

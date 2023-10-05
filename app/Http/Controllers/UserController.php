@@ -73,26 +73,6 @@ class UserController extends Controller
         return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator', 'blackAlarmsPaginator', 'orden'));
     }
 
-    private function ordenarAlarmasPorFechaAsc($alarms)
-    {
-        // Utiliza la función usort para ordenar las alarmas por fecha de forma ascendente
-        usort($alarms, function ($a, $b) {
-            return strtotime($a['warranty']->fecha_final) - strtotime($b['warranty']->fecha_final);
-        });
-
-        return $alarms;
-    }
-
-    private function ordenarAlarmasPorFechaDesc($alarms)
-    {
-        // Utiliza la función usort para ordenar las alarmas por fecha de forma descendente
-        usort($alarms, function ($a, $b) {
-            return strtotime($b['warranty']->fecha_final) - strtotime($a['warranty']->fecha_final);
-        });
-
-        return $alarms;
-    }
-
     private function isBlackAlarm($warranty)
     {
         $daysRemaining = now()->diffInDays($warranty->fecha_final);
@@ -115,29 +95,48 @@ class UserController extends Controller
     private function getAlarms()
     {
         $alarms = [];
-        
+    
         // Obtener las garantías que están a punto de expirar
         $expiringWarranties = Waranty::whereDate('fecha_final', '>=', now())
             ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
             ->get();
-
+    
         foreach ($expiringWarranties as $warranty) {
             // Lógica para determinar si es una alarma roja, naranja o negra
-            $isRedAlarm = $this->isRedAlarm($warranty->fecha_final);
-            $isOrangeAlarm = $this->isOrangeAlarm($warranty->fecha_final);
-            $isBlackAlarm = $this->isBlackAlarm($warranty->fecha_final);
-
+            $isRedAlarm = $this->isRedAlarm($warranty);
+            $isOrangeAlarm = $this->isOrangeAlarm($warranty);
+            $isBlackAlarm = $this->isBlackAlarm($warranty);
+    
             if ($isRedAlarm || $isOrangeAlarm || $isBlackAlarm) {
-                // Almacenar la alarma en el array asociativo usando el ID de la garantía como clave
-                $alarms[$warranty->id] = [
+                $alarms[] = [
+                    'warranty' => $warranty,
                     'color' => $isRedAlarm ? 'red' : ($isOrangeAlarm ? 'orange' : 'black'),
                 ];
             }
         }
+    
+        return $alarms;
+    }
+    
+    private function ordenarAlarmasPorFechaAsc($alarms)
+    {
+        // Utiliza la función usort para ordenar las alarmas por fecha de forma ascendente
+        usort($alarms, function ($a, $b) {
+            return strtotime($a['warranty']->fecha_final) - strtotime($b['warranty']->fecha_final);
+        });
 
         return $alarms;
     }
-  
+
+    private function ordenarAlarmasPorFechaDesc($alarms)
+    {
+        // Utiliza la función usort para ordenar las alarmas por fecha de forma descendente
+        usort($alarms, function ($a, $b) {
+            return strtotime($b['warranty']->fecha_final) - strtotime($a['warranty']->fecha_final);
+        });
+
+        return $alarms;
+    }
     private function paginateAlarms($alarms, Request $request)
     {
         // Convierte el array de alarmas en una colección

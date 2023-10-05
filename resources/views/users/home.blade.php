@@ -163,7 +163,6 @@
     function searchAlarm(color) {
     const searchField = document.querySelector(`.search-alarm[data-color="${color}"]`);
     const searchTerm = searchField.value.toLowerCase();
-
     const alarmContainers = document.querySelectorAll(`.alert-${color}`);
 
     alarmContainers.forEach((alarmContainer) => {
