@@ -108,8 +108,8 @@
                                                             <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
                                                         @elseif ($alarms[$blog->id]['color'] === 'orange')
                                                             <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Naranja</strong>
-                                                        @else
-                                                            <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Negra</strong>
+                                                        @elseif ($alarms[$blog->id]['color'] === 'black')
+                                                            <i class="fas fa-exclamation-triangle text-white"></i> <strong class="text-white">Alarma Negra</strong>
                                                         @endif
                                                     </div>
                                                 @else
@@ -117,10 +117,9 @@
                                                     <div class="alert alert-info text-center">Sin alarma</div>
                                                 @endif
                                             </td>
-
                                             <!-- Agregar mensajes de depuración -->
-                                            <td>Blog ID: {{ $blog->id }}</td>
-                                            <td>Alarmas: {{ json_encode($alarms) }}</td>
+                                            {{-- <td>Blog ID: {{ $blog->id }}</td>
+                                            <td>Alarmas: {{ json_encode($alarms) }}</td> --}}
                                             <td>
                                                 <div class="btn-group" role="group" aria-label="Acciones">
                                                     <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">
@@ -132,7 +131,6 @@
                                                             <i class="fas fa-edit"></i> Editar
                                                         </a>
                                                     @endcan
-                                                    
                                                     @can('borrar_tickets')
                                                         <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST">
                                                             @csrf
@@ -142,12 +140,10 @@
                                                             </button>
                                                         </form>
                                                     @endcan
-
                                                     <!-- Botón para generar el informe con ícono PDF -->
                                                     <a href="{{ route('blogs.generarpdf', ['id' => $blog->id]) }}" class="btn btn-success">
                                                         Generar PDF
                                                     </a>
-                                                    
                                                 </div>
                                             </td>
                                         </tr>

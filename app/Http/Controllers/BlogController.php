@@ -82,18 +82,19 @@ class BlogController extends Controller
     private function isRedAlarm($fechaFinal)
     {
         $daysRemaining = now()->diffInDays($fechaFinal);
-        return $daysRemaining <= 11 && $daysRemaining > 0;
+        return ($daysRemaining <= 11 && $daysRemaining > 0) || round($daysRemaining) === 2;
     }
-
+    
     private function isOrangeAlarm($fechaFinal)
     {
         $daysRemaining = now()->diffInDays($fechaFinal);
-        return $daysRemaining <= 13 && !$this->isRedAlarm($fechaFinal);
+        $isRed = ($daysRemaining <= 11 && $daysRemaining > 0) || round($daysRemaining) === 2;
+        return $daysRemaining <= 13 && $daysRemaining > 0 && !$isRed;
     }
 
     private function handleBlogAlarm($blog)
     {
-        // Lógica para determinar si es una alarma roja o naranja
+        // Lógica para determinar si es una alarma roja,naranja y negra
         $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
         $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
         $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final);

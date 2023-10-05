@@ -16,7 +16,42 @@
                 <div class="card">
                     <div class="card-body">
                         <h1> Página de Inicio </h1>
-                        
+                        <div>
+                            <h2>Alarmas Negras</h2>
+                            <div class="filter-container">
+                                <form id="blackAlarmsFilterForm" method="get" action="{{ route('home') }}">
+                                    <input type="hidden" name="alarm_color" value="black">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control search-alarm" data-color="black" placeholder="Buscar en alarmas negras" value="{{ request('search') }}">
+                                        <select name="orden" id="orderBlackAlarm" class="form-control">
+                                            <option value="">Ordenar por</option>
+                                            <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
+                                            <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary search-button">Buscar</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                            
+                            <div>
+                                @foreach($blackAlarmsPaginator->items() as $alarm)
+                                    @if($alarm['color'] === 'black')
+                                        <div class="card alarm-card" style="border: 2px solid #000000; background-color: #EAEAEA;">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h5 class="card-title"><i class="fas fa-exclamation-circle" style="color: #000000;"></i> Alarma Negra</h5>
+                                                </div>
+                                                <p class="card-text"><strong>Garantía a punto de expirar:</strong> {{ $alarm['warranty']->titulo }}</p>
+                                                <a href="{{ route('blogs.edit', ['blog' => $alarm['warranty']->blog->id]) }}" class="btn btn-primary">Ver Blog</a>
+                                                <button class="btn btn-danger alarm-close-button" onclick="closeAlarm(this)" style="transition: opacity 0.3s;">Cerrar</button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                            {{ $blackAlarmsPaginator->links() }}
+                        </div>
                         <div>
                             <h2>Alarmas Rojas</h2>
                             <!-- Agrupa elementos relacionados en un contenedor -->

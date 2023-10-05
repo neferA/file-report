@@ -48,9 +48,10 @@ class UserController extends Controller
             // Lógica para determinar si es una alarma roja o naranja
             $isRedAlarm = $this->isRedAlarm($warranty);
             $isOrangeAlarm = $this->isOrangeAlarm($warranty);
+            $isBlackAlarm = $this->isBlackAlarm($warranty);
 
             // Crear una instancia de WarrantyExpired con los valores correctos
-            $event = new WarrantyExpired($warranty, $isRedAlarm, $isOrangeAlarm);
+            $event = new WarrantyExpired($warranty, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
             event($event); // Disparar el evento
         }
 
@@ -67,9 +68,9 @@ class UserController extends Controller
         }
 
         //paginación de alarmas
-        list($redAlarmsPaginator, $orangeAlarmsPaginator) = $this->paginateAlarms($alarms, $request);
+        list($redAlarmsPaginator, $orangeAlarmsPaginator, $blackAlarmsPaginator) = $this->paginateAlarms($alarms, $request);
 
-        return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator', 'orden'));
+        return view('users.home', compact('redAlarmsPaginator', 'orangeAlarmsPaginator', 'blackAlarmsPaginator', 'orden'));
     }
 
     private function ordenarAlarmasPorFechaAsc($alarms)
@@ -92,43 +93,50 @@ class UserController extends Controller
         return $alarms;
     }
 
+    private function isBlackAlarm($warranty)
+    {
+        $daysRemaining = now()->diffInDays($warranty->fecha_final);
+        return $daysRemaining === 0;
+    }
+
     private function isRedAlarm($warranty)
     {
         $daysRemaining = now()->diffInDays($warranty->fecha_final);
-        return $daysRemaining <= 11;
+        return ($daysRemaining <= 11 && $daysRemaining > 0) || round($daysRemaining) === 2;
     }
 
     private function isOrangeAlarm($warranty)
     {
         $daysRemaining = now()->diffInDays($warranty->fecha_final);
-        return $daysRemaining <= 13 && !$this->isRedAlarm($warranty);
+        $isRed = ($daysRemaining <= 11 && $daysRemaining > 0) || round($daysRemaining) === 2;
+        return $daysRemaining <= 13 && $daysRemaining > 0 && !$isRed;
     }
 
     private function getAlarms()
     {
         $alarms = [];
-    
+        
         // Obtener las garantías que están a punto de expirar
         $expiringWarranties = Waranty::whereDate('fecha_final', '>=', now())
             ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
             ->get();
-    
+
         foreach ($expiringWarranties as $warranty) {
-            // Lógica para determinar si es una alarma roja o naranja
-            $isRedAlarm = $this->isRedAlarm($warranty);
-            $isOrangeAlarm = $this->isOrangeAlarm($warranty);
-    
-            if ($isRedAlarm || $isOrangeAlarm) {
-                $alarms[] = [
-                    'warranty' => $warranty,
-                    'color' => $isRedAlarm ? 'red' : 'orange',
+            // Lógica para determinar si es una alarma roja, naranja o negra
+            $isRedAlarm = $this->isRedAlarm($warranty->fecha_final);
+            $isOrangeAlarm = $this->isOrangeAlarm($warranty->fecha_final);
+            $isBlackAlarm = $this->isBlackAlarm($warranty->fecha_final);
+
+            if ($isRedAlarm || $isOrangeAlarm || $isBlackAlarm) {
+                // Almacenar la alarma en el array asociativo usando el ID de la garantía como clave
+                $alarms[$warranty->id] = [
+                    'color' => $isRedAlarm ? 'red' : ($isOrangeAlarm ? 'orange' : 'black'),
                 ];
             }
         }
-    
+
         return $alarms;
     }
-   
   
     private function paginateAlarms($alarms, Request $request)
     {
@@ -138,18 +146,22 @@ class UserController extends Controller
         // Número de alarmas por página para cada tipo de alarma
         $perPageRed = 3; // Número de alarmas rojas por página
         $perPageOrange = 3; // Número de alarmas naranjas por página
+        $perPageBlack = 3; // Número de alarmas negras por página
     
         $currentPage = $request->input('page', 1);
     
-        // Separa las alarmas en dos variables: $redAlarms y $orangeAlarms
+        // Separa las alarmas en tres variables: $redAlarms, $orangeAlarms y $blackAlarms
         $redAlarms = [];
         $orangeAlarms = [];
+        $blackAlarms = [];
     
         foreach ($alarmsCollection as $alarm) {
             if ($alarm['color'] === 'red') {
                 $redAlarms[] = $alarm;
             } elseif ($alarm['color'] === 'orange') {
                 $orangeAlarms[] = $alarm;
+            } elseif ($alarm['color'] === 'black') {
+                $blackAlarms[] = $alarm;
             }
         }
     
@@ -170,14 +182,21 @@ class UserController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
     
+        $blackAlarmsPaginator = new LengthAwarePaginator(
+            collect($blackAlarms)->forPage($currentPage, $perPageBlack),
+            count($blackAlarms),
+            $perPageBlack,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+    
         return [
             $redAlarmsPaginator,
             $orangeAlarmsPaginator,
+            $blackAlarmsPaginator,
         ];
     }
-    
-
-    
+   
 
     public function financiers()
     {
