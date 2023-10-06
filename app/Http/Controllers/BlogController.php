@@ -143,18 +143,13 @@ class BlogController extends Controller
         // Filtro de búsqueda
         $search = $request->input('search');
         if ($search) {
-            $columnsToSearch = ['num_boleta', 'proveedor', 'motivo', 'unidad_ejecutora_id'];
-            $query->where(function ($q) use ($search, $columnsToSearch) {
-                foreach ($columnsToSearch as $column) {
-                    if ($column === 'unidad_ejecutora_id') {
-                        // Asegúrate de que el valor de búsqueda sea un entero
-                        $searchAsInteger = (int)$search;
-                        // Compara directamente como entero
-                        $q->orWhere($column, '=', $searchAsInteger);
-                    } else {
-                        $q->orWhere($column, 'like', '%' . $search . '%');
-                    }
-                }
+            $query->where(function ($q) use ($search) {
+                $q->where('num_boleta', 'like', '%' . $search . '%')
+                    ->orWhere('proveedor', 'like', '%' . $search . '%')
+                    ->orWhere('motivo', 'like', '%' . $search . '%')
+                    ->orWhereHas('unidadEjecutora', function ($subq) use ($search) {
+                        $subq->where('nombre', 'like', '%' . $search . '%');
+                    });
             });
         }
 
@@ -163,17 +158,18 @@ class BlogController extends Controller
         $query->whereHas('waranty', function ($q) use ($alarma) {
             $q->where(function ($subq) use ($alarma) {
                 if ($alarma === 'red') {
-                    $subq->where('fecha_final', '<=', now()->addDays(11))
-                        ->whereNotIn('id', function ($query) {
-                            $query->select('id')
-                                ->from('waranty_histories')
-                                ->whereDate('fecha_final', '=', now());
-                        });
+                    $subq->where('fecha_final', '<=', now()->addDays(11));
                 } elseif ($alarma === 'orange') {
                     $subq->where('fecha_final', '>', now()->addDays(11))
                         ->where('fecha_final', '<=', now()->addDays(13));
                 } elseif ($alarma === 'black') {
                     $subq->whereDate('fecha_final', '=', now());
+                } elseif ($alarma === 'none') {
+                    // Para blogs sin alarma, asegúrate de que no tengan una alarma configurada
+                    $subq->where(function ($subsubq) {
+                        $subsubq->where('fecha_final', '>', now()->addDays(13))
+                                ->orWhere('fecha_final', '<', now());
+                    });
                 }
             });
         });
