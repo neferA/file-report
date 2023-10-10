@@ -74,11 +74,19 @@ class BlogController extends Controller
             ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
             ->get();
     }
-    private function isBlackAlarm($fechaFinal)
+    
+    private function isBlackAlarm($fechaFinal, &$blog)
     {
         $daysRemaining = now()->diffInDays($fechaFinal);
+
+        // Cambiar el estado a "vencido" si la fecha final es hoy
+        if ($daysRemaining === 0) {
+            $blog->update(['estado' => Blog::ESTADO_VENCIDO]);
+        }
+
         return $daysRemaining === 0;
     }
+
     private function isRedAlarm($fechaFinal)
     {
         $daysRemaining = now()->diffInDays($fechaFinal);
@@ -94,42 +102,55 @@ class BlogController extends Controller
 
     private function handleBlogAlarm($blog)
     {
-        // Lógica para determinar si es una alarma roja,naranja y negra
+        // Lógica para determinar si es una alarma roja, naranja y negra
         $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
         $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
-        $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final);
-
+        $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final, $blog);
+    
         // Crear una instancia de WarrantyExpired con los valores correctos
         $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
         event($event); // Disparar el evento
+    
+        // Si la alarma es negra, ya hemos cambiado el estado a "vencido", no es necesario hacer nada más aquí
+        if (!$isBlackAlarm) {
+            // Si no es una alarma negra, podrías realizar acciones adicionales según sea necesario
+        }
     }
+    
 
     private function getAlarms()
     {
         $alarms = [];
-    
+
         // Obtener los blogs que están a punto de expirar
-        $expiringBlogs = waranty::whereDate('fecha_final', '>=', now())
-            ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
+        $expiringBlogs = Waranty::whereDate('fecha_final', '>=', now())
+            ->whereDate('fecha_final', '<=', now()->addDays(13))
             ->get();
-    
-       
+
         foreach ($expiringBlogs as $blog) {
             // Lógica para determinar si es una alarma roja, naranja o negra
             $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
             $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
-            $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final);
+            $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final, $blog);
 
+            // Almacenar la alarma en el array asociativo usando el ID del blog como clave
             if ($isRedAlarm || $isOrangeAlarm || $isBlackAlarm) {
-                // Almacenar la alarma en el array asociativo usando el ID del blog como clave
                 $alarms[$blog->id] = [
                     'color' => $isRedAlarm ? 'red' : ($isOrangeAlarm ? 'orange' : 'black'),
                 ];
             }
         }
-    
+
         return $alarms;
     }
+
+
+    
+    private function isExpired($fechaFinal)
+    {
+        return now() > $fechaFinal;
+    }
+    
     private function buildQuery(Request $request)
     {
         $query = Blog::query();
@@ -143,36 +164,34 @@ class BlogController extends Controller
         // Filtro de búsqueda
         $search = $request->input('search');
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('num_boleta', 'like', '%' . $search . '%')
-                    ->orWhere('proveedor', 'like', '%' . $search . '%')
-                    ->orWhere('motivo', 'like', '%' . $search . '%')
-                    ->orWhereHas('unidadEjecutora', function ($subq) use ($search) {
-                        $subq->where('nombre', 'like', '%' . $search . '%');
-                    });
+            $columnsToSearch = ['num_boleta', 'proveedor', 'motivo', 'unidad_ejecutora_id'];
+            $query->where(function ($q) use ($search, $columnsToSearch) {
+                foreach ($columnsToSearch as $column) {
+                    if ($column === 'unidad_ejecutora_id') {
+                        // Convierte el valor de búsqueda a tipo bigint y compara directamente
+                        $q->orWhere($column, '=', (int)$search);
+                    } else {
+                        $q->orWhere($column, 'like', '%' . $search . '%');
+                    }
+                }
             });
         }
 
-       // Filtro por alarma
+        // Filtro por alarma
         $alarma = $request->input('alarma');
-        $query->whereHas('waranty', function ($q) use ($alarma) {
-            $q->where(function ($subq) use ($alarma) {
-                if ($alarma === 'red') {
-                    $subq->where('fecha_final', '<=', now()->addDays(11));
-                } elseif ($alarma === 'orange') {
-                    $subq->where('fecha_final', '>', now()->addDays(11))
-                        ->where('fecha_final', '<=', now()->addDays(13));
-                } elseif ($alarma === 'black') {
-                    $subq->whereDate('fecha_final', '=', now());
-                } elseif ($alarma === 'none') {
-                    // Para blogs sin alarma, asegúrate de que no tengan una alarma configurada
-                    $subq->where(function ($subsubq) {
-                        $subsubq->where('fecha_final', '>', now()->addDays(13))
-                                ->orWhere('fecha_final', '<', now());
-                    });
-                }
+        if ($alarma && in_array($alarma, ['red', 'orange'])) {
+            // Aplicar el filtro de alarma en función del color en tus blogs
+            $query->whereHas('waranty', function ($q) use ($alarma) {
+                $q->where(function ($subq) use ($alarma) {
+                    if ($alarma === 'red') {
+                        $subq->where('fecha_final', '<=', now()->addDays(11));
+                    } elseif ($alarma === 'orange') {
+                        $subq->where('fecha_final', '>', now()->addDays(11))
+                            ->where('fecha_final', '<=', now()->addDays(13));
+                    }
+                });
             });
-        });
+        }
 
         // Ordenamiento
         $orden = $request->input('orden');
@@ -376,7 +395,6 @@ class BlogController extends Controller
             'fecha_inicio' => 'required',
             'fecha_final' => 'required',
             'estado' => 'required|in:' . implode(',', [
-                Blog::ESTADO_VIGENTE,
                 Blog::ESTADO_LIBERADO,
                 Blog::ESTADO_EJECUTADO,
                 Blog::ESTADO_RENOVADO,
