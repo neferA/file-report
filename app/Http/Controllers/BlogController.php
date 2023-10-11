@@ -164,34 +164,36 @@ class BlogController extends Controller
         // Filtro de búsqueda
         $search = $request->input('search');
         if ($search) {
-            $columnsToSearch = ['num_boleta', 'proveedor', 'motivo', 'unidad_ejecutora_id'];
-            $query->where(function ($q) use ($search, $columnsToSearch) {
-                foreach ($columnsToSearch as $column) {
-                    if ($column === 'unidad_ejecutora_id') {
-                        // Convierte el valor de búsqueda a tipo bigint y compara directamente
-                        $q->orWhere($column, '=', (int)$search);
-                    } else {
-                        $q->orWhere($column, 'like', '%' . $search . '%');
-                    }
-                }
+            $query->where(function ($q) use ($search) {
+                $q->where('num_boleta', 'like', '%' . $search . '%')
+                    ->orWhere('proveedor', 'like', '%' . $search . '%')
+                    ->orWhere('motivo', 'like', '%' . $search . '%')
+                    ->orWhereHas('unidadEjecutora', function ($subq) use ($search) {
+                        $subq->where('nombre', 'like', '%' . $search . '%');
+                    });
             });
         }
 
-        // Filtro por alarma
+       // Filtro por alarma
         $alarma = $request->input('alarma');
-        if ($alarma && in_array($alarma, ['red', 'orange'])) {
-            // Aplicar el filtro de alarma en función del color en tus blogs
-            $query->whereHas('waranty', function ($q) use ($alarma) {
-                $q->where(function ($subq) use ($alarma) {
-                    if ($alarma === 'red') {
-                        $subq->where('fecha_final', '<=', now()->addDays(11));
-                    } elseif ($alarma === 'orange') {
-                        $subq->where('fecha_final', '>', now()->addDays(11))
-                            ->where('fecha_final', '<=', now()->addDays(13));
-                    }
-                });
+        $query->whereHas('waranty', function ($q) use ($alarma) {
+            $q->where(function ($subq) use ($alarma) {
+                if ($alarma === 'red') {
+                    $subq->where('fecha_final', '<=', now()->addDays(11));
+                } elseif ($alarma === 'orange') {
+                    $subq->where('fecha_final', '>', now()->addDays(11))
+                        ->where('fecha_final', '<=', now()->addDays(13));
+                } elseif ($alarma === 'black') {
+                    $subq->whereDate('fecha_final', '=', now());
+                } elseif ($alarma === 'none') {
+                    // Para blogs sin alarma, asegúrate de que no tengan una alarma configurada
+                    $subq->where(function ($subsubq) {
+                        $subsubq->where('fecha_final', '>', now()->addDays(13))
+                                ->orWhere('fecha_final', '<', now());
+                    });
+                }
             });
-        }
+        });
 
         // Ordenamiento
         $orden = $request->input('orden');

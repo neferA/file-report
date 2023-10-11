@@ -143,37 +143,50 @@
 
 @section('js')
 <script>
-    function closeAlarm(button) {
+    function closeAlarm(button) 
+    {
         // Encuentra el elemento padre de la alarma (div.alert) y ocúltalo o elimínalo
-        const alarm = button.closest('.alert');
+        const alarm = button.closest('.alarm-card');
         if (alarm) {
             alarm.style.display = 'none'; // Para ocultar la alarma
             // Opcionalmente, puedes eliminar la alarma: alarm.remove();
         }
     }
-    function changeSorting(color, order) {
-        const orderField = document.querySelector(`#order${color.charAt(0).toUpperCase() + color.slice(1)}Alarm`);
-        if (orderField) {
-            orderField.value = order;
-            // Llamar a la función de búsqueda después de cambiar el orden
-            searchAlarm(color);
-        }
-    }
 
+    // Llama a closeAlarm cuando se hace clic en el botón de cierre
+    document.querySelectorAll('.alarm-close-button').forEach(function(button) {
+        button.addEventListener('click', function() {
+            closeAlarm(this);
+        });
+    });
     function searchAlarm(color) {
     const searchField = document.querySelector(`.search-alarm[data-color="${color}"]`);
     const searchTerm = searchField.value.toLowerCase();
     const alarmContainers = document.querySelectorAll(`.alert-${color}`);
 
+    let foundAlarm = null;
+
     alarmContainers.forEach((alarmContainer) => {
         const alarmText = alarmContainer.textContent.toLowerCase();
-        if (alarmText.includes(searchTerm)) {
+        if (alarmText.includes(searchTerm) && foundAlarm === null) {
             alarmContainer.style.display = 'block';
+            foundAlarm = alarmContainer; // Almacena el primer elemento que coincide con la búsqueda
         } else {
             alarmContainer.style.display = 'none';
         }
     });
+
+    return foundAlarm; // Devuelve el primer elemento que coincide con la búsqueda o null si no hay coincidencias
 }
+
+// Para buscar en las alarmas rojas
+const redAlarm = searchAlarm('red');
+
+// Para buscar en las alarmas naranjas
+const orangeAlarm = searchAlarm('orange');
+
+// Para buscar en las alarmas negras
+const blackAlarm = searchAlarm('black');
 
 </script>
 @stop
