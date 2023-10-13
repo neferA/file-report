@@ -75,15 +75,9 @@ class BlogController extends Controller
             ->get();
     }
     
-    private function isBlackAlarm($fechaFinal, &$blog)
+    private function isBlackAlarm($fechaFinal)
     {
         $daysRemaining = now()->diffInDays($fechaFinal);
-
-        // Cambiar el estado a "vencido" si la fecha final es hoy
-        if ($daysRemaining === 0) {
-            $blog->update(['estado' => Blog::ESTADO_VENCIDO]);
-        }
-
         return $daysRemaining === 0;
     }
 
@@ -105,18 +99,23 @@ class BlogController extends Controller
         // Lógica para determinar si es una alarma roja, naranja y negra
         $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
         $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
-        $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final, $blog);
-    
-        // Crear una instancia de WarrantyExpired con los valores correctos
-        $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
-        event($event); // Disparar el evento
-    
-        // Si la alarma es negra, ya hemos cambiado el estado a "vencido", no es necesario hacer nada más aquí
-        if (!$isBlackAlarm) {
+        $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final);
+
+        // Si es una alarma negra, cambia el estado de los blogs con alarma negra a "vencido"
+        if ($isBlackAlarm) {
+            Blog::where('id', $blog->id)
+                ->update([
+                    'estado' => Blog::ESTADO_VENCIDO,
+                    'updated_at' => now(),  
+                ]);
+
+            // Crear una instancia de WarrantyExpired con los valores correctos
+            $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
+            event($event); // Disparar el evento
+        } else {
             // Si no es una alarma negra, podrías realizar acciones adicionales según sea necesario
         }
     }
-    
 
     private function getAlarms()
     {
@@ -142,13 +141,6 @@ class BlogController extends Controller
         }
 
         return $alarms;
-    }
-
-
-    
-    private function isExpired($fechaFinal)
-    {
-        return now() > $fechaFinal;
     }
     
     private function buildQuery(Request $request)
@@ -212,9 +204,7 @@ class BlogController extends Controller
 
         return $query;
     }
-
-
-    
+      
    
     /**
      * Show the form for creating a new resource.

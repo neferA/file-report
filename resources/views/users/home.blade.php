@@ -22,8 +22,7 @@
                                 <form id="blackAlarmsFilterForm" method="get" action="{{ route('home') }}">
                                     <input type="hidden" name="alarm_color" value="black">
                                     <div class="input-group">
-                                        <input type="text" class="form-control search-alarm" data-color="black" placeholder="Buscar en alarmas negras" value="{{ request('search') }}">
-                                        <select name="orden" id="orderBlackAlarm" class="form-control">
+                                        <input type="text" class="form-control search-alarm" data-color="black" placeholder="Buscar en alarmas negras por número de boleta" name="boleta_number" value="{{ request('boleta_number') }}">                                        <select name="orden" id="orderBlackAlarm" class="form-control">
                                             <option value="">Ordenar por</option>
                                             <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
                                             <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
@@ -59,8 +58,7 @@
                                 <form id="redAlarmsFilterForm" method="get" action="{{ route('home') }}">
                                     <input type="hidden" name="alarm_color" value="red">
                                     <div class="input-group">
-                                        <input type="text" class="form-control search-alarm" data-color="red" placeholder="Buscar en alarmas rojas" value="{{ request('search') }}">
-                                        <select name="orden" id="orderRedAlarm" class="form-control">
+                                        <input type="text" class="form-control search-alarm" data-color="red" placeholder="Buscar en alarmas rojas por número de boleta" name="boleta_number" value="{{ request('boleta_number') }}">                                        <select name="orden" id="orderRedAlarm" class="form-control">
                                             <option value="">Ordenar por</option>
                                             <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>
                                             <option value="creacion_desc"{{ $orden === 'creacion_desc' ? ' selected' : '' }}>Más recientes primero</option>
@@ -98,7 +96,7 @@
                                 <form id="orangeAlarmsFilterForm" method="get" action="{{ route('home') }}">
                                     <input type="hidden" name="alarm_color" value="orange">
                                     <div class="input-group">
-                                        <input type="text" class="form-control search-alarm" data-color="orange" placeholder="Buscar en alarmas naranjas" value="{{ request('search') }}">
+                                        <input type="text" class="form-control search-alarm" data-color="orange" placeholder="Buscar en alarmas naranjas por número de boleta" name="boleta_number" value="{{ request('boleta_number') }}">
                                         <select name="orden" id="orderOrangeAlarm" class="form-control">
                                             <option value="">Ordenar por</option>
                                             <option value="creacion_asc"{{ $orden === 'creacion_asc' ? ' selected' : '' }}>Más antiguos primero</option>

@@ -106,21 +106,59 @@
 
                                             <td>
                                                 @if(isset($alarms[$blog->id]))
-                                                    <div class="alert alert-{{ $alarms[$blog->id]['color'] }} text-center" style="background-color: {{ $alarms[$blog->id]['color'] }}">
-                                                        @if ($alarms[$blog->id]['color'] === 'red')
+                                                    @if ($alarms[$blog->id]['color'] === 'red')
+                                                        <div class="alert alert-danger text-center">
                                                             <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
-                                                        @elseif ($alarms[$blog->id]['color'] === 'orange')
+                                                        </div>
+                                                    @elseif ($alarms[$blog->id]['color'] === 'orange')
+                                                        <div class="alert alert-warning text-center">
                                                             <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Naranja</strong>
-                                                        @elseif ($alarms[$blog->id]['color'] === 'black')
-                                                            <i class="fas fa-exclamation-triangle text-white"></i> <strong class="text-white">Alarma Negra</strong>
-                                                        @endif
-                                                    </div>
+                                                        </div>
+                                                    @elseif ($alarms[$blog->id]['color'] === 'black')
+                                                        <div class="alert alert-dark text-center text-white">
+                                                            <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Negra</strong>
+                                                            <br>
+                                                            <!-- Botón para abrir el modal de renovación -->
+                                                            <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal">
+                                                                Estado
+                                                            </button>
+                                                        </div>
+                                                    @endif
                                                 @else
                                                     <!-- Si no hay alarma, muestra un mensaje informativo -->
                                                     <div class="alert alert-info text-center">Sin alarma</div>
                                                 @endif
                                             </td>
-                                            <!-- Agregar mensajes de depuración -->
+                                            <!-- Modal para la renovación -->
+                                            <div class="modal fade" id="renovarModal" tabindex="-1" role="dialog" aria-labelledby="renovarModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="renovarModalLabel">Estado de Boleta</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <!-- Botones para los estados Liberado y Renovado -->
+                                                            <div class="form-group">
+                                                                <label for="estado">que desea hacer:</label>
+                                                                <div class="btn-group" role="group" aria-label="Estado_liberado">
+                                                                    <button type="button" class="btn btn-success" id="btnLiberado">Liberado</button>
+                                                                </div>
+                                                                <div class="btn-group" role="group" aria-label="Estado_renovado">
+                                                                    <button type="button" class="btn btn-warning" id="btnRenovado">Renovado</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                            <!-- Agrega el botón de enviar el formulario para la renovación -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Agregar mensajes de depuración --> 
                                             <!-- <td>Blog ID: {{ $blog->id }}</td>
                                             <td>Alarmas: {{ json_encode($alarms) }}</td>  -->
                                             <td>

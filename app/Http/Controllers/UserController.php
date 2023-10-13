@@ -56,7 +56,7 @@ class UserController extends Controller
         }
 
         // Obtener las alarmas para mostrar en la vista
-        $alarms = $this->getAlarms();
+        $alarms = $this->getAlarms($request);
         // Aplicar el filtro de orden si se ha seleccionado
         $orden = $request->input('orden');
 
@@ -90,14 +90,24 @@ class UserController extends Controller
         return $daysRemaining <= 13 && $daysRemaining > 0 && !$isRed;
     }
 
-    private function getAlarms()
+    private function getAlarms(Request $request)
     {
-        $alarms = [];
+        $boletaNumber = $request->input('boleta_number');
+
+        // Obtener las garantías que están a punto de expirar, filtrando por número de boleta si se proporciona
+        $expiringWarrantiesQuery = Waranty::whereDate('fecha_final', '>=', now())
+            ->whereDate('fecha_final', '<=', now()->addDays(13)); // Cambiar a 13 días si es naranja
+        
+        if ($boletaNumber) {
+            // Filtra por número de boleta si se proporciona en la búsqueda
+            $expiringWarrantiesQuery->whereHas('blog', function ($query) use ($boletaNumber) {
+                $query->where('num_boleta', 'like', '%' . $boletaNumber . '%');
+            });
+        }
+
+        $expiringWarranties = $expiringWarrantiesQuery->get();
     
-        // Obtener las garantías que están a punto de expirar
-        $expiringWarranties = Waranty::whereDate('fecha_final', '>=', now())
-            ->whereDate('fecha_final', '<=', now()->addDays(13)) // Cambiar a 13 días si es naranja
-            ->get();
+        $alarms = [];
     
         foreach ($expiringWarranties as $warranty) {
             // Lógica para determinar si es una alarma roja, naranja o negra
@@ -115,6 +125,7 @@ class UserController extends Controller
     
         return $alarms;
     }
+    
     
     private function ordenarAlarmasPorFechaAsc($alarms)
     {
