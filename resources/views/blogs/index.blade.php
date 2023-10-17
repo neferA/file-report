@@ -120,7 +120,7 @@
                                                             <br>
                                                             <!-- Botón para abrir el modal de renovación -->
                                                             <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal">
-                                                                Estado
+                                                                renovar
                                                             </button>
                                                         </div>
                                                     @endif
@@ -142,17 +142,12 @@
                                                         <div class="modal-body">
                                                             <!-- Botones para los estados Liberado y Renovado -->
                                                             <div class="form-group">
-                                                                <label for="estado">que desea hacer:</label>
-                                                                <div class="btn-group" role="group" aria-label="Estado_liberado">
-                                                                    <button type="button" class="btn btn-success" id="btnLiberado">Liberado</button>
-                                                                </div>
-                                                                <div class="btn-group" role="group" aria-label="Estado_renovado">
-                                                                    <button type="button" class="btn btn-warning" id="btnRenovado">Renovado</button>
-                                                                </div>
+                                                                <label for="estado"></label>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                            <button type="button" class="btn btn-warning" id="btnRenovado">Renovado</button>
                                                             <!-- Agrega el botón de enviar el formulario para la renovación -->
                                                         </div>
                                                     </div>

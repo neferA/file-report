@@ -58,7 +58,7 @@ class BlogController extends Controller
         
         return view('blogs.index', compact('blogs', 'alarms'));
     }
-
+    
     private function applyDateFilter($query, $startDate, $endDate)
     {
         if ($startDate && $endDate) {

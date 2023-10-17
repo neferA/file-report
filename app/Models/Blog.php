@@ -65,4 +65,8 @@ class Blog extends Model
     {
         return $this->belongsTo(ejecutora::class, 'unidad_ejecutora_id');
     }
+    public function renewedBlogs()
+    {
+        return $this->hasMany(RenewedBlog::class, 'parent_blog_id');
+    }
 }
