@@ -65,8 +65,14 @@ class Blog extends Model
     {
         return $this->belongsTo(ejecutora::class, 'unidad_ejecutora_id');
     }
+<<<<<<< HEAD
     public function afianzado()
     {
         return $this->belongsTo(afianzadora::class, 'blogs_id');
+=======
+    public function renewedBlogs()
+    {
+        return $this->hasMany(RenewedBlog::class, 'parent_blog_id');
+>>>>>>> origin/file_history
     }
 }
