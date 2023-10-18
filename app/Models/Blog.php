@@ -11,8 +11,8 @@ class Blog extends Model
     protected $fillable = [
         'tipo_garantia_id',
         'unidad_ejecutora_id',
+        'afianzadora_id',
         'num_boleta',
-        'proveedor',
         'motivo',
         'ejecutora',
         'usuario',
@@ -64,5 +64,9 @@ class Blog extends Model
     public function unidadEjecutora()
     {
         return $this->belongsTo(ejecutora::class, 'unidad_ejecutora_id');
+    }
+    public function afianzado()
+    {
+        return $this->belongsTo(afianzadora::class, 'blogs_id');
     }
 }

@@ -8,6 +8,8 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\FinanciersController;
 use App\Http\Controllers\WarantyController;
 use App\Http\Controllers\ExecutorController;
+use App\Http\Controllers\SuppliersController;
+
 
 use App\Models\waranty;
 use Illuminate\Support\Facades\Route;
@@ -68,11 +70,16 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::resource('executor', ExecutorController::class);
 
+    Route::resource('suppliers', SuppliersController::class);
+
 });
 
 // guest/auth users enter this routes
 Route::get('/financiers', [UserController::class, 'financiers'])->name('financiers');
 Route::get('/financiers', [FinanciersController::class,'index'])->name('financiers.index');
+
+Route::get('/suppliers', [UserController::class, 'suppliers'])->name('suppliers');
+Route::get('/suppliers', [SuppliersController::class,'index'])->name('suppliers.index');
 
 Route::get('/home', [UserController::class, 'home'])->name('home');
 
@@ -90,6 +97,7 @@ Route::get('historial/{id}/show', [HistoryController::class, 'show'])->name('his
 Route::get('blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
 Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
 Route::get('/blogs/{id}/generarpdf', [BlogController::class, 'generarPDF'])->name('blogs.generarpdf');
+Route::get('/blogs/{id}/actualizar_estado', [BlogController::class, 'actualizarEstado'])->name('blogs.actualizarEstado');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');
 
 

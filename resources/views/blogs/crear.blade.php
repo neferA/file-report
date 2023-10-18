@@ -37,8 +37,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">afianzado</label>
-                                            {!! Form::text('proveedor', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el proveedor']) !!}
+                                            <label for="afianzadora_id">afianzado</label>
+                                            {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -56,7 +56,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">observaciones</label> //abajo
+                                            <label for="contenido">observaciones</label> 
                                             {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
                                         </div>
                                     </div> 

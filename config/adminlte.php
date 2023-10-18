@@ -348,6 +348,11 @@ return [
             'icon'          => 'fa fa-download',
         ],
         [
+            'text'          => 'afianzadores',
+            'url'           => '/suppliers',
+            'icon'          => 'fa fa-download',
+        ],
+        [
             'text'          => 'Boletas',
             'url'           => '/tickets',
             'icon'          => 'fa fa-blog',

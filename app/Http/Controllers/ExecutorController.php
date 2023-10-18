@@ -18,17 +18,17 @@ class ExecutorController extends Controller
     }
     public function store(Request $request)
     {
-            $request->validate([
-                'nombre' => 'required',
-                'descripcion' => 'required',
-            ]);
+        $request->validate([
+            'nombre' => 'required',
+            'descripcion' => 'required',
+        ]);
 
-            $data = $request->all();
+        $data = $request->all();
 
-            $ejecutora = ejecutora::create($data);
+        $ejecutora = ejecutora::create($data);
 
-            return redirect()->route('executor.index')
-                ->with('success', 'garantia creada exitosamente');
+        return redirect()->route('executor.index')
+        ->with('success', 'garantia creada exitosamente');
     }
     public function edit($id)
     {

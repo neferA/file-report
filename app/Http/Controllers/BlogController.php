@@ -8,9 +8,10 @@ use App\Models\waranty;
 use App\Models\TipoGarantia;
 use App\Models\Financiadora;
 use App\Models\Modification;
+use App\Models\afianzadora;
+
 use App\Events\BlogUpdated;
 use App\Events\WarrantyExpired;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -205,7 +206,6 @@ class BlogController extends Controller
         return $query;
     }
       
-   
     /**
      * Show the form for creating a new resource.
      */
@@ -214,8 +214,9 @@ class BlogController extends Controller
         $financiadoras = Financiadora::pluck('nombre', 'id');
         $garantias = TipoGarantia::pluck('nombre', 'id');
         $ejecutoras = ejecutora::pluck('nombre', 'id');
+        $afianzadoras = afianzadora::pluck('nombre', 'id');
         
-        return view('blogs.crear', compact('financiadoras','garantias','ejecutoras'));
+        return view('blogs.crear', compact('financiadoras','garantias','ejecutoras','afianzadoras'));
     }
     
     private function uploadPDF($file, $folder)
@@ -236,7 +237,7 @@ class BlogController extends Controller
             'num_boleta' => 'required',
             'tipo_garantia_id' => 'required',
             'unidad_ejecutora_id' => 'required',
-            'proveedor' => 'required',
+            'afianzadora_id' => 'required',
             'motivo' => 'required',
             'caracteristicas' => 'required',
             'observaciones' => 'required',
@@ -311,6 +312,10 @@ class BlogController extends Controller
         // Asociar la ejecutora al blog creado
         $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
         $blog->unidadEjecutora()->associate($unidadEjecutora);
+
+        // Asociar las afianzadoras al blog creado
+        $afianzadora = afianzadora::find($request->input('afianzadora_id'));
+        $blog->afianzado()->associate($afianzadora);
 
         return redirect()->route('tickets.index');
     }

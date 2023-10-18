@@ -215,6 +215,10 @@ class UserController extends Controller
     {
         return view('financiadoras.index');
     }
+    public function suppliers()
+    {
+        return view('afianzados.index');
+    }
     public function waranty()
     {
         return view('garantias.index');

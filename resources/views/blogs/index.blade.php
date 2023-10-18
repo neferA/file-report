@@ -142,12 +142,15 @@
                                                         <div class="modal-body">
                                                             <!-- Botones para los estados Liberado y Renovado -->
                                                             <div class="form-group">
-                                                                <label for="estado">que desea hacer:</label>
+                                                                <label for="estado">¿Qué desea hacer?</label>
                                                                 <div class="btn-group" role="group" aria-label="Estado_liberado">
-                                                                    <button type="button" class="btn btn-success" id="btnLiberado">Liberado</button>
+                                                                    <button type="button" class="btn btn-success" data-action="liberado" data-entryid="{{ $blog->id }}">Liberado</button>
                                                                 </div>
                                                                 <div class="btn-group" role="group" aria-label="Estado_renovado">
-                                                                    <button type="button" class="btn btn-warning" id="btnRenovado">Renovado</button>
+                                                                    <button type="button" class="btn btn-warning" data-action="renovado" data-entryid="{{ $blog->id }}">Renovado</button>
+                                                                </div>
+                                                                <div class="btn-group" role="group" aria-label="Estado_ejecutado">
+                                                                    <button type="button" class="btn btn-warning" data-action="ejecutado" data-entryid="{{ $blog->id }}">ejecutado</button>
                                                                 </div>
                                                             </div>
                                                         </div>
