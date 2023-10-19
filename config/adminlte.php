@@ -348,7 +348,7 @@ return [
             'icon'          => 'fa fa-download',
         ],
         [
-            'text'          => 'afianzadores',
+            'text'          => 'afianzadoras',
             'url'           => '/suppliers',
             'icon'          => 'fa fa-download',
         ],

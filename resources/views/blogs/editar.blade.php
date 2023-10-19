@@ -38,10 +38,10 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="num_boleta">proveedor</label>
-                                        {!! Form::text('proveedor', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
+                                        <label for="afianzadora_id">Afianzado</label>
+                                        {!! Form::select('afianzadora_id',$afianzadoras, $blog->afianzado->pluck('id'), ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
                                     </div>
-                                </div>
+                                </div>        
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="num_boleta">motivo</label>
@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="observaciones">monto</label>
+                                        <label for="monto">monto</label>
                                         {!! Form::text('monto', $blog->waranty ? $blog->waranty->monto : null, ['class' => 'form-control', 'placeholder' => 'Ingrese el monto']) !!}
                                     </div>
                                 </div>

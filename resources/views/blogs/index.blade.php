@@ -80,8 +80,8 @@
                                     <tr>
                                         <th style="display: none;">ID</th>
                                         <th style="display: #fff;">Número de Boleta</th>
-                                        <th style="display: #fff;">Proveedor</th>
-                                        <th style="display: #fff;">Motivo</th>
+                                        <th style="display: #fff;">Afianzado</th>
+                                        <th style="display: #fff;">Empresa</th>
                                         <th style="display: #fff;">Ejecutora</th>
                                         <th style="display: #fff;">Creado por</th>
                                         <th style="display: #fff;">Estado</th>
@@ -95,8 +95,8 @@
                                         <tr>
                                             <td style="display: none;">{{ $blog->id }}</td>
                                             <td>{{ $blog->num_boleta }}</td>
-                                            <td>{{ $blog->proveedor }}</td>    
-                                            <td>{{ $blog->motivo }}</td>    
+                                            <td>{{ $blog->afianzado->nombre}}</td>    
+                                            <td>{{ $blog->empresa}}</td>    
                                             <td>{{ $blog->unidadEjecutora->nombre }}</td>
                                             <td>{{ $blog->usuario }}</td>
                                             <td>
@@ -142,7 +142,6 @@
                                                         <div class="modal-body">
                                                             <!-- Botones para los estados Liberado y Renovado -->
                                                             <div class="form-group">
-<<<<<<< HEAD
                                                                 <label for="estado">¿Qué desea hacer?</label>
                                                                 <div class="btn-group" role="group" aria-label="Estado_liberado">
                                                                     <button type="button" class="btn btn-success" data-action="liberado" data-entryid="{{ $blog->id }}">Liberado</button>
@@ -153,9 +152,7 @@
                                                                 <div class="btn-group" role="group" aria-label="Estado_ejecutado">
                                                                     <button type="button" class="btn btn-warning" data-action="ejecutado" data-entryid="{{ $blog->id }}">ejecutado</button>
                                                                 </div>
-=======
                                                                 <label for="estado"></label>
->>>>>>> origin/file_history
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">

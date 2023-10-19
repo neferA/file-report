@@ -235,6 +235,7 @@ class BlogController extends Controller
     {
         request()->validate([
             'num_boleta' => 'required',
+            'empresa' => 'required',
             'tipo_garantia_id' => 'required',
             'unidad_ejecutora_id' => 'required',
             'afianzadora_id' => 'required',
@@ -369,8 +370,9 @@ class BlogController extends Controller
         $financiadoras = Financiadora::pluck('nombre', 'id'); // Obtener las financiadoras para el campo select
         $garantias = TipoGarantia::pluck('nombre', 'id'); // Obtener los tipos de garantía para el campo select
         $ejecutoras = ejecutora::pluck('nombre', 'id'); // Obtener las ejecutoras para el campo select
+        $afianzadoras = afianzadora::pluck('nombre', 'id');// Obtener las ejecutoras para el campo select
 
-        return view('blogs.editar', compact('blog', 'financiadoras', 'garantias','ejecutoras'));
+        return view('blogs.editar', compact('blog','financiadoras','garantias','ejecutoras','afianzadoras'));
     }
 
     /**
@@ -384,8 +386,8 @@ class BlogController extends Controller
         // Validar los datos recibidos del formulario de edición
         $request->validate([
             'num_boleta' => 'required',
-            'proveedor' => 'required',
             'motivo' => 'required',
+            'empresa' => 'required',
             'caracteristicas' => 'required',
             'monto' => 'required',
             'observaciones' => 'required',
@@ -475,6 +477,11 @@ class BlogController extends Controller
         $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
         $blog->unidadEjecutora()->associate($unidadEjecutora);
 
+        // Actualizar la ejecutora de la afianzadora
+        $afianzadora = afianzadora::find($request->input('afianzadora_id'));
+        $blog->afianzado()->associate($afianzadora);
+
+
         // Parsear las fechas usando Carbon
         $data['fecha_inicio'] = Carbon::parse($request->input('fecha_inicio'));
         $data['fecha_final'] = Carbon::parse($request->input('fecha_final'));
@@ -527,7 +534,6 @@ class BlogController extends Controller
     {
         return [
             'num_boleta' => $blog->num_boleta,
-            'proveedor' => $blog->proveedor,
             'motivo' => $blog->motivo,
             'estado' => $blog->estado,
             'caracteristicas' => $blog->waranty->caracteristicas,

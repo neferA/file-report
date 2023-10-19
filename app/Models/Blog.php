@@ -13,6 +13,7 @@ class Blog extends Model
         'unidad_ejecutora_id',
         'afianzadora_id',
         'num_boleta',
+        'empresa',
         'motivo',
         'ejecutora',
         'usuario',
@@ -65,14 +66,13 @@ class Blog extends Model
     {
         return $this->belongsTo(ejecutora::class, 'unidad_ejecutora_id');
     }
-<<<<<<< HEAD
     public function afianzado()
     {
-        return $this->belongsTo(afianzadora::class, 'blogs_id');
-=======
+        return $this->belongsTo(afianzadora::class, 'afianzadora_id');
+    }
     public function renewedBlogs()
     {
         return $this->hasMany(RenewedBlog::class, 'parent_blog_id');
->>>>>>> origin/file_history
+
     }
 }

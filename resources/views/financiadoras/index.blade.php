@@ -67,7 +67,7 @@
                                                             @foreach ($financiadora->blogs as $blog)
                                                                 <li>
                                                                     Número de Boleta: {{ $blog->num_boleta }}<br>
-                                                                    Ejecutora: {{ $blog->ejecutora }}<br>
+                                                                    Ejecutora: {{ $blog->unidadEjecutora->nombre }}<br>
                                                                     Estado: {{ $blog->estado }}
                                                                 </li>
                                                             @endforeach

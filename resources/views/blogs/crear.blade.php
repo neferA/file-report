@@ -37,21 +37,26 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label for="empresa">empresa</label>
+                                            {!! Form::text('empresa', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la empresa']) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label for="afianzadora_id">afianzado</label>
                                             {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="titulo">motivo</label>
+                                            <label for="motivo">motivo</label>
                                             {!! Form::text('motivo', null, ['class' => 'form-control', 'placeholder' => 'Ingrese el motivo']) !!}
                                         </div>
                                     </div>
-
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="titulo">caracteristicas</label>
-                                            {!! Form::text('caracteristicas', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las caracteristicas']) !!}
+                                            {!! Form::text('caracteristicas', 'A PRIMER REQUERIMIENTO, RENOVABLE, IRREVOCABLE Y EJECUCION INMEDIATA', ['class' => 'form-control', 'readonly' => 'readonly']) !!}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
