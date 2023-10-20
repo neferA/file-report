@@ -41,12 +41,7 @@
                                             {!! Form::text('empresa', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la empresa']) !!}
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="afianzadora_id">afianzado</label>
-                                            {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
-                                        </div>
-                                    </div>
+                
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="motivo">motivo</label>
@@ -59,10 +54,11 @@
                                             {!! Form::text('caracteristicas', 'A PRIMER REQUERIMIENTO, RENOVABLE, IRREVOCABLE Y EJECUCION INMEDIATA', ['class' => 'form-control', 'readonly' => 'readonly']) !!}
                                         </div>
                                     </div>
+            
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="contenido">observaciones</label> 
-                                            {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
+                                            <label for="afianzadora_id">afianzado</label>
+                                            {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
                                         </div>
                                     </div> 
                                     <div class="col-md-6">
@@ -128,7 +124,12 @@
                                             <input type="date" id="fecha_final" name="fecha_final" class="form-control" placeholder="Ingrese la fecha final" required value="{{ now()->format('Y-m-d') }}">
                                         </div>
                                     </div>
-                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contenido">observaciones</label> 
+                                            {!! Form::text('observaciones', null, ['class' => 'form-control', 'placeholder' => 'Ingrese las observaciones']) !!}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
