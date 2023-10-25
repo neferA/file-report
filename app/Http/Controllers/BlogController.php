@@ -9,6 +9,7 @@ use App\Models\TipoGarantia;
 use App\Models\Financiadora;
 use App\Models\Modification;
 use App\Models\afianzadora;
+use App\Models\RenewedBlog;
 
 use App\Events\BlogUpdated;
 use App\Events\WarrantyExpired;
@@ -16,8 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 use Carbon\Carbon;
 use PDF;
@@ -323,10 +322,7 @@ class BlogController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    
     public function generarPDF($id)
     {
         // dd("ID recibido: " . $id);
@@ -588,7 +584,38 @@ class BlogController extends Controller
             Log::warning("Intento de registro de modificación fallido. Datos inválidos.");
         }
     }
-    
+    public function show($id)
+    {
+        // Recupera el blog original por su ID
+        $blog = Blog::findOrFail($id);
+
+        // Verifica si el blog ha sido renovado previamente
+        $renovatedBlog = RenewedBlog::where('parent_blog_id', $blog->id)->first();
+
+        // Pasa los datos del blog original y la boleta renovada (si existe) a la vista
+        return view('blogs.show', compact('blog', 'renovatedBlog'));
+    }
+
+    public function renovar(Request $request, $id)
+    {
+        // Obtén el blog original
+        $blogOriginal = Blog::find($id);
+
+        // Crea un nuevo blog renovado
+        $blogRenovado = new RenewedBlog();
+        // Asigna el ID del blog original a la columna parent_blog_id
+        $blogRenovado->parent_blog_id = $blogOriginal->id;
+        // Asigna otros campos necesarios para la boleta renovada
+        // ...
+        //  // Copia otros datos relevantes del blog original al blog renovado si es necesario
+        //  $blogRenovado->titulo = $blogOriginal->titulo;
+        //  $blogRenovado->contenido = $blogOriginal->contenido;
+
+        $blogRenovado->save();
+
+        // Redirige al usuario al nuevo blog renovado
+        return redirect()->route('tickets.show', $blogRenovado->id);
+    }
       /**
      * Remove the specified resource from storage.
      */

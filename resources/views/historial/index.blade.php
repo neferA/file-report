@@ -91,7 +91,6 @@
                                         {!! $historial->links() !!}
                                     </div>
                                 </div>
-                                </div>
                             </div>
                         </div>
                     </div>
