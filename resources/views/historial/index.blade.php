@@ -25,6 +25,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('historial.show', ['id' => $blog->id]) }}">Modificaciones</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('blogs.show', ['id' => $blog->id]) }}">renovaciones</a>
+                                </li>
                                 <!-- Otras pestañas si es necesario -->
                             </ul>
                            

@@ -230,9 +230,10 @@ class BlogController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $originalBlogId = null)
     {
-        request()->validate([
+        // Validaciones del formulario
+        $request->validate([
             'num_boleta' => 'required',
             'empresa' => 'required',
             'tipo_garantia_id' => 'required',
@@ -255,9 +256,10 @@ class BlogController extends Controller
             'nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
         ]);
 
-        // Cargar y almacenar el archivo PDF 'boleta_pdf'
+        // Lógica para almacenar los datos del formulario en la tabla Blog
         $data = $request->except(['boleta_pdf', 'nota_pdf']);
 
+        // Cargar y almacenar el archivo PDF 'boleta_pdf'
         if ($request->hasFile('boleta_pdf')) {
             $data['boleta_pdf'] = $this->uploadPDF($request->file('boleta_pdf'), 'boletas_pdfs');
         }
@@ -271,54 +273,69 @@ class BlogController extends Controller
         $data['fecha_inicio'] = Carbon::parse($request->input('fecha_inicio'));
         $data['fecha_final'] = Carbon::parse($request->input('fecha_final'));
 
-        // Obtén el nombre del usuario actualmente autenticado y guárdalo en el campo correspondiente
+        // Obtener el nombre del usuario actualmente autenticado y guardarlo en el campo correspondiente
         $data['usuario'] = Auth::user()->name;
 
-        $blog = Blog::create($data);
+        // Si se proporciona el ID del blog original, realizar la renovación
+        if ($originalBlogId !== null) {
+            $this->renovarBlog($originalBlogId, $data);
+        } else {
+            // Si no se proporciona el ID del blog original, crear un nuevo blog
+            $blog = Blog::create($data);
 
-         // Obtén los IDs de las financiadoras seleccionadas
-        $financiadoraIds = $request->input('financiadora_id');
+            // Obtener los IDs de las financiadoras seleccionadas
+            $financiadoraIds = $request->input('financiadora_id');
 
-        // Adjunta los IDs de las financiadoras relacionadas a la tabla pivote
-        $blog->financiadoras()->attach($financiadoraIds);
+            // Adjuntar los IDs de las financiadoras relacionadas a la tabla pivote
+            $blog->financiadoras()->attach($financiadoraIds);
+
+            // Crear un nuevo registro en la tabla Waranty_Histories vinculado al registro de Blog recién creado
+            $waranty = Waranty::create([
+                'blogs_id' => $blog->id,
+                'titulo' => $blog->num_boleta,
+                'contenido' => $blog->motivo,
+                'caracteristicas' => $request->input('caracteristicas'),    
+                'observaciones' => $request->input('observaciones'),
+                'monto' => $request->input('monto'),
+                'boleta_pdf' => $data['boleta_pdf'] ?? null,
+                'nota_pdf' => $data['nota_pdf'] ?? null,
+                'fecha_inicio' => $request->input('fecha_inicio'),
+                'fecha_final' => $request->input('fecha_final'),
+            ]);
+            
+            // Verificar si se cargó un nuevo archivo boleta_pdf y actualizar si es necesario
+            if ($request->hasFile('boleta_pdf')) {
+                $waranty->update(['boleta_pdf' => $data['boleta_pdf']]);
+            }
+            
+            // Verificar si se cargó un nuevo archivo nota_pdf y actualizar si es necesario
+            if ($request->hasFile('nota_pdf')) {
+                $waranty->update(['nota_pdf' => $data['nota_pdf']]);
+            }
         
-        // Crea un nuevo registro en la tabla waranty_Histories vinculado al registro de Blog recién creado
-        $waranty = Waranty::create([
-            'blogs_id' => $blog->id,
-            'titulo' => $blog->num_boleta,
-            'contenido' => $blog->motivo,
-            'caracteristicas' => $request->input('caracteristicas'),    
-            'observaciones' => $request->input('observaciones'),
-            'monto' => $request->input('monto'),
-            'boleta_pdf' => $data['boleta_pdf'] ?? null,
-            'nota_pdf' => $data['nota_pdf'] ?? null,
-            'fecha_inicio' => $request->input('fecha_inicio'),
-            'fecha_final' => $request->input('fecha_final'),
-        ]);
-        
-        // Verificar si se cargó un nuevo archivo boleta_pdf y actualizar si es necesario
-        if ($request->hasFile('boleta_pdf')) {
-            $waranty->update(['boleta_pdf' => $data['boleta_pdf']]);
+            // Asociar la garantía al blog creado
+            $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
+            $blog->tipoGarantia()->associate($tipoGarantia);
+
+            // Asociar la ejecutora al blog creado
+            $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
+            $blog->unidadEjecutora()->associate($unidadEjecutora);
+
+            // Asociar las afianzadoras al blog creado
+            $afianzadora = afianzadora::find($request->input('afianzadora_id'));
+            $blog->afianzado()->associate($afianzadora);
         }
-        
-        // Verificar si se cargó un nuevo archivo nota_pdf y actualizar si es necesario
-        if ($request->hasFile('nota_pdf')) {
-            $waranty->update(['nota_pdf' => $data['nota_pdf']]);
-        }
-       // Asociar la garantía al blog creado
-        $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
-        $blog->tipoGarantia()->associate($tipoGarantia);
-
-        // Asociar la ejecutora al blog creado
-        $unidadEjecutora = ejecutora::find($request->input('unidad_ejecutora_id'));
-        $blog->unidadEjecutora()->associate($unidadEjecutora);
-
-        // Asociar las afianzadoras al blog creado
-        $afianzadora = afianzadora::find($request->input('afianzadora_id'));
-        $blog->afianzado()->associate($afianzadora);
 
         return redirect()->route('tickets.index');
     }
+
+    private function renovarBlog($originalBlogId, $data)
+    {
+            // En este método se realiza la lógica de renovación similar a la del método store, 
+            // pero utilizando el ID del blog original para copiar datos o realizar otras operaciones.
+            // ...
+    }
+
     /**
      * Display the specified resource.
      */
@@ -596,25 +613,12 @@ class BlogController extends Controller
         return view('blogs.show', compact('blog', 'renovatedBlog'));
     }
 
-    public function renovar(Request $request, $id)
+    public function renovar($id)
     {
-        // Obtén el blog original
-        $blogOriginal = Blog::find($id);
-
-        // Crea un nuevo blog renovado
-        $blogRenovado = new RenewedBlog();
-        // Asigna el ID del blog original a la columna parent_blog_id
-        $blogRenovado->parent_blog_id = $blogOriginal->id;
-        // Asigna otros campos necesarios para la boleta renovada
-        // ...
-        //  // Copia otros datos relevantes del blog original al blog renovado si es necesario
-        //  $blogRenovado->titulo = $blogOriginal->titulo;
-        //  $blogRenovado->contenido = $blogOriginal->contenido;
-
-        $blogRenovado->save();
-
-        // Redirige al usuario al nuevo blog renovado
-        return redirect()->route('tickets.show', $blogRenovado->id);
+        // Recupera el blog original por su ID
+        $blog = Blog::findOrFail($id);
+        // Pasa el ID del blog original a la vista de renovación
+        return view('blogs.renovar', ['blogId' => $blog->id]);
     }
       /**
      * Remove the specified resource from storage.

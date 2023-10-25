@@ -2,7 +2,9 @@
 
 @section('title', 'File report')
 
-@extends('layouts.app')
+@section('content_header')
+
+@stop
 
 @section('content')
 <div class="container">

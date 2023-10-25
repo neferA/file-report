@@ -65,7 +65,6 @@
                             </a>
                         @endcan
 
-
                             <!-- Pestañas para organizar la información -->
                             <ul class="nav nav-tabs">
                                 <li class="nav-item">
@@ -143,18 +142,7 @@
                                                             <!-- Botones para los estados Liberado y Renovado -->
                                                             <div class="form-group">
                                                                 <label for="estado">¿Qué desea hacer?</label>
-                                                                <form action="{{ route('blogs.renovar', $blog->id) }}" method="post">
-                                                                    @csrf
-                                                                    <div class="btn-group" role="group" aria-label="Estado_renovado">
-                                                                        <button type="submit" class="btn btn-warning">Renovado</button>
-                                                                    </div>
-                                                                </form>
-                                                                {{-- <div class="btn-group" role="group" aria-label="Estado_liberado">
-                                                                    <button type="button" class="btn btn-success" data-action="liberado" data-entryid="{{ $blog->id }}">Liberado</button>
-                                                                </div>
-                                                                <div class="btn-group" role="group" aria-label="Estado_ejecutado">
-                                                                    <button type="button" class="btn btn-warning" data-action="ejecutado" data-entryid="{{ $blog->id }}">ejecutado</button>
-                                                                </div> --}}
+                                                                    <a href="{{ route('blogs.renovar', ['id' => $blog->id]) }}" class="btn btn-primary">Renovar Blog</a>                                       
                                                                 <label for="estado"></label>
                                                             </div>
                                                         </div>
