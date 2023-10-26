@@ -133,25 +133,22 @@
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="renovarModalLabel">Estado de Boleta</h5>
+                                                            <h5 class="modal-title" id="renovarModalLabel">Renovar Boleta</h5>
                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                                                                 <span aria-hidden="true">&times;</span>
                                                             </button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <!-- Botones para los estados Liberado y Renovado -->
-                                                            <div class="form-group">
-                                                                <label for="estado">¿Qué desea hacer?</label>
-                                                                    <a href="{{ route('blogs.renovar', ['id' => $blog->id]) }}" class="btn btn-primary">Renovar Blog</a>                                       
-                                                                <label for="estado"></label>
-                                                            </div>
+                                                            ¿Está seguro que desea renovar esta boleta?
                                                         </div>
                                                         <div class="modal-footer">
+                                                            <a href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog</a>
                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <!-- Agregar mensajes de depuración --> 
                                             <!-- <td>Blog ID: {{ $blog->id }}</td>
                                             <td>Alarmas: {{ json_encode($alarms) }}</td>  -->

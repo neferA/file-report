@@ -72,7 +72,6 @@ class Blog extends Model
     }
     public function renewedBlogs()
     {
-        return $this->hasMany(RenewedBlog::class, 'parent_blog_id');
-
+        return $this->hasMany(RenewedBlog::class, 'parent_blog_id', 'id');
     }
 }

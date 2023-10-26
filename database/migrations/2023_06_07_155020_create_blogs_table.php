@@ -16,7 +16,8 @@ return new class extends Migration
 
             $table->unsignedBigInteger('tipo_garantia_id')->nullable();// Clave foránea
             $table->unsignedBigInteger('unidad_ejecutora_id'); // Clave foránea 
-            $table->unsignedBigInteger('afianzadora_id'); // Clave foránea 
+            $table->unsignedBigInteger('afianzadora_id'); // Clave foránea
+            $table->unsignedBigInteger('renewed_blog_id')->nullable(); // Clave foránea hacia la versión renovada 
 
 
             $table->text('num_boleta');
@@ -28,7 +29,8 @@ return new class extends Migration
             
             $table->foreign('tipo_garantia_id')->references('id')->on('tipo_garantia')->onDelete('cascade');        
             $table->foreign('unidad_ejecutora_id')->references('id')->on('unidad_ejecutora')->onDelete('cascade');        
-            $table->foreign('afianzadora_id')->references('id')->on('afianzadora')->onDelete('cascade');        
+            $table->foreign('afianzadora_id')->references('id')->on('afianzadora')->onDelete('cascade');
+            $table->foreign('renewed_blog_id')->references('id')->on('renewed_blogs')->onDelete('cascade')->onUpdate('cascade')->name('blogs_renewed_blog_id_foreign');        
            
         });
     }

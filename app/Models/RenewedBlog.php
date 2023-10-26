@@ -10,8 +10,7 @@ class RenewedBlog extends Model
     use HasFactory;
     protected $fillable = [
         'parent_blog_id',
-        // Otros campos necesarios para la boleta renovada
-        // ...
+        'renewed_blog_id'
     ];
 
     public function parentBlog()

@@ -204,6 +204,15 @@ class BlogController extends Controller
 
         return $query;
     }
+    private function uploadPDF($file, $folder)
+    {
+        if ($file)
+        {
+            $pdfPath = $file->store($folder, 'public');
+            return $pdfPath;
+        }
+            return null;
+    }
       
     /**
      * Show the form for creating a new resource.
@@ -218,14 +227,6 @@ class BlogController extends Controller
         return view('blogs.crear', compact('financiadoras','garantias','ejecutoras','afianzadoras'));
     }
     
-    private function uploadPDF($file, $folder)
-        {
-            if ($file) {
-                $pdfPath = $file->store($folder, 'public');
-                return $pdfPath;
-            }
-            return null;
-        }
 
     /**
      * Store a newly created resource in storage.
@@ -330,11 +331,53 @@ class BlogController extends Controller
     }
 
     private function renovarBlog($originalBlogId, $data)
-    {
-            // En este método se realiza la lógica de renovación similar a la del método store, 
-            // pero utilizando el ID del blog original para copiar datos o realizar otras operaciones.
-            // ...
+{
+    // Obtener el blog original que se va a renovar
+    $originalBlog = Blog::find($originalBlogId);
+
+    // Copiar el campo 'empresa' del blog original al nuevo blog renovado
+    $data['empresa'] = $originalBlog->empresa;
+
+    // Crear el nuevo blog renovado con los datos copiados y los nuevos datos proporcionados
+    $blogRenovado = Blog::create($data);
+
+    // Almacenar las IDs de las boletas original y renovada en la tabla renewed_blogs
+    RenewedBlog::create([
+        'parent_blog_id' => $originalBlog->id,
+        'renewed_blog_id' => $blogRenovado->id,
+    ]);
+
+    // Obtener y copiar las financiadoras relacionadas al blog original
+    $financiadoras = $originalBlog->financiadoras;
+    foreach ($financiadoras as $financiadora) {
+        $blogRenovado->financiadoras()->attach($financiadora->id);
     }
+
+    // Obtener la Waranty_History del blog original y copiar el campo 'caracteristicas'
+    $warantyOriginal = $originalBlog->warantyHistory;
+    if ($warantyOriginal) {
+        $warantyRenovado = new Waranty();
+        $warantyRenovado->blogs_id = $blogRenovado->id;
+        $warantyRenovado->titulo = $originalBlog->num_boleta;
+        $warantyRenovado->contenido = $originalBlog->motivo;
+        $warantyRenovado->caracteristicas = $warantyOriginal->caracteristicas;
+        // ... copia otros campos según sea necesario para Waranty_Histories
+
+        $warantyRenovado->save();
+    }
+
+    return $blogRenovado;
+}
+
+    public function renovar($id)
+    {
+        $blog = Blog::find($id);
+        $financiadoras = Financiadora::pluck('nombre', 'id');
+        $garantias = TipoGarantia::pluck('nombre', 'id');
+        $ejecutoras = ejecutora::pluck('nombre', 'id');
+        $afianzadoras = afianzadora::pluck('nombre', 'id');
+        return view('blogs.crear', compact('financiadoras','garantias','ejecutoras','afianzadoras','blog'));
+    }    
 
     /**
      * Display the specified resource.
@@ -611,14 +654,6 @@ class BlogController extends Controller
 
         // Pasa los datos del blog original y la boleta renovada (si existe) a la vista
         return view('blogs.show', compact('blog', 'renovatedBlog'));
-    }
-
-    public function renovar($id)
-    {
-        // Recupera el blog original por su ID
-        $blog = Blog::findOrFail($id);
-        // Pasa el ID del blog original a la vista de renovación
-        return view('blogs.renovar', ['blogId' => $blog->id]);
     }
       /**
      * Remove the specified resource from storage.

@@ -27,8 +27,10 @@
                                 </div>
                             @endif
 
-                            {!! Form::open(['route' => 'tickets.store', 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
-                            <div class="row">
+                            {!! Form::open(['route' => isset($blog) ? ['tickets.store', $blog->id] : 'tickets.store', 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
+
+                                    
+                                    <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="titulo">numero de boleta</label>
