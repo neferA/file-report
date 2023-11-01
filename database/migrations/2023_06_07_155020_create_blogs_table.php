@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
 
+            $table->unsignedBigInteger('renewed_blog_id')->nullable(); // Clave foránea hacia la versión renovada 
             $table->unsignedBigInteger('tipo_garantia_id')->nullable();// Clave foránea
             $table->unsignedBigInteger('unidad_ejecutora_id'); // Clave foránea 
             $table->unsignedBigInteger('afianzadora_id'); // Clave foránea
-            $table->unsignedBigInteger('renewed_blog_id')->nullable(); // Clave foránea hacia la versión renovada 
 
 
             $table->text('num_boleta');
