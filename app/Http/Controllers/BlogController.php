@@ -330,54 +330,42 @@ class BlogController extends Controller
         return redirect()->route('tickets.index');
     }
 
-    private function renovarBlog($originalBlogId, $data)
-{
-    // Obtener el blog original que se va a renovar
-    $originalBlog = Blog::find($originalBlogId);
+    private function renovarBlog($originalBlogId)
+    {
+        // Obtener el blog original que se va a renovar
+        $originalBlog = Blog::find($originalBlogId);
 
-    // Copiar el campo 'empresa' del blog original al nuevo blog renovado
-    $data['empresa'] = $originalBlog->empresa;
+        // Lógica para renovar el blog aquí, si es necesario
+        // ...
 
-    // Crear el nuevo blog renovado con los datos copiados y los nuevos datos proporcionados
-    $blogRenovado = Blog::create($data);
+        // Crear un nuevo blog renovado con los datos del original
+        $blogRenovado = new Blog($originalBlog->toArray());
+        $blogRenovado->save();
 
-    // Almacenar las IDs de las boletas original y renovada en la tabla renewed_blogs
-    RenewedBlog::create([
-        'parent_blog_id' => $originalBlog->id,
-        'renewed_blog_id' => $blogRenovado->id,
-    ]);
+        // Almacenar las IDs de las boletas original y renovada en la tabla renewed_blogs
+        RenewedBlog::create([
+            'parent_blog_id' => $originalBlog->id,
+            'renewed_blog_id' => $blogRenovado->id,
+        ]);
 
-    // Obtener y copiar las financiadoras relacionadas al blog original
-    $financiadoras = $originalBlog->financiadoras;
-    foreach ($financiadoras as $financiadora) {
-        $blogRenovado->financiadoras()->attach($financiadora->id);
+        return $blogRenovado;
     }
-
-    // Obtener la Waranty_History del blog original y copiar el campo 'caracteristicas'
-    $warantyOriginal = $originalBlog->warantyHistory;
-    if ($warantyOriginal) {
-        $warantyRenovado = new Waranty();
-        $warantyRenovado->blogs_id = $blogRenovado->id;
-        $warantyRenovado->titulo = $originalBlog->num_boleta;
-        $warantyRenovado->contenido = $originalBlog->motivo;
-        $warantyRenovado->caracteristicas = $warantyOriginal->caracteristicas;
-        // ... copia otros campos según sea necesario para Waranty_Histories
-
-        $warantyRenovado->save();
-    }
-
-    return $blogRenovado;
-}
 
     public function renovar($id)
     {
-        $blog = Blog::find($id);
+        // dd($id);
+        $originalBlog = Blog::find($id);
+        // dd($originalBlog);
         $financiadoras = Financiadora::pluck('nombre', 'id');
         $garantias = TipoGarantia::pluck('nombre', 'id');
         $ejecutoras = ejecutora::pluck('nombre', 'id');
         $afianzadoras = afianzadora::pluck('nombre', 'id');
-        return view('blogs.crear', compact('financiadoras','garantias','ejecutoras','afianzadoras','blog'));
-    }    
+
+        // Pasar el ID del blog original al método renovarBlog
+        $blogRenovado = $this->renovarBlog($originalBlog->id);
+
+        return view('blogs.crear', compact('financiadoras', 'garantias', 'ejecutoras', 'afianzadoras', 'blogRenovado'));
+    }  
 
     /**
      * Display the specified resource.
