@@ -14,13 +14,11 @@ return new class extends Migration
         Schema::create('renewed_blogs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('parent_blog_id'); // Clave foránea hacia la boleta original
-            $table->unsignedBigInteger('renewed_blog_id'); // Clave foránea hacia la boleta renovada
-            // Otros campos necesarios para la boleta renovada
-            // ...
+            //$table->bigIncrements('renewed_blog_id'); // Columna autoincremental
+           
             $table->timestamps();
 
             $table->foreign('parent_blog_id')->references('id')->on('blogs')->onDelete('cascade')->onUpdate('cascade')->name('renewed_blogs_parent_blog_id_foreign');
-            $table->foreign('renewed_blog_id')->references('id')->on('blogs')->onDelete('cascade')->onUpdate('cascade')->name('renewed_blogs_renewed_blog_id_foreign');
         });
     }
 

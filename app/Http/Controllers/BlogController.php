@@ -279,7 +279,7 @@ class BlogController extends Controller
 
         // Si se proporciona el ID del blog original, realizar la renovación
         if ($originalBlogId !== null) {
-            $this->renovarBlog($originalBlogId, $data);
+            $this->renovarBlog($originalBlogId);
         } else {
             // Si no se proporciona el ID del blog original, crear un nuevo blog
             $blog = Blog::create($data);
@@ -335,27 +335,24 @@ class BlogController extends Controller
         // Obtener el blog original que se va a renovar
         $originalBlog = Blog::find($originalBlogId);
 
-        // Lógica para renovar el blog aquí, si es necesario
-        // ...
-
-        // Crear un nuevo blog renovado con los datos del original
-        $blogRenovado = new Blog($originalBlog->toArray());
-        $blogRenovado->save();
-
-        // Almacenar las IDs de las boletas original y renovada en la tabla renewed_blogs
-        RenewedBlog::create([
+        // Insertar un nuevo registro en la tabla renewed_blogs
+        $newRenewedBlog = RenewedBlog::create([
             'parent_blog_id' => $originalBlog->id,
-            'renewed_blog_id' => $blogRenovado->id,
-        ]);
+            ]);
 
-        return $blogRenovado;
+        // Obtener el valor autoincremental generado para la columna 'id' de renewed_blogs
+        $newRenewedBlogId = $newRenewedBlog->id;
+        // dd($originalBlogId, $newRenewedBlogId);
+        // Actualizar la columna 'renewed_blog_id' en la tabla blogs con el valor obtenido
+        $originalBlog->update(['renewed_blog_id' => $newRenewedBlogId]);
+
+        return $newRenewedBlog;
     }
-
     public function renovar($id)
     {
-        // dd($id);
-        $originalBlog = Blog::find($id);
-        // dd($originalBlog);
+        //dd($id);
+        $originalBlog = Blog::findOrFail($id);
+        //dd($originalBlog);
         $financiadoras = Financiadora::pluck('nombre', 'id');
         $garantias = TipoGarantia::pluck('nombre', 'id');
         $ejecutoras = ejecutora::pluck('nombre', 'id');

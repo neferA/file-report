@@ -97,7 +97,7 @@ Route::get('historial/{id}/show', [HistoryController::class, 'show'])->name('his
 Route::get('blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
 Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
 
-Route::get('/blogs/{id}/renovar', [BlogController::class, 'renovar'])->name('blogs.renovar');
+Route::get('/blogs/{id}/renewed', [BlogController::class, 'renovar'])->name('blogs.renovar');
 Route::get('/blogs/{id}/show', [BlogController::class, 'show'])->name('blogs.show');
 
 Route::get('/blogs/{id}/generarpdf', [BlogController::class, 'generarPDF'])->name('blogs.generarpdf');

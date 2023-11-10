@@ -9,6 +9,8 @@ class Blog extends Model
 {
     use HasFactory;
     protected $fillable = [
+        //'id_boleta_real',
+        'renewed_blog_id',
         'tipo_garantia_id',
         'unidad_ejecutora_id',
         'afianzadora_id',
@@ -57,7 +59,6 @@ class Blog extends Model
     {
         return $this->belongsToMany(Financiadora::class, 'boleta_financiadora', 'blogs_id', 'financiadora_id');
     }
-    
     public function tipoGarantia()
     {
         return $this->belongsTo(TipoGarantia::class, 'tipo_garantia_id');
@@ -72,6 +73,6 @@ class Blog extends Model
     }
     public function renewedBlogs()
     {
-        return $this->hasMany(RenewedBlog::class, 'parent_blog_id', 'id');
+        return $this->hasMany(RenewedBlog::class, 'parent_blog_id');
     }
 }
