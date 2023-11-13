@@ -276,7 +276,7 @@ class BlogController extends Controller
 
         // Obtener el nombre del usuario actualmente autenticado y guardarlo en el campo correspondiente
         $data['usuario'] = Auth::user()->name;
-
+        
         // Si se proporciona el ID del blog original, realizar la renovación
         if ($originalBlogId !== null) {
             $this->renovarBlog($originalBlogId);
@@ -359,7 +359,7 @@ class BlogController extends Controller
         $afianzadoras = afianzadora::pluck('nombre', 'id');
 
         // Pasar el ID del blog original al método renovarBlog
-        $blogRenovado = $this->renovarBlog($originalBlog->id);
+        $blogRenovado = $this->renovarBlog($id);
 
         return view('blogs.crear', compact('financiadoras', 'garantias', 'ejecutoras', 'afianzadoras', 'blogRenovado'));
     }  

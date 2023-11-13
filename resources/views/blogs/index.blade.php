@@ -142,7 +142,7 @@
                                                             ¿Está seguro que desea renovar esta boleta?
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <a class="btn btn-primary" href="{{ route('blogs.renovar', $blog->id) }}">Renovar Blog</a>
+                                                            <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>
                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                                         </div>
                                                     </div>
