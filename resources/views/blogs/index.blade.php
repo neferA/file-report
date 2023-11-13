@@ -118,9 +118,7 @@
                                                             <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Negra</strong>
                                                             <br>
                                                             <!-- Botón para abrir el modal de renovación -->
-                                                            <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal">
-                                                                renovar
-                                                            </button>
+                                                            <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Renovar</button>
                                                         </div>
                                                     @endif
                                                 @else
@@ -129,7 +127,7 @@
                                                 @endif
                                             </td>
                                             <!-- Modal para la renovación -->
-                                            <div class="modal fade" id="renovarModal" tabindex="-1" role="dialog" aria-labelledby="renovarModalLabel" aria-hidden="true">
+                                            <div class="modal fade" id="renovarModal{{ $blog->id }}" tabindex="-1" role="dialog" aria-labelledby="renovarModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -142,8 +140,7 @@
                                                             ¿Está seguro que desea renovar esta boleta?
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                        <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                                         </div>
                                                     </div>
                                                 </div>
