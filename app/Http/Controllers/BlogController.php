@@ -279,7 +279,9 @@ class BlogController extends Controller
         
         // Si se proporciona el ID del blog original, realizar la renovación
         if ($originalBlogId !== null) {
-            $this->renovarBlog($originalBlogId);
+            $blogs = $this->renovarBlog($originalBlogId);
+            $data['renewed_blog_id'] = $blogs['renovado']->renewed_blog_id;
+            $data['next_renewed_blog_id'] = $blogs['renovado']->next_renewed_blog_id;
         } else {
             // Si no se proporciona el ID del blog original, crear un nuevo blog
             $blog = Blog::create($data);
@@ -331,23 +333,36 @@ class BlogController extends Controller
     }
 
     private function renovarBlog($originalBlogId)
-    {
-        // Obtener el blog original que se va a renovar
-        $originalBlog = Blog::find($originalBlogId);
+{
+    // Obtener el blog original que se va a renovar
+    $originalBlog = Blog::find($originalBlogId);
 
-        // Insertar un nuevo registro en la tabla renewed_blogs
-        $newRenewedBlog = RenewedBlog::create([
-            'parent_blog_id' => $originalBlog->id,
-            ]);
+    // Insertar un nuevo registro en la tabla renewed_blogs
+    $newRenewedBlog = RenewedBlog::create([
+        'parent_blog_id' => $originalBlog->id,
+    ]);
 
-        // Obtener el valor autoincremental generado para la columna 'id' de renewed_blogs
-        $newRenewedBlogId = $newRenewedBlog->id;
-        // dd($originalBlogId, $newRenewedBlogId);
-        // Actualizar la columna 'renewed_blog_id' en la tabla blogs con el valor obtenido
-        $originalBlog->update(['renewed_blog_id' => $newRenewedBlogId]);
+    // Obtener el valor autoincremental generado para la columna 'id' de renewed_blogs
+    $newRenewedBlogId = $newRenewedBlog->id;
 
-        return $newRenewedBlog;
-    }
+    // Obtener el siguiente ID de la tabla blogs
+    $nextRenewedBlogId = Blog::max('id') + 1;
+
+    // Actualizar la columna 'renewed_blog_id' y 'next_renewed_blog_id' en la tabla blogs con los valores obtenidos
+    $originalBlog->update([
+        'renewed_blog_id' => $newRenewedBlogId,
+        'next_renewed_blog_id' => $nextRenewedBlogId,
+    ]);
+
+    return [
+        'original' => $originalBlog,
+        'renovado' => $newRenewedBlog,
+    ];
+}
+
+
+
+    
     public function renovar($id)
     {
         //dd($id);
