@@ -10,12 +10,13 @@ class RenewedBlog extends Model
     use HasFactory;
     protected $fillable = [
         'parent_blog_id',
-        //'renewed_blog_id'
+        'renewed_blog_id'
     ];
     
     public function parentBlog()
     {
         return $this->belongsTo(Blog::class, 'parent_blog_id');
     }
+
 }
 

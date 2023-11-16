@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('renewed_blogs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('parent_blog_id'); // Clave foránea hacia la boleta original
-            //$table->unsignedBigInteger('renewed_blog_id'); // Columna autoincremental
+            $table->unsignedBigInteger('renewed_blog_id'); // Columna autoincremental
            
             $table->timestamps();
 
