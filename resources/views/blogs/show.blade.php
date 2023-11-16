@@ -7,22 +7,32 @@
 @stop
 
 @section('content')
-<div class="container">
-    <h1>Detalles del Blog</h1>
+<h2>Blog</h2>
+<p>ID: {{ $blog->id }}</p>
+<p>Estado: {{ $blog->estado }}</p>
+{{-- Agrega más campos según sea necesario --}}
+<p>Num Boleta: {{ $blog->num_boleta }}</p>
+<p>Empresa: {{ $blog->empresa }}</p>
+<p>Motivo: {{ $blog->motivo }}</p>
 
-    <h2>Blog Original</h2>
-    <p>ID: {{ $blog->id }}</p>
-    <!-- Mostrar otros detalles del blog original según tu estructura de datos -->
+{{-- Mostrar información de renovaciones, si existen --}}
+@if($renovatedBlogs->isNotEmpty())
+    <h3>Renovaciones</h3>
+    @foreach($renovatedBlogs as $renovatedBlog)
+        <p>ID Renovado: {{ $renovatedBlog->renewed_blog_id }}</p>
+        {{-- Agrega más campos según sea necesario --}}
+    @endforeach
+@endif
 
-    @if($renovatedBlog)
-    <h2>Boleta Renovada</h2>
-    <p>ID: {{ $renovatedBlog->id }}</p>
-    <!-- Mostrar otros detalles de la boleta renovada según tu estructura de datos -->
-    @else
-    <p>No hay boleta renovada asociada a este blog.</p>
-    @endif
+{{-- Mostrar información de waranty --}}
+@if($blog->waranty)
+    <h3>Waranty</h3>
+    <p>ID Waranty: {{ $blog->waranty->id }}</p>
+    <p>Título: {{ $blog->waranty->titulo }}</p>
+    <p>Contenido: {{ $blog->waranty->contenido }}</p>
+    <p>Contenido: {{ $blog->waranty->caracteristicas }}</p>
 
-    <!-- Agregar aquí más detalles del blog original y la boleta renovada según tu estructura de datos -->
+    {{-- Agrega más campos según sea necesario --}}
+@endif
 
-</div>
-@endsection
+    @endsection

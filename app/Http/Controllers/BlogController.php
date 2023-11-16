@@ -637,16 +637,17 @@ class BlogController extends Controller
         }
     }
     public function show($id)
-    {
-        // Recupera el blog original por su ID
-        $blog = Blog::findOrFail($id);
+{
+    // Recupera el blog original por su ID
+    $blog = Blog::findOrFail($id);
 
-        // Verifica si el blog ha sido renovado previamente
-        $renovatedBlog = RenewedBlog::where('parent_blog_id', $blog->id)->first();
+    // Verifica si el blog ha sido renovado previamente
+    $renovatedBlogs = RenewedBlog::where('parent_blog_id', $blog->id)->get();
 
-        // Pasa los datos del blog original y la boleta renovada (si existe) a la vista
-        return view('blogs.show', compact('blog', 'renovatedBlog'));
-    }
+    // Pasa los datos del blog original y las boletas renovadas (si existen) a la vista
+    return view('blogs.show', compact('blog', 'renovatedBlogs'));
+}
+
       /**
      * Remove the specified resource from storage.
      */
