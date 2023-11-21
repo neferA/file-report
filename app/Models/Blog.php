@@ -48,13 +48,12 @@ class Blog extends Model
         }
         
     }
-
+    
 
     public function waranty()
     {
         return $this->hasOne(waranty::class, 'blogs_id');
     }
-    
     public function financiadoras()
     {
         return $this->belongsToMany(Financiadora::class, 'boleta_financiadora', 'blogs_id', 'financiadora_id');
@@ -75,5 +74,5 @@ class Blog extends Model
     {
         return $this->hasMany(RenewedBlog::class, 'parent_blog_id');
     }
-    
+ 
 }

@@ -344,6 +344,7 @@ class BlogController extends Controller
         $newRenewedBlog = RenewedBlog::create([
             'parent_blog_id' => $originalBlog->id,
             'renewed_blog_id' => $nextId,
+            'original_blog_id' => $originalBlog->original_blog_id ?? $originalBlog->renewed_blog_id ?? $originalBlog->id,
         ]);
 
         // Actualizar la columna 'renewed_blog_id' en la tabla blogs con el valor obtenido
@@ -351,6 +352,9 @@ class BlogController extends Controller
 
         // Actualizar la columna 'next_renewed_blog_id' en la tabla blogs con el próximo ID disponible
         DB::table('blogs')->where('id', $originalBlog->id)->update(['next_renewed_blog_id' => $nextId]);
+        // Actualizar la columna 'original_blog_id' en la tabla renewed_blogs
+        // para mantener la referencia al blog original
+        $newRenewedBlog->update(['original_blog_id' => $originalBlog->original_blog_id ?? $originalBlog->renewed_blog_id ?? $originalBlog->id]);
 
         return $newRenewedBlog;
     }
