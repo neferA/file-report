@@ -333,30 +333,53 @@ class BlogController extends Controller
     }
 
     private function renovarBlog($originalBlogId)
+{
+    // Obtener el blog original que se va a renovar
+    $originalBlog = Blog::find($originalBlogId);
+
+    // Obtener el próximo ID disponible en la tabla blogs
+    $nextId = DB::table('blogs')->max('id') + 1;
+
+    // Insertar un nuevo registro en la tabla renewed_blogs
+    $newRenewedBlog = RenewedBlog::create([
+        'parent_blog_id' => $originalBlog->id,
+        'renewed_blog_id' => $nextId,
+        'original_blog_id' => $originalBlog->id,
+    ]);
+   
+    // Actualizar la columna 'next_renewed_blog_id' en la tabla blogs con el próximo ID disponible
+    DB::table('blogs')->where('id', $originalBlog->id)->update(['next_renewed_blog_id' => $nextId]);
+
+    // Realizar la búsqueda recursiva y asignar el valor a 'original_blog_id'
+    $originalBlogIdRecursivo = $this->realizarBusquedaRecursiva($newRenewedBlog);
+    $newRenewedBlog->update(['original_blog_id' => $originalBlogIdRecursivo]);
+
+    return $newRenewedBlog;
+}
+
+
+
+    private function realizarBusquedaRecursiva($currentRenewedBlog)
     {
-        // Obtener el blog original que se va a renovar
-        $originalBlog = Blog::find($originalBlogId);
+        // Guardar el ID original inicial
+        $originalId = $currentRenewedBlog->original_blog_id;
 
-        // Obtener el próximo ID disponible en la tabla blogs
-        $nextId = DB::table('blogs')->max('id') + 1;
+        // Iterar hasta encontrar el abuelo original
+        while ($currentRenewedBlog->parent_blog_id !== null) {
+            // Obtener el siguiente blog renovado
+            $currentRenewedBlog = RenewedBlog::where('renewed_blog_id', $currentRenewedBlog->parent_blog_id)->first();
 
-        // Insertar un nuevo registro en la tabla renewed_blogs
-        $newRenewedBlog = RenewedBlog::create([
-            'parent_blog_id' => $originalBlog->id,
-            'renewed_blog_id' => $nextId,
-            'original_blog_id' => $originalBlog->original_blog_id ?? $originalBlog->renewed_blog_id ?? $originalBlog->id,
-        ]);
+            // Si no se encuentra el siguiente blog renovado, romper el bucle
+            if (!$currentRenewedBlog) {
+                break;
+            }
 
-        // Actualizar la columna 'renewed_blog_id' en la tabla blogs con el valor obtenido
-        $originalBlog->update(['renewed_blog_id' => $newRenewedBlog->id]);
+            // Actualizar el ID original
+            $originalId = $currentRenewedBlog->original_blog_id;
+        }
 
-        // Actualizar la columna 'next_renewed_blog_id' en la tabla blogs con el próximo ID disponible
-        DB::table('blogs')->where('id', $originalBlog->id)->update(['next_renewed_blog_id' => $nextId]);
-        // Actualizar la columna 'original_blog_id' en la tabla renewed_blogs
-        // para mantener la referencia al blog original
-        $newRenewedBlog->update(['original_blog_id' => $originalBlog->original_blog_id ?? $originalBlog->renewed_blog_id ?? $originalBlog->id]);
-
-        return $newRenewedBlog;
+        // Devolver el ID original encontrado durante la búsqueda recursiva
+        return $originalId;
     }
     
     public function renovar($id)

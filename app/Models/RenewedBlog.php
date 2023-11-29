@@ -22,9 +22,6 @@ class RenewedBlog extends Model
     {
         return $this->belongsTo(Blog::class, 'original_blog_id');
     }
-    public function findOriginalBlog()
-    {
-        return $this->originalBlog ?? $this->parentBlog->findOriginalBlog();
-    }
+    
 }
 

@@ -9,8 +9,7 @@ class Blog extends Model
 {
     use HasFactory;
     protected $fillable = [
-        //'id_boleta_real',
-        'renewed_blog_id',
+        
         'tipo_garantia_id',
         'unidad_ejecutora_id',
         'afianzadora_id',
