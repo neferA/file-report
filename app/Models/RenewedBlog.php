@@ -9,6 +9,7 @@ class RenewedBlog extends Model
 {
     use HasFactory;
     protected $fillable = [
+
         'parent_blog_id',
         'renewed_blog_id',
         'original_blog_id',
@@ -22,6 +23,7 @@ class RenewedBlog extends Model
     {
         return $this->belongsTo(Blog::class, 'original_blog_id');
     }
+    
     
 }
 

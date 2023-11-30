@@ -21,7 +21,6 @@ return new class extends Migration
 
             $table->foreign('parent_blog_id')->references('id')->on('blogs')->onDelete('cascade')->onUpdate('cascade')->name('renewed_blogs_parent_blog_id_foreign');
             $table->foreign('original_blog_id')->references('id')->on('blogs')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('renewed_blog_id')->references('id')->on('blogs')->onDelete('cascade');
         });
     }
 
