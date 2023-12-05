@@ -34,45 +34,99 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Muestra las renovaciones -->
             <div class="col-md-6">
-                @if($renovatedBlogs->isNotEmpty())
-                    <div class="card">
-                        <div class="card-header bg-success text-white">
-                            <h2>Renovaciones</h2>
-                        </div>
-                        <div class="card-body">
-                            @foreach($renovatedBlogs as $renovatedBlog)
-                                <p><strong>ID Renovado:</strong> {{ $renovatedBlog->renewed_blog_id }}</p>
-                                @php
-                                    $blogRenovado = \App\Models\Blog::find($renovatedBlog->renewed_blog_id);
-                                    $warantyHistory = \App\Models\Waranty::where('blogs_id', $renovatedBlog->renewed_blog_id)->first();
-                                @endphp
-
-                                @if($blogRenovado && $warantyHistory)
+                <div class="card mt-3">
+                    <div class="card-header bg-success text-white">
+                        <h2>Renovaciones</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="renovatedBlogsAccordion">
+                            @if($renovatedBlogs->isNotEmpty())
+                                @foreach($renovatedBlogs as $renovatedBlog)
                                     <div class="card mt-3">
-                                        <div class="card-header bg-info text-white">
-                                            <h3>Información del Blog Renovado (ID: {{ $renovatedBlog->renewed_blog_id }})</h3>
+                                        <div class="card-header bg-info" id="renovatedBlogHeading{{ $renovatedBlog->renewed_blog_id }}">
+                                            <h2 class="mb-0">
+                                                <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#renovatedBlogCollapse{{ $renovatedBlog->renewed_blog_id }}" aria-expanded="true" aria-controls="renovatedBlogCollapse{{ $renovatedBlog->renewed_blog_id }}">
+                                                    <strong>Blog Renovado (ID: {{ $renovatedBlog->renewed_blog_id }})</strong>
+                                                </button>
+                                            </h2>
                                         </div>
-                                        <div class="card-body">
-                                            <p><strong>Num Boleta:</strong> {{ $blogRenovado->num_boleta }}</p>
-                                            <p><strong>Empresa:</strong> {{ $blogRenovado->empresa }}</p>
-                                            <p><strong>Motivo:</strong> {{ $blogRenovado->motivo }}</p>                                            
-                                            <details>
-                                                <!-- <summary><h4>Historial de Garantía</h4></summary> -->
-                                                <p><strong>Características:</strong> {{ $warantyHistory->caracteristicas }}</p>
-                                                <p><strong>Observaciones:</strong> {{ $warantyHistory->observaciones }}</p>
-                                                <p><strong>Monto:</strong> {{ $warantyHistory->monto }}</p>
-                                                <p><strong>Fecha Inicial:</strong> {{ $warantyHistory->fecha_inicio }}</p>
-                                                <p><strong>Fecha Final:</strong> {{ $warantyHistory->fecha_final }}</p>
-                                            </details>
+                                        <div id="renovatedBlogCollapse{{ $renovatedBlog->renewed_blog_id }}" class="collapse" aria-labelledby="renovatedBlogHeading{{ $renovatedBlog->renewed_blog_id }}" data-parent="#renovatedBlogsAccordion">
+                                            <div class="card-body">
+                                                <p><strong>ID Renovado:</strong> {{ $renovatedBlog->renewed_blog_id }}</p>
+                                                <!-- Otros campos del blog renovado -->
+                                                <!-- Recuperar el blog renovado y su garantía -->
+                                                @php
+                                                    $blogRenovado = \App\Models\Blog::find($renovatedBlog->renewed_blog_id);
+                                                    $warantyHistory = \App\Models\Waranty::where('blogs_id', $renovatedBlog->renewed_blog_id)->first();
+                                                @endphp
+                                                <!-- Mostrar otros campos del blog renovado -->
+                                                @if($blogRenovado)
+                                                    <p><strong>Estado:</strong> {{ $blogRenovado->estado }}</p>
+                                                    <p><strong>Num Boleta:</strong> {{ $blogRenovado->num_boleta }}</p>
+                                                    <p><strong>Empresa:</strong> {{ $blogRenovado->empresa }}</p>
+                                                    <p><strong>Motivo:</strong> {{ $blogRenovado->motivo }}</p>
+                                                @endif
+
+                                                <!-- También mostrar detalles de garantía si está presente -->
+                                                @if($warantyHistory)
+                                                    <p><strong>Características:</strong> {{ $warantyHistory->caracteristicas }}</p>
+                                                    <p><strong>Observaciones:</strong> {{ $warantyHistory->observaciones }}</p>
+                                                    <p><strong>Monto:</strong> {{ $warantyHistory->monto }}</p>
+                                                    <p><strong>Fecha Inicial:</strong> {{ $warantyHistory->fecha_inicio }}</p>
+                                                    <p><strong>Fecha Final:</strong> {{ $warantyHistory->fecha_final }}</p>
+                                                @endif
+                                                <!-- Comprueba si hay hijos antes de intentar iterar -->
+                                                @if($renovatedBlog->hijos && $renovatedBlog->hijos->isNotEmpty())
+                                                    <!-- Muestra los hijos de cada renovación -->
+                                                    @foreach($renovatedBlog->hijos as $hijo)
+                                                        <div class="card mt-3">
+                                                            <div class="card-header bg-warning" id="hijoHeading{{ $hijo->renewed_blog_id }}">
+                                                                <h2 class="mb-0">
+                                                                    <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#hijoCollapse{{ $hijo->renewed_blog_id }}" aria-expanded="true" aria-controls="hijoCollapse{{ $hijo->renewed_blog_id }}">
+                                                                        <strong>Blog Hijo (ID: {{ $hijo->renewed_blog_id }})</strong>
+                                                                    </button>
+                                                                </h2>
+                                                            </div>
+                                                            <div id="hijoCollapse{{ $hijo->renewed_blog_id }}" class="collapse" aria-labelledby="hijoHeading{{ $hijo->renewed_blog_id }}" data-parent="#renovatedBlogCollapse{{ $renovatedBlog->renewed_blog_id }}">
+                                                                <div class="card-body">
+                                                                    <p><strong>ID Renovado:</strong> {{ $hijo->renewed_blog_id }}</p>
+                                                                    
+                                                                    <!-- Comprueba si hay nietos antes de intentar iterar -->
+                                                                    @if($hijo->hijos && $hijo->hijos->isNotEmpty())
+                                                                        <!-- Muestra los nietos de cada hijo -->
+                                                                        @foreach($hijo->hijos as $nieto)
+                                                                            <div class="card mt-3">
+                                                                                <div class="card-header bg-danger" id="nietoHeading{{ $nieto->renewed_blog_id }}">
+                                                                                    <h2 class="mb-0">
+                                                                                        <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#nietoCollapse{{ $nieto->renewed_blog_id }}" aria-expanded="true" aria-controls="nietoCollapse{{ $nieto->renewed_blog_id }}">
+                                                                                            <strong>Blog Nieto (ID: {{ $nieto->renewed_blog_id }})</strong>
+                                                                                        </button>
+                                                                                    </h2>
+                                                                                </div>
+                                                                                <div id="nietoCollapse{{ $nieto->renewed_blog_id }}" class="collapse" aria-labelledby="nietoHeading{{ $nieto->renewed_blog_id }}" data-parent="#hijoCollapse{{ $hijo->renewed_blog_id }}">
+                                                                                    <div class="card-body">
+                                                                                        <p><strong>ID Renovado:</strong> {{ $nieto->renewed_blog_id }}</p>
+                                                                                        <!-- Otros campos del blog nieto -->
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
-                                @endif
-                            @endforeach
+                                @endforeach
+                            @endif
                         </div>
                     </div>
-                @endif
+                </div>
             </div>
         </div>
     </div>

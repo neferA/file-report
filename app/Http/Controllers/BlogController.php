@@ -333,31 +333,29 @@ class BlogController extends Controller
     }
 
     private function renovarBlog($originalBlogId)
-{
-    // Obtener el blog original que se va a renovar
-    $originalBlog = Blog::find($originalBlogId);
+    {
+        // Obtener el blog original que se va a renovar
+        $originalBlog = Blog::find($originalBlogId);
 
-    // Obtener el próximo ID disponible en la tabla blogs
-    $nextId = DB::table('blogs')->max('id') + 1;
+        // Obtener el próximo ID disponible en la tabla blogs
+        $nextId = DB::table('blogs')->max('id') + 1;
 
-    // Insertar un nuevo registro en la tabla renewed_blogs
-    $newRenewedBlog = RenewedBlog::create([
-        'parent_blog_id' => $originalBlog->id,
-        'renewed_blog_id' => $nextId,
-        'original_blog_id' => $originalBlog->id,
-    ]);
-   
-    // Actualizar la columna 'next_renewed_blog_id' en la tabla blogs con el próximo ID disponible
-    DB::table('blogs')->where('id', $originalBlog->id)->update(['next_renewed_blog_id' => $nextId]);
+        // Insertar un nuevo registro en la tabla renewed_blogs
+        $newRenewedBlog = RenewedBlog::create([
+            'parent_blog_id' => $originalBlog->id,
+            'renewed_blog_id' => $nextId,
+            'original_blog_id' => $originalBlog->id,
+        ]);
+    
+        // Actualizar la columna 'next_renewed_blog_id' en la tabla blogs con el próximo ID disponible
+        DB::table('blogs')->where('id', $originalBlog->id)->update(['next_renewed_blog_id' => $nextId]);
 
-    // Realizar la búsqueda recursiva y asignar el valor a 'original_blog_id'
-    $originalBlogIdRecursivo = $this->realizarBusquedaRecursiva($newRenewedBlog);
-    $newRenewedBlog->update(['original_blog_id' => $originalBlogIdRecursivo]);
+        // Realizar la búsqueda recursiva y asignar el valor a 'original_blog_id'
+        $originalBlogIdRecursivo = $this->realizarBusquedaRecursiva($newRenewedBlog);
+        $newRenewedBlog->update(['original_blog_id' => $originalBlogIdRecursivo]);
 
-    return $newRenewedBlog;
-}
-
-
+        return $newRenewedBlog;
+    }
 
     private function realizarBusquedaRecursiva($currentRenewedBlog)
     {
@@ -668,10 +666,12 @@ class BlogController extends Controller
         // Recupera el blog original por su ID
         $blog = Blog::findOrFail($id);
 
-        // Verifica si el blog ha sido renovado previamente
-        $renovatedBlogs = RenewedBlog::where('parent_blog_id', $blog->id)->get();
+        // Obtén todas las renovaciones para el blog original y sus hijos
+        $renovatedBlogs = RenewedBlog::where('parent_blog_id', $blog->id)
+            ->orWhere('original_blog_id', $blog->id)
+            ->get();
 
-        // Pasa los datos del blog original y las boletas renovadas (si existen) a la vista
+        // Pasa los datos del blog original y las renovaciones a la vista
         return view('blogs.show', compact('blog', 'renovatedBlogs'));
     }
 
