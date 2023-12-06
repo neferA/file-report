@@ -103,16 +103,15 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="boleta_pdf">boleta pdf</label>
-                                            {!! Form::file('boleta_pdf', ['class' => 'form-control-file', 'id' => 'boleta_pdf']) !!}
+                                            {!! Form::file('boleta_pdf', ['class' => 'form-control-file', 'id' => 'boleta_pdf', 'required' => 'required']) !!}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="nota_pdf">nota pdf</label>
-                                            {!! Form::file('nota_pdf', ['class' => 'form-control-file', 'id' => 'nota_pdf']) !!}
+                                            {!! Form::file('nota_pdf', ['class' => 'form-control-file', 'id' => 'nota_pdf', 'required' => 'required']) !!}
                                         </div>
                                     </div>
-                                    
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="fecha_inicio">Fecha inicial</label>

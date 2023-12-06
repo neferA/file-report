@@ -160,7 +160,7 @@ class BlogController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('num_boleta', 'like', '%' . $search . '%')
-                    ->orWhere('proveedor', 'like', '%' . $search . '%')
+                    ->orWhere('empresa', 'like', '%' . $search . '%')
                     ->orWhere('motivo', 'like', '%' . $search . '%')
                     ->orWhereHas('unidadEjecutora', function ($subq) use ($search) {
                         $subq->where('nombre', 'like', '%' . $search . '%');
@@ -400,17 +400,16 @@ class BlogController extends Controller
      * Display the specified resource.
      */
     
-    public function generarPDF($id)
+     public function generarPDF($id)
     {
-        // dd("ID recibido: " . $id);
         // Obtener el blog basado en el ID proporcionado
         $blog = Blog::with('waranty', 'unidadEjecutora')->find($id);
 
         // Verificar si el blog existe
-    if (!$blog) {
-        abort(404); // Muestra una página 404 si el blog no se encuentra
-    }
-    
+        if (!$blog) {
+            abort(404); // Muestra una página 404 si el blog no se encuentra
+        }
+
         // Obtener los valores necesarios del blog
         $fechaInicio = $blog->waranty->fecha_inicio;
         $fechaFinal = $blog->waranty->fecha_final;
@@ -418,21 +417,56 @@ class BlogController extends Controller
         $warantyMonto = $blog->waranty->monto;
         $unidadEjecutoraNombre = $blog->unidadEjecutora->nombre;
 
-        // Obtener los datos necesarios para el informe en PDF (puedes utilizar tus propios métodos para obtener estos datos)
+        // Obtener los IDs de los blogs renovados (hijos y nietos) y sus datos
+        $renovatedBlogData = $this->getRenovatedBlogData($blog);
+
+        // Calcular la suma de montos
+        $totalMonto = $warantyMonto + array_sum(array_column($renovatedBlogData, 'monto'));
+
+        // Obtener los datos necesarios para el informe en PDF
         $data = [
             'num_boleta' => $blog->num_boleta,
             'usuario' => $blog->usuario,
-            'tipo_garantia' => $blog->tipoGarantia->nombre, 
-            'monto' => $blog->waranty->monto,
-            'unidad_ejecutora' => $blog->unidadEjecutora->nombre, 
+            'tipo_garantia' => $blog->tipoGarantia->nombre,
+            'monto' => $warantyMonto,
+            'unidad_ejecutora' => $unidadEjecutoraNombre,
+            'renovated_blog_data' => $renovatedBlogData,
+            'total_monto' => $totalMonto, // Nuevo dato para la suma de montos
         ];
-    
+
         // Generar el informe en PDF usando Laravel PDF
-        $pdf = PDF::loadView('report', compact('data'));
-    
+        $pdf = PDF::loadView('report', compact('data'));   
+
         // Descargar el PDF
         return $pdf->download('informe.pdf');
     }
+         // Función para obtener los IDs de los blogs renovados (hijos y nietos) y sus datos
+        private function getRenovatedBlogData($blog)
+        {
+            $renovatedBlogData = [];
+
+            // Recorrer los blogs renovados recursivamente
+            $currentRenewedBlog = RenewedBlog::where('parent_blog_id', $blog->id)->first();
+
+            while ($currentRenewedBlog) {
+                // Obtener datos del blog renovado
+                $renovatedBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($currentRenewedBlog->renewed_blog_id);
+
+                // Agregar datos del blog renovado al arreglo
+                $renovatedBlogData[] = [
+                    'num_boleta' => $renovatedBlog->num_boleta,
+                    'usuario' => $renovatedBlog->usuario,
+                    'tipo_garantia' => $renovatedBlog->tipoGarantia->nombre,
+                    'monto' => $renovatedBlog->waranty->monto,
+                    'unidad_ejecutora' => $renovatedBlog->unidadEjecutora->nombre,
+                ];
+
+                // Obtener el siguiente blog renovado
+                $currentRenewedBlog = RenewedBlog::where('parent_blog_id', $currentRenewedBlog->renewed_blog_id)->first();
+            }
+
+            return $renovatedBlogData;
+        } 
 
     /**
      * Show the form for editing the specified resource.

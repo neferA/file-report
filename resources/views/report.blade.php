@@ -41,13 +41,42 @@
             <tr>
                 <td>{{ $data['num_boleta'] }}</td>
                 <td>{{ $data['usuario'] }}</td>
-                <td>{{ $data['tipo_garantia'] }}</td> <!-- Asegúrate de que la clave sea correcta según cómo la pasas desde el controlador -->
-                <td>{{ $data['monto'] }}</td> <!-- Accede al monto directamente desde el array de datos -->
-                <td>{{ $data['unidad_ejecutora'] }}</td> <!-- Accede al nombre de la unidad ejecutora desde el array de datos -->
+                <td>{{ $data['tipo_garantia'] }}</td>
+                <td>{{ $data['monto'] }}</td>
+                <td>{{ $data['unidad_ejecutora'] }}</td>
             </tr>
         </tbody>
     </table>
+
+    <!-- Sección para mostrar hijos y nietos -->
+    @if(isset($data['renovated_blog_data']) && count($data['renovated_blog_data']) > 0)
+        <h2>Blogs Renovados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Número de Boleta</th>
+                    <th>Usuario</th>
+                    <th>Tipo de Garantía</th>
+                    <th>Monto</th>
+                    <th>Unidad Ejecutora</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data['renovated_blog_data'] as $renovatedBlog)
+                    <tr>
+                        <td>{{ $renovatedBlog['num_boleta'] }}</td>
+                        <td>{{ $renovatedBlog['usuario'] }}</td>
+                        <td>{{ $renovatedBlog['tipo_garantia'] }}</td>
+                        <td>{{ $renovatedBlog['monto'] }}</td>
+                        <td>{{ $renovatedBlog['unidad_ejecutora'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <p>No hay blogs renovados.</p>
+    @endif
+    <!-- Muestra la suma de montos -->
+    <p>Total Monto: {{ $data['total_monto'] }}</p>
 </body>
-
-
 </html>

@@ -59,12 +59,14 @@
                             </div>
                             <button type="submit" class="btn btn-primary">Filtrar por Fecha</button>
                         </form>
+                        <br>
                         @can('crear_tickets')
                             <a class="btn btn-warning" href="{{ route('tickets.create')}}">
                                 <i class="fas fa-plus"></i> Nueva boleta
                             </a>
                         @endcan
-
+                        <br>
+                        <br>
                             <!-- Pestañas para organizar la información -->
                             <ul class="nav nav-tabs">
                                 <li class="nav-item">
