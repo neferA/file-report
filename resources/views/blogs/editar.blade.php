@@ -69,8 +69,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="monto">monto</label>
-                                            {!! Form::text('monto', $blog->waranty ? $blog->waranty->monto : null, ['class' => 'form-control', 'placeholder' => 'Ingrese el monto']) !!}
+                                            <label for="monto">Monto</label>
+                                            {!! Form::number('monto', $blog->waranty ? $blog->waranty->monto : null, ['class' => 'form-control', 'placeholder' => 'Ingrese el monto', 'step' => 'any', 'required' => true]) !!}
                                         </div>
                                     </div>
                                     <div class="col-md-6">

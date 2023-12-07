@@ -401,72 +401,100 @@ class BlogController extends Controller
      */
     
      public function generarPDF($id)
-    {
-        // Obtener el blog basado en el ID proporcionado
-        $blog = Blog::with('waranty', 'unidadEjecutora')->find($id);
+     {
+         // Obtener el blog basado en el ID proporcionado
+         $blog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($id);
+     
+         // Verificar si el blog existe
+         if (!$blog) {
+             abort(404); // Muestra una página 404 si el blog no se encuentra
+         }
+     
+         // Obtener los valores necesarios del blog
+         $fechaInicio = $blog->waranty->fecha_inicio;
+         $fechaFinal = $blog->waranty->fecha_final;
+         $unidadEjecutoraId = $blog->unidad_ejecutora_id;
+         $warantyMonto = $blog->waranty->monto;
+         $unidadEjecutoraNombre = $blog->unidadEjecutora->nombre;
+     
+         // Obtener los IDs de los blogs renovados descendientes y sus datos
+         $descendantRenovatedBlogData = $this->getRenovatedBlogData($blog, 'descendant')['renovatedBlogData'];
+         $totalMontoDescendant = $this->getRenovatedBlogData($blog, 'descendant')['totalMonto'];
+     
+         // Obtener los IDs de los blogs renovados ascendientes y sus datos
+         $ascendantRenovatedBlogData = $this->getRenovatedBlogData($blog, 'ascendant')['renovatedBlogData'];
+         $totalMontoAscendant = $this->getRenovatedBlogData($blog, 'ascendant')['totalMonto'];
+     
+         // Calcular la suma de montos
+         $totalMonto = $totalMontoDescendant + $totalMontoAscendant + $warantyMonto ;
+     
+         // Obtener los datos necesarios para el informe en PDF
+         $data = [
+             'num_boleta' => $blog->num_boleta,
+             'usuario' => $blog->usuario,
+             'tipo_garantia' => $blog->tipoGarantia->nombre,
+             'monto' => $warantyMonto,
+             'unidad_ejecutora' => $unidadEjecutoraNombre,
+             'descendant_renovated_blog_data' => $descendantRenovatedBlogData,
+             'ascendant_renovated_blog_data' => $ascendantRenovatedBlogData,
+             'total_monto' => $totalMonto, 
+         ];
+     
+         // Generar el informe en PDF usando Laravel PDF
+         $pdf = PDF::loadView('report', compact('data'));   
+     
+         // Descargar el PDF
+         return $pdf->download('informe.pdf');
+     }
+     
 
-        // Verificar si el blog existe
-        if (!$blog) {
-            abort(404); // Muestra una página 404 si el blog no se encuentra
-        }
+    // Función para obtener los IDs de los blogs renovados y sus datos (descendientes o ascendientes)
+    private function getRenovatedBlogData($blog, $direction)
+{
+    $renovatedBlogData = [];
 
-        // Obtener los valores necesarios del blog
-        $fechaInicio = $blog->waranty->fecha_inicio;
-        $fechaFinal = $blog->waranty->fecha_final;
-        $unidadEjecutoraId = $blog->unidad_ejecutora_id;
-        $warantyMonto = $blog->waranty->monto;
-        $unidadEjecutoraNombre = $blog->unidadEjecutora->nombre;
+    $currentRenewedBlog = null;
 
-        // Obtener los IDs de los blogs renovados (hijos y nietos) y sus datos
-        $renovatedBlogData = $this->getRenovatedBlogData($blog);
-
-        // Calcular la suma de montos
-        $totalMonto = $warantyMonto + array_sum(array_column($renovatedBlogData, 'monto'));
-
-        // Obtener los datos necesarios para el informe en PDF
-        $data = [
-            'num_boleta' => $blog->num_boleta,
-            'usuario' => $blog->usuario,
-            'tipo_garantia' => $blog->tipoGarantia->nombre,
-            'monto' => $warantyMonto,
-            'unidad_ejecutora' => $unidadEjecutoraNombre,
-            'renovated_blog_data' => $renovatedBlogData,
-            'total_monto' => $totalMonto, // Nuevo dato para la suma de montos
-        ];
-
-        // Generar el informe en PDF usando Laravel PDF
-        $pdf = PDF::loadView('report', compact('data'));   
-
-        // Descargar el PDF
-        return $pdf->download('informe.pdf');
+    // Determinar la dirección y obtener el blog inicial
+    if ($direction === 'descendant') {
+        $currentRenewedBlog = RenewedBlog::where('parent_blog_id', $blog->id)->first();
+    } elseif ($direction === 'ascendant') {
+        $currentRenewedBlog = RenewedBlog::where('renewed_blog_id', $blog->id)->first();
     }
-         // Función para obtener los IDs de los blogs renovados (hijos y nietos) y sus datos
-        private function getRenovatedBlogData($blog)
-        {
-            $renovatedBlogData = [];
 
-            // Recorrer los blogs renovados recursivamente
-            $currentRenewedBlog = RenewedBlog::where('parent_blog_id', $blog->id)->first();
+    $totalMonto = 0; // Inicializar la suma total
 
-            while ($currentRenewedBlog) {
-                // Obtener datos del blog renovado
-                $renovatedBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($currentRenewedBlog->renewed_blog_id);
+    // Función recursiva para obtener datos de blogs renovados y la suma total
+    $getRenovatedBlogDataRecursive = function ($currentBlogId) use (&$getRenovatedBlogDataRecursive, &$renovatedBlogData, &$totalMonto, $blog) {
+        // Omitir el blog actual cuando recuperas blogs renovados ascendentes
+        if ($currentBlogId !== $blog->id) {
+            $currentBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($currentBlogId);
 
-                // Agregar datos del blog renovado al arreglo
-                $renovatedBlogData[] = [
-                    'num_boleta' => $renovatedBlog->num_boleta,
-                    'usuario' => $renovatedBlog->usuario,
-                    'tipo_garantia' => $renovatedBlog->tipoGarantia->nombre,
-                    'monto' => $renovatedBlog->waranty->monto,
-                    'unidad_ejecutora' => $renovatedBlog->unidadEjecutora->nombre,
-                ];
+            $renovatedBlogData[] = [
+                'num_boleta' => $currentBlog->num_boleta,
+                'usuario' => $currentBlog->usuario,
+                'tipo_garantia' => $currentBlog->tipoGarantia->nombre,
+                'monto' => $currentBlog->waranty->monto,
+                'unidad_ejecutora' => $currentBlog->unidadEjecutora->nombre,
+            ];
 
-                // Obtener el siguiente blog renovado
-                $currentRenewedBlog = RenewedBlog::where('parent_blog_id', $currentRenewedBlog->renewed_blog_id)->first();
+            $totalMonto += $currentBlog->waranty->monto; // Sumar al total
+
+            $descendantRenewedBlogs = RenewedBlog::where('parent_blog_id', $currentBlogId)->get();
+
+            foreach ($descendantRenewedBlogs as $descendantRenewedBlog) {
+                $getRenovatedBlogDataRecursive($descendantRenewedBlog->renewed_blog_id);
             }
+        }
+    };
 
-            return $renovatedBlogData;
-        } 
+    if ($currentRenewedBlog) {
+        $getRenovatedBlogDataRecursive($direction === 'descendant' ? $currentRenewedBlog->renewed_blog_id : $currentRenewedBlog->parent_blog_id);
+    }
+
+    return ['renovatedBlogData' => $renovatedBlogData, 'totalMonto' => $totalMonto];
+}
+
 
     /**
      * Show the form for editing the specified resource.

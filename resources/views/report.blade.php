@@ -48,35 +48,65 @@
         </tbody>
     </table>
 
-    <!-- Sección para mostrar hijos y nietos -->
-    @if(isset($data['renovated_blog_data']) && count($data['renovated_blog_data']) > 0)
-        <h2>Blogs Renovados</h2>
-        <table>
-            <thead>
+   <!-- Sección para mostrar hijos y nietos -->
+@if(isset($data['descendant_renovated_blog_data']) && count($data['descendant_renovated_blog_data']) > 0)
+    <h2>Blogs Renovados Descendientes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Número de Boleta</th>
+                <th>Usuario</th>
+                <th>Tipo de Garantía</th>
+                <th>Monto</th>
+                <th>Unidad Ejecutora</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($data['descendant_renovated_blog_data'] as $descendantRenovatedBlog)
                 <tr>
-                    <th>Número de Boleta</th>
-                    <th>Usuario</th>
-                    <th>Tipo de Garantía</th>
-                    <th>Monto</th>
-                    <th>Unidad Ejecutora</th>
+                    <td>{{ $descendantRenovatedBlog['num_boleta'] }}</td>
+                    <td>{{ $descendantRenovatedBlog['usuario'] }}</td>
+                    <td>{{ $descendantRenovatedBlog['tipo_garantia'] }}</td>
+                    <td>{{ $descendantRenovatedBlog['monto'] }}</td>
+                    <td>{{ $descendantRenovatedBlog['unidad_ejecutora'] }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($data['renovated_blog_data'] as $renovatedBlog)
-                    <tr>
-                        <td>{{ $renovatedBlog['num_boleta'] }}</td>
-                        <td>{{ $renovatedBlog['usuario'] }}</td>
-                        <td>{{ $renovatedBlog['tipo_garantia'] }}</td>
-                        <td>{{ $renovatedBlog['monto'] }}</td>
-                        <td>{{ $renovatedBlog['unidad_ejecutora'] }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <p>No hay blogs renovados.</p>
-    @endif
-    <!-- Muestra la suma de montos -->
-    <p>Total Monto: {{ $data['total_monto'] }}</p>
+            @endforeach
+        </tbody>
+    </table>
+@else
+    <p>No hay blogs renovados descendientes.</p>
+@endif
+
+@if(isset($data['ascendant_renovated_blog_data']) && count($data['ascendant_renovated_blog_data']) > 0)
+    <h2>Blogs Renovados Ascendientes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Número de Boleta</th>
+                <th>Usuario</th>
+                <th>Tipo de Garantía</th>
+                <th>Monto</th>
+                <th>Unidad Ejecutora</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($data['ascendant_renovated_blog_data'] as $ascendantRenovatedBlog)
+                <tr>
+                    <td>{{ $ascendantRenovatedBlog['num_boleta'] }}</td>
+                    <td>{{ $ascendantRenovatedBlog['usuario'] }}</td>
+                    <td>{{ $ascendantRenovatedBlog['tipo_garantia'] }}</td>
+                    <td>{{ $ascendantRenovatedBlog['monto'] }}</td>
+                    <td>{{ $ascendantRenovatedBlog['unidad_ejecutora'] }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+@else
+    <p>No hay blogs renovados ascendientes.</p>
+@endif
+
+<!-- Muestra la suma de montos -->
+<p>Total Monto: {{ $data['total_monto'] }}</p>
+
 </body>
 </html>

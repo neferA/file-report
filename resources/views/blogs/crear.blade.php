@@ -65,8 +65,8 @@
                                     </div> 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="titulo">monto</label>
-                                            {!! Form::text('monto', null, ['class' => 'form-control', 'placeholder' => 'Ingrese monto']) !!}
+                                            <label for="titulo">Monto</label>
+                                            {!! Form::number('monto', null, ['class' => 'form-control', 'placeholder' => 'Ingrese monto', 'step' => 'any', 'required' => true]) !!}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
