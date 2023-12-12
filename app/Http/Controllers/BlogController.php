@@ -449,60 +449,71 @@ class BlogController extends Controller
      
 
     // Función para obtener los IDs de los blogs renovados y sus datos (descendientes o ascendientes)
-        private function getRenovatedBlogData($blog, $direction)
-        {
-            $renovatedBlogData = [];
-            $ancestors = [];
-            $totalMonto = 0; // Inicializar la suma total
+    private function getRenovatedBlogData($blog, $direction)
+    {
+        $renovatedBlogData = [];
+        $processedBlogIds = []; // Conjunto de IDs de blogs procesados
+        $totalMonto = 0; // Inicializar la suma total
 
-            // Función recursiva para obtener datos de blogs renovados y la suma total
-            $getRenovatedBlogDataRecursive = function ($currentBlogId) use (&$getRenovatedBlogDataRecursive, &$renovatedBlogData, &$ancestors, &$totalMonto, $direction) {
-                $currentBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($currentBlogId);
+        // Función recursiva para obtener datos de blogs renovados y la suma total
+        $getRenovatedBlogDataRecursive = function ($currentBlogId, $direction) use (&$getRenovatedBlogDataRecursive, &$renovatedBlogData, &$processedBlogIds, &$totalMonto) {
+            // Verificar si el blog ya ha sido procesado para la dirección actual
+            if (in_array($currentBlogId, $processedBlogIds)) {
+                return;
+            }
 
-                // Agregar datos de blogs renovados
-                $renovatedBlogData[] = [
-                    'num_boleta' => $currentBlog->num_boleta,
-                    'usuario' => $currentBlog->usuario,
-                    'tipo_garantia' => $currentBlog->tipoGarantia->nombre,
-                    'monto' => $currentBlog->waranty->monto,
-                    'unidad_ejecutora' => $currentBlog->unidadEjecutora->nombre,
-                ];
+            $currentBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($currentBlogId);
 
-                // Agregar datos de ancestros
-                $ancestors[] = [
-                    'num_boleta' => $currentBlog->num_boleta,
-                    'usuario' => $currentBlog->usuario,
-                    'tipo_garantia' => $currentBlog->tipoGarantia->nombre,
-                    'monto' => $currentBlog->waranty->monto,
-                    'unidad_ejecutora' => $currentBlog->unidadEjecutora->nombre,
-                ];
+            // Agregar datos de blogs renovados
+            $renovatedBlogData[] = [
+                'id' => $currentBlog->id,
+                'num_boleta' => $currentBlog->num_boleta,
+                'usuario' => $currentBlog->usuario,
+                'tipo_garantia' => $currentBlog->tipoGarantia->nombre,
+                'monto' => $currentBlog->waranty->monto,
+                'unidad_ejecutora' => $currentBlog->unidadEjecutora->nombre,
+                'caracteristicas' => $currentBlog->waranty->caracteristicas,
+                'observaciones' => $currentBlog->waranty->observaciones,
+                'fecha_inicio' => $currentBlog->waranty->fecha_inicio,
+                'fecha_final' => $currentBlog->waranty->fecha_final,
+                'estado' => $currentBlog->estado,
+            ];
 
-                $totalMonto += $currentBlog->waranty->monto; // Sumar al total
+            $totalMonto += $currentBlog->waranty->monto; // Sumar al total
 
-                // Obtener el siguiente blog ascendente
-                $nextRenewedBlog = RenewedBlog::where('renewed_blog_id', $currentBlogId)->first();
+            $processedBlogIds[] = $currentBlogId; // Agregar el blog actual al conjunto de blogs procesados
 
-                if ($nextRenewedBlog) {
-                    $nextBlogId = $nextRenewedBlog->parent_blog_id;
-                    $getRenovatedBlogDataRecursive($nextBlogId);
-                }
-            };
+            $nextRenewedBlog = null;
 
-            // Determinar la dirección y obtener el blog inicial
+            // Obtener el siguiente blog según la dirección
             if ($direction === 'descendant') {
-                $currentRenewedBlog = RenewedBlog::where('parent_blog_id', $blog->id)->first();
+                $nextRenewedBlog = RenewedBlog::where('parent_blog_id', $currentBlogId)->first();
             } elseif ($direction === 'ascendant') {
-                $currentRenewedBlog = RenewedBlog::where('renewed_blog_id', $blog->id)->first();
+                $nextRenewedBlog = RenewedBlog::where('renewed_blog_id', $currentBlogId)->first();
             }
 
-            // Comenzar la búsqueda recursiva desde el blog inicial
-            if ($currentRenewedBlog) {
-                $nextBlogId = $direction === 'descendant' ? $currentRenewedBlog->renewed_blog_id : $currentRenewedBlog->parent_blog_id;
-                $getRenovatedBlogDataRecursive($nextBlogId);
+            if ($nextRenewedBlog) {
+                $nextBlogId = $direction === 'descendant' ? $nextRenewedBlog->renewed_blog_id : $nextRenewedBlog->parent_blog_id;
+                $getRenovatedBlogDataRecursive($nextBlogId, $direction);
             }
+        };
 
-            return ['renovatedBlogData' => $renovatedBlogData, 'ancestors' => $ancestors, 'totalMonto' => $totalMonto];
+        // Determinar la dirección y obtener el blog inicial
+        $currentRenewedBlog = null;
+
+        if ($direction === 'descendant') {
+            $currentRenewedBlog = RenewedBlog::where('parent_blog_id', $blog->id)->first();
+        } elseif ($direction === 'ascendant') {
+            $currentRenewedBlog = RenewedBlog::where('renewed_blog_id', $blog->id)->first();
         }
+
+        if ($currentRenewedBlog) {
+            $nextBlogId = $direction === 'descendant' ? $currentRenewedBlog->renewed_blog_id : $currentRenewedBlog->parent_blog_id;
+            $getRenovatedBlogDataRecursive($nextBlogId, $direction);
+        }
+
+        return ['renovatedBlogData' => $renovatedBlogData, 'totalMonto' => $totalMonto];
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -735,15 +746,21 @@ class BlogController extends Controller
     {
         // Recupera el blog original por su ID
         $blog = Blog::findOrFail($id);
-
-        // Obtén todas las renovaciones para el blog original y sus hijos
-        $renovatedBlogs = RenewedBlog::where('parent_blog_id', $blog->id)
-            ->orWhere('original_blog_id', $blog->id)
-            ->get();
-
+    
+        // Obtén todas las renovaciones para el blog original y sus hijos (descendientes)
+        $resultDescendant = $this->getRenovatedBlogData($blog, 'descendant');
+        $renovatedBlogDataDescendant = $resultDescendant['renovatedBlogData'];
+        $totalMontoDescendant = $resultDescendant['totalMonto'];
+    
+        // Obtén todas las renovaciones para el blog original y sus padres (ascendentes)
+        $resultAscendant = $this->getRenovatedBlogData($blog, 'ascendant');
+        $renovatedBlogDataAscendant = $resultAscendant['renovatedBlogData'];
+        $totalMontoAscendant = $resultAscendant['totalMonto'];
+    
         // Pasa los datos del blog original y las renovaciones a la vista
-        return view('blogs.show', compact('blog', 'renovatedBlogs'));
+        return view('blogs.show', compact('blog', 'renovatedBlogDataDescendant', 'renovatedBlogDataAscendant', 'totalMontoDescendant', 'totalMontoAscendant'));
     }
+    
 
       /**
      * Remove the specified resource from storage.
