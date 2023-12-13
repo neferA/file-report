@@ -349,10 +349,14 @@ class BlogController extends Controller
     
         // Actualizar la columna 'next_renewed_blog_id' en la tabla blogs con el próximo ID disponible
         DB::table('blogs')->where('id', $originalBlog->id)->update(['next_renewed_blog_id' => $nextId]);
-
+               
         // Realizar la búsqueda recursiva y asignar el valor a 'original_blog_id'
         $originalBlogIdRecursivo = $this->realizarBusquedaRecursiva($newRenewedBlog);
         $newRenewedBlog->update(['original_blog_id' => $originalBlogIdRecursivo]);
+
+        // Actualizar el estado del blog original a "Renovado"
+$originalBlog->estado = Blog::ESTADO_RENOVADO;
+$originalBlog->save();
 
         return $newRenewedBlog;
     }
