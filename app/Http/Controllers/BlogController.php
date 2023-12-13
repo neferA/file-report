@@ -110,7 +110,7 @@ class BlogController extends Controller
                     'estado' => Blog::ESTADO_VENCIDO,
                     'updated_at' => now(),  
                 ]);
-
+                
             // Crear una instancia de WarrantyExpired con los valores correctos
             $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
             event($event); // Disparar el evento
@@ -355,9 +355,9 @@ class BlogController extends Controller
         $newRenewedBlog->update(['original_blog_id' => $originalBlogIdRecursivo]);
 
         // Actualizar el estado del blog original a "Renovado"
-$originalBlog->estado = Blog::ESTADO_RENOVADO;
-$originalBlog->save();
-
+        $originalBlog->estado = Blog::ESTADO_RENOVADO;
+        $originalBlog->save();
+        
         return $newRenewedBlog;
     }
 

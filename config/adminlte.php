@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Files</b> Management',
+    'logo' => '<b>Files</b> Goberment',
     'logo_img' => 'vendor/adminlte/dist/img/assets/logo_dashboard.png', /*Logo dashboard*/
     // 'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png', /*Logo dashboard public//*/
     'logo_img_class' => 'brand-image img-circle elevation-3',
@@ -345,12 +345,12 @@ return [
         [
             'text'          => 'financiadoras',
             'url'           => '/financiers',
-            'icon'          => 'fa fa-download',
+            'icon'          => 'fa fa-university',
         ],
         [
             'text'          => 'afianzadoras',
             'url'           => '/suppliers',
-            'icon'          => 'fa fa-download',
+            'icon'          => 'fa fa-network-wired',
         ],
         [
             'text'          => 'Boletas',
@@ -361,12 +361,12 @@ return [
         [
             'text'          => 'garantia',
             'url'           => '/waranty',
-            'icon'          => 'fa fa-download',
+            'icon'          => 'fa fa-certificate',
         ],
         [
             'text'          => 'ejecutora',
             'url'           => '/executor',
-            'icon'          => 'fa fa-download',
+            'icon'          => 'fa fa-tools',
         ],
         // [
         //     'text'        => 'pages',
