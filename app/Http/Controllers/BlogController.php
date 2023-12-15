@@ -806,6 +806,14 @@ class BlogController extends Controller
             }
         }
     }
+    public function destroySelected(Request $request)
+    {
+        $selectedBlogIds = $request->input('selected_blogs', []);
+
+        // Verificar si se están pasando los IDs correctamente
+        dd($selectedBlogIds);
+    }
+
 }
    
 

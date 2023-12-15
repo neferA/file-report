@@ -67,6 +67,13 @@
                         @endcan
                         <br>
                         <br>
+                        <form action="{{ route('blogs.destroySelected') }}" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar los blogs seleccionados?')">Eliminar seleccionados</button>
+                            </div>
+                        </form>
+                        <br>
                             <!-- Pestañas para organizar la información -->
                             <ul class="nav nav-tabs">
                                 <li class="nav-item">
@@ -80,6 +87,7 @@
                                 <thead>
                                     <tr>
                                         <th style="display: none;">ID</th>
+                                        <th style="display: #fff;"></th>
                                         <th style="display: #fff;">Número de Boleta</th>
                                         <th style="display: #fff;">Afianzado</th>
                                         <th style="display: #fff;">Empresa</th>
@@ -95,6 +103,9 @@
                                     @foreach($blogs as $blog)
                                         <tr>
                                             <td style="display: none;">{{ $blog->id }}</td>
+                                            <td style="display: #fff;">
+                                                <input type="checkbox" name="selected_blogs[]" value="{{ $blog->id }}" class="form-check-input">
+                                            </td>
                                             <td>{{ $blog->num_boleta }}</td>
                                             <td>{{ $blog->afianzado->nombre}}</td>    
                                             <td>{{ $blog->empresa}}</td>    
@@ -142,7 +153,7 @@
                                                             ¿Está seguro que desea renovar esta boleta?
                                                         </div>
                                                         <div class="modal-footer">
-                                                        <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                            <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                                         </div>
                                                     </div>
                                                 </div>
