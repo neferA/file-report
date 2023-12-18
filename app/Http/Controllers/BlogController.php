@@ -769,25 +769,30 @@ class BlogController extends Controller
       /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $blog = Blog::findOrFail($id);
-    
-        if ($blog->waranty) {
-            // Definir rutas de almacenamiento de PDFs
-            $boletaPdfPath = $blog->waranty->boleta_pdf;
-            $notaPdfPath = $blog->waranty->nota_pdf;
-    
-            // Verificar y eliminar archivos PDF si existen
-            $this->deletePDF($boletaPdfPath);
-            $this->deletePDF($notaPdfPath);
+        $selectedIds = $request->input('selected_blogs');
+
+        foreach ($selectedIds as $id) {
+            $blog = Blog::findOrFail($id);
+
+            if ($blog->waranty) {
+                // Definir rutas de almacenamiento de PDFs
+                $boletaPdfPath = $blog->waranty->boleta_pdf;
+                $notaPdfPath = $blog->waranty->nota_pdf;
+
+                // Verificar y eliminar archivos PDF si existen
+                $this->deletePDF($boletaPdfPath);
+                $this->deletePDF($notaPdfPath);
+            }
+
+            // Eliminar el registro del blog
+            $blog->delete();
         }
-    
-        // Eliminar el registro del blog
-        $blog->delete();
-    
-        return redirect()->route('tickets.index')->with('success', 'Blog eliminado exitosamente.');
+
+        return redirect()->route('tickets.index')->with('success', 'Blogs seleccionados eliminados exitosamente.');
     }
+
     
     /**
      * Elimina un archivo PDF del almacenamiento si existe.
@@ -807,12 +812,25 @@ class BlogController extends Controller
         }
     }
     public function destroySelected(Request $request)
-    {
-        $selectedBlogIds = $request->input('selected_blogs', []);
+{
+    if ($request->has('submit_action')) {
+        if ($request->input('submit_action') === 'eliminar') {
+            $selectedIds = $request->input('selected_blogs');
 
-        // Verificar si se están pasando los IDs correctamente
-        dd($selectedBlogIds);
+            foreach ($selectedIds as $id) {
+                $this->destroy($id);
+            }
+
+            return redirect()->route('tickets.index')->with('success', 'Blogs seleccionados eliminados exitosamente.');
+        } elseif ($request->input('submit_action') === 'generar_pdf') {
+            // Lógica para generar PDF
+            // ...
+        }
     }
+
+    // Resto del código si es necesario
+}
+
 
 }
    

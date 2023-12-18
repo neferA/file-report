@@ -60,21 +60,7 @@
                             <button type="submit" class="btn btn-primary">Filtrar por Fecha</button>
                         </form>
                         <br>
-                        @can('crear_tickets')
-                            <a class="btn btn-warning" href="{{ route('tickets.create')}}">
-                                <i class="fas fa-plus"></i> Nueva boleta
-                            </a>
-                        @endcan
-                        <br>
-                        <br>
-                        <form action="{{ route('blogs.destroySelected') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar los blogs seleccionados?')">Eliminar seleccionados</button>
-                            </div>
-                        </form>
-                        <br>
-                            <!-- Pestañas para organizar la información -->
+                        <!-- Pestañas para organizar la información -->
                             <ul class="nav nav-tabs">
                                 <li class="nav-item">
                                     <a class="nav-link active" data-toggle="tab" href="#historial-tab">Historial</a>
@@ -83,116 +69,130 @@
                             </ul>                 
                         <div class="table-responsive">
                                                     
-                            <table class="table table-striped mt-2">
-                                <thead>
-                                    <tr>
-                                        <th style="display: none;">ID</th>
-                                        <th style="display: #fff;"></th>
-                                        <th style="display: #fff;">Número de Boleta</th>
-                                        <th style="display: #fff;">Afianzado</th>
-                                        <th style="display: #fff;">Empresa</th>
-                                        <th style="display: #fff;">Ejecutora</th>
-                                        <th style="display: #fff;">Creado por</th>
-                                        <th style="display: #fff;">Estado</th>
-                                        <th style="display: #fff;">Fecha de Creación</th>
-                                        <th style="display: #fff;">Alarma</th> 
-                                        <th style="display: #fff;">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($blogs as $blog)
-                                        <tr>
-                                            <td style="display: none;">{{ $blog->id }}</td>
-                                            <td style="display: #fff;">
-                                                <input type="checkbox" name="selected_blogs[]" value="{{ $blog->id }}" class="form-check-input">
-                                            </td>
-                                            <td>{{ $blog->num_boleta }}</td>
-                                            <td>{{ $blog->afianzado->nombre}}</td>    
-                                            <td>{{ $blog->empresa}}</td>    
-                                            <td>{{ $blog->unidadEjecutora->nombre }}</td>
-                                            <td>{{ $blog->usuario }}</td>
-                                            <td>
-                                                <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
-                                            </td>                                                                                           
-                                            <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
+                    <form method="POST" action="{{ route('blogs.destroySelected') }}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        @can('crear_tickets')
+                            <a class="btn btn-warning" href="{{ route('tickets.create')}}">
+                                <i class="fas fa-plus me-1"></i> Nueva boleta
+                            </a>
+                        @endcan
 
-                                            <td>
-                                                @if(isset($alarms[$blog->id]))
-                                                    @if ($alarms[$blog->id]['color'] === 'red')
-                                                        <div class="alert alert-danger text-center">
-                                                            <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
-                                                        </div>
-                                                    @elseif ($alarms[$blog->id]['color'] === 'orange')
-                                                        <div class="alert alert-warning text-center">
-                                                            <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Naranja</strong>
-                                                        </div>
-                                                    @elseif ($alarms[$blog->id]['color'] === 'black')
-                                                        <div class="alert alert-dark text-center text-white">
-                                                            <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Negra</strong>
-                                                            <br>
-                                                            <!-- Botón para abrir el modal de renovación -->
-                                                            <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Renovar</button>
-                                                        </div>
-                                                    @endif
-                                                @else
-                                                    <!-- Si no hay alarma, muestra un mensaje informativo -->
-                                                    <div class="alert alert-info text-center">Sin alarma</div>
+                        <div class="d-flex">
+                            <button type="submit" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de generar PDF?')">
+                                <i class="fas fa-file-pdf me-1"></i> Generar PDF
+                            </button>
+                            <button type="submit" name="submit_action" value="eliminar" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar los blogs seleccionados?')">
+                                <i class="fas fa-trash me-1"></i> Eliminar seleccionados
+                            </button>
+                        </div>
+                    </div>
+
+                        @csrf
+                        <table class="table table-striped mt-2">
+                            <thead>
+                                <tr>
+                                    <th style="display: none;">ID</th>
+                                    <th style="display: #fff;"></th>
+                                    <th style="display: #fff;">Número de Boleta</th>
+                                    <th style="display: #fff;">Afianzado</th>
+                                    <th style="display: #fff;">Empresa</th>
+                                    <th style="display: #fff;">Ejecutora</th>
+                                    <th style="display: #fff;">Creado por</th>
+                                    <th style="display: #fff;">Estado</th>
+                                    <th style="display: #fff;">Fecha de Creación</th>
+                                    <th style="display: #fff;">Alarma</th> 
+                                    <th style="display: #fff;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($blogs as $blog)
+                                    <tr>
+                                        <td style="display: none;">{{ $blog->id }}</td>
+                                        <td style="display: #fff;">
+                                            <input type="checkbox" name="selected_blogs[]" value="{{ $blog->id }}" class="form-check-input">
+                                        </td>
+                                        <td>{{ $blog->num_boleta }}</td>
+                                        <td>{{ $blog->afianzado->nombre}}</td>    
+                                        <td>{{ $blog->empresa}}</td>    
+                                        <td>{{ $blog->unidadEjecutora->nombre }}</td>
+                                        <td>{{ $blog->usuario }}</td>
+                                        <td>
+                                            <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
+                                        </td>                                                                                           
+                                        <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
+
+                                        <td>
+                                            @if(isset($alarms[$blog->id]))
+                                                @if ($alarms[$blog->id]['color'] === 'red')
+                                                    <div class="alert alert-danger text-center">
+                                                        <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
+                                                    </div>
+                                                @elseif ($alarms[$blog->id]['color'] === 'orange')
+                                                    <div class="alert alert-warning text-center">
+                                                        <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Naranja</strong>
+                                                    </div>
+                                                @elseif ($alarms[$blog->id]['color'] === 'black')
+                                                    <div class="alert alert-dark text-center text-white">
+                                                        <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Negra</strong>
+                                                        <br>
+                                                        <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Renovar</button>
+                                                    </div>
                                                 @endif
-                                            </td>
-                                            <!-- Modal para la renovación -->
-                                            <div class="modal fade" id="renovarModal{{ $blog->id }}" tabindex="-1" role="dialog" aria-labelledby="renovarModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="renovarModalLabel">Renovar Boleta</h5>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            ¿Está seguro que desea renovar esta boleta?
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                                        </div>
+                                            @else
+                                                <div class="alert alert-info text-center">Sin alarma</div>
+                                            @endif
+                                        </td>
+
+                                        <div class="modal fade" id="renovarModal{{ $blog->id }}" tabindex="-1" role="dialog" aria-labelledby="renovarModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="renovarModalLabel">Renovar Boleta</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        ¿Está seguro que desea renovar esta boleta?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <!-- Agregar mensajes de depuración --> 
-                                            <!-- <td>Blog ID: {{ $blog->id }}</td>
-                                            <td>Alarmas: {{ json_encode($alarms) }}</td>  -->
-                                            <td>
-                                                <div class="btn-group" role="group" aria-label="Acciones">
-                                                    <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">
-                                                        <i class="fas fa-history"></i> Ver Historial
+                                        </div>
+                    </form>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Acciones">
+                                                <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">
+                                                    <i class="fas fa-history"></i> Ver Historial
+                                                </a>
+                                                
+                                                @can('editar_tickets')
+                                                    <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">
+                                                        <i class="fas fa-edit"></i> Editar
                                                     </a>
-                                                    
-                                                    @can('editar_tickets')
-                                                        <a class="btn btn-info" href="{{ route('tickets.edit', $blog->id) }}">
-                                                            <i class="fas fa-edit"></i> Editar
-                                                        </a>
-                                                    @endcan
-                                                    @can('borrar_tickets')
-                                                        <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
-                                                                <i class="fas fa-trash"></i> Eliminar
-                                                            </button>
-                                                        </form>
-                                                    @endcan
-                                                    <!-- Botón para generar el informe con ícono PDF -->
-                                                    <a href="{{ route('blogs.generarpdf', ['id' => $blog->id]) }}" class="btn btn-success">
-                                                        Generar PDF
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-
+                                                @endcan
+                                                @can('borrar_tickets')
+                                                    <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
+                                                            <i class="fas fa-trash"></i> Eliminar
+                                                        </button>
+                                                    </form>
+                                                @endcan
+                                                <a href="{{ route('blogs.generarpdf', ['id' => $blog->id]) }}" class="btn btn-success">
+                                                    <i class="fas fa-file-pdf me-1"></i> 
+                                                     PDF
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                         </div>
                             <div class="pagination justify-content-end">
                                 {!! $blogs->links() !!}
