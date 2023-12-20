@@ -812,24 +812,30 @@ class BlogController extends Controller
         }
     }
     public function destroySelected(Request $request)
-{
-    if ($request->has('submit_action')) {
-        if ($request->input('submit_action') === 'eliminar') {
-            $selectedIds = $request->input('selected_blogs');
+    {
+        if ($request->has('submit_action')) {
+            if ($request->input('submit_action') === 'eliminar') {
+                $selectedIds = $request->input('selected_blogs');
 
-            foreach ($selectedIds as $id) {
-                $this->destroy($id);
+                foreach ($selectedIds as $id) {
+                    $this->destroy($id);
+                }
+
+                return redirect()->route('tickets.index')->with('success', 'Blogs seleccionados eliminados exitosamente.');
+            }  elseif ($request->input('submit_action') === 'generar_pdf' && $request->has('generate_pdf')) {
+                $selectedIds = $request->input('selected_blogs');
+            
+                // Generar PDF para cada blog seleccionado
+                foreach ($selectedIds as $id) {
+                    $this->generarPDF($id);
+                }
+            
+                return redirect()->route('tickets.index')->with('success', 'Informes en PDF generados exitosamente.');
             }
-
-            return redirect()->route('tickets.index')->with('success', 'Blogs seleccionados eliminados exitosamente.');
-        } elseif ($request->input('submit_action') === 'generar_pdf') {
-            // Lógica para generar PDF
-            // ...
         }
-    }
 
-    // Resto del código si es necesario
-}
+        // Resto del código si es necesario
+    }
 
 
 }

@@ -78,7 +78,7 @@
                         @endcan
 
                         <div class="d-flex">
-                            <button type="submit" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de generar PDF?')">
+                            <button type="submit" name="submit_action" value="generar_pdf" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de generar PDF?')">
                                 <i class="fas fa-file-pdf me-1"></i> Generar PDF
                             </button>
                             <button type="submit" name="submit_action" value="eliminar" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar los blogs seleccionados?')">
@@ -88,6 +88,8 @@
                     </div>
 
                         @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="generate_pdf" value="1">
                         <table class="table table-striped mt-2">
                             <thead>
                                 <tr>
