@@ -769,28 +769,24 @@ class BlogController extends Controller
       /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        $selectedIds = $request->input('selected_blogs');
-
-        foreach ($selectedIds as $id) {
-            $blog = Blog::findOrFail($id);
-
-            if ($blog->waranty) {
-                // Definir rutas de almacenamiento de PDFs
-                $boletaPdfPath = $blog->waranty->boleta_pdf;
-                $notaPdfPath = $blog->waranty->nota_pdf;
-
-                // Verificar y eliminar archivos PDF si existen
-                $this->deletePDF($boletaPdfPath);
-                $this->deletePDF($notaPdfPath);
-            }
-
-            // Eliminar el registro del blog
-            $blog->delete();
+        $blog = Blog::findOrFail($id);
+    
+        if ($blog->waranty) {
+            // Definir rutas de almacenamiento de PDFs
+            $boletaPdfPath = $blog->waranty->boleta_pdf;
+            $notaPdfPath = $blog->waranty->nota_pdf;
+    
+            // Verificar y eliminar archivos PDF si existen
+            $this->deletePDF($boletaPdfPath);
+            $this->deletePDF($notaPdfPath);
         }
-
-        return redirect()->route('tickets.index')->with('success', 'Blogs seleccionados eliminados exitosamente.');
+    
+        // Eliminar el registro del blog
+        $blog->delete();
+    
+        return redirect()->route('tickets.index')->with('success', 'Blog eliminado exitosamente.');
     }
 
     
@@ -811,33 +807,76 @@ class BlogController extends Controller
             }
         }
     }
-    public function destroySelected(Request $request)
+    public function Selecteditems(Request $request)
     {
-        if ($request->has('submit_action')) {
-            if ($request->input('submit_action') === 'eliminar') {
-                $selectedIds = $request->input('selected_blogs');
+        // Recupera los IDs de los blogs seleccionados del formulario
+        $selectedBlogIds = $request->input('selected_blogs');
+        //dd($selectedBlogIds);
 
-                foreach ($selectedIds as $id) {
-                    $this->destroy($id);
-                }
-
-                return redirect()->route('tickets.index')->with('success', 'Blogs seleccionados eliminados exitosamente.');
-            }  elseif ($request->input('submit_action') === 'generar_pdf' && $request->has('generate_pdf')) {
-                $selectedIds = $request->input('selected_blogs');
-            
-                // Generar PDF para cada blog seleccionado
-                foreach ($selectedIds as $id) {
-                    $this->generarPDF($id);
-                }
-            
-                return redirect()->route('tickets.index')->with('success', 'Informes en PDF generados exitosamente.');
-            }
+        // Verifica si hay blogs seleccionados
+        if (empty($selectedBlogIds)) {
+            return redirect()->back()->with('error', 'No se han seleccionado blogs para procesar.');
         }
 
-        // Resto del código si es necesario
+        // Obtiene los datos de los blogs seleccionados desde la base de datos
+        $selectedBlogs = $this->getSelectedBlogs($selectedBlogIds);
+
+        // Recupera el valor de submit_action
+        $submitAction = $request->input('submit_action');
+        //dd("Botón seleccionado: $submitAction");
+
+        // Llama a métodos privados para realizar funciones específicas según la acción seleccionada
+        switch ($submitAction) {
+            case 'generar_pdf':
+                $this->generatePDF($selectedBlogs);
+                break;
+
+            case 'eliminar':
+                $this->deleteSelectedBlogs($selectedBlogs);
+                break;
+
+            default:
+                // Acción por defecto o manejo de otras acciones si es necesario
+                break;
+        }
+
+        return redirect()->back()->with('success', 'Blogs seleccionados procesados correctamente.');
+    }
+    // Dentro de tu controlador (por ejemplo, BlogController)
+    public function getSelectedBlogs($blogIds)
+    {
+        return Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')
+            ->whereIn('id', $blogIds)
+            ->get();
     }
 
+    /// Métodos privados para realizar funciones específicas
+private function generatePDF($selectedBlogs)
+{
+    // Lógica para generar el PDF
+    // Utiliza los datos de $selectedBlogs según sea necesario
+    //dd('Generando PDF con los siguientes blogs:', $selectedBlogs);
 
+    // Aquí puedes llamar a tu método existente de generación de PDF
+    foreach ($selectedBlogs as $blog) {
+        dd('Generando PDF para el blog con ID:', $blog->id);
+        $this->generarPDF($blog->id);
+    }
+}
+
+private function deleteSelectedBlogs($selectedBlogs)
+{
+    // Lógica para eliminar los blogs seleccionados
+    // Utiliza los datos de $selectedBlogs según sea necesario
+    //dd('Eliminando blogs con los siguientes datos:', $selectedBlogs);
+
+    // Aquí puedes llamar a tu método existente de eliminación de blogs
+    foreach ($selectedBlogs as $blog) {
+        $this->destroy($blog->id);
+    }
+}
+
+    
 }
    
 

@@ -69,7 +69,7 @@
                             </ul>                 
                         <div class="table-responsive">
                                                     
-                    <form method="POST" action="{{ route('blogs.destroySelected') }}">
+                    <form method="POST" action="{{ route('blogs.Selecteditems') }}">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         @can('crear_tickets')
                             <a class="btn btn-warning" href="{{ route('tickets.create')}}">
@@ -77,19 +77,20 @@
                             </a>
                         @endcan
 
+                        <input type="hidden" name="submit_action" value=""> <!-- Campo oculto para la acción -->
+
                         <div class="d-flex">
-                            <button type="submit" name="submit_action" value="generar_pdf" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de generar PDF?')">
+                            <button type="submit" name="submit_action" value="generar_pdf" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
                                 <i class="fas fa-file-pdf me-1"></i> Generar PDF
                             </button>
-                            <button type="submit" name="submit_action" value="eliminar" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar los blogs seleccionados?')">
+                            <button type="submit" name="submit_action" value="eliminar" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
                                 <i class="fas fa-trash me-1"></i> Eliminar seleccionados
                             </button>
                         </div>
                     </div>
 
                         @csrf
-                        @method('DELETE')
-                        <input type="hidden" name="generate_pdf" value="1">
+                        <!-- @method('DELETE') -->
                         <table class="table table-striped mt-2">
                             <thead>
                                 <tr>
