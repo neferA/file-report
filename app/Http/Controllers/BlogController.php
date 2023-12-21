@@ -851,31 +851,49 @@ class BlogController extends Controller
     }
 
     /// Métodos privados para realizar funciones específicas
-private function generatePDF($selectedBlogs)
-{
-    // Lógica para generar el PDF
-    // Utiliza los datos de $selectedBlogs según sea necesario
-    //dd('Generando PDF con los siguientes blogs:', $selectedBlogs);
+    private function generatePDF($selectedBlogs)
+    {
+        // Lógica para generar el PDF
+        // Utiliza los datos de $selectedBlogs según sea necesario
+        //dd('Generando PDF con los siguientes blogs:', $selectedBlogs) 
+        $blogsData = [];
 
-    // Aquí puedes llamar a tu método existente de generación de PDF
-    foreach ($selectedBlogs as $blog) {
-        dd('Generando PDF para el blog con ID:', $blog->id);
-        $this->generarPDF($blog->id);
+        foreach ($selectedBlogs as $blog) {
+            // Agrega la información del blog al array
+            $blogsData[] = [
+                'id' => $blog->id,
+                'num_boleta' => $blog->num_boleta,
+                'usuario' => $blog->usuario,
+                // Agrega más campos según sea necesario
+            ];
+    
+            // Puedes realizar lógica adicional para cada blog individual si es necesario
+        }
+    
+        // dd para imprimir los datos y verificar
+        //dd('Datos de la colección:', $blogsData);
+    
+        // Carga la vista del informe con los datos
+        $pdf = PDF::loadView('report_1', ['blogsData' => $blogsData]);
+
+        // Descargar o mostrar el PDF según tus necesidades
+        return $pdf->stream('informe_1.pdf');
     }
-}
+        
+    
 
-private function deleteSelectedBlogs($selectedBlogs)
-{
-    // Lógica para eliminar los blogs seleccionados
-    // Utiliza los datos de $selectedBlogs según sea necesario
-    //dd('Eliminando blogs con los siguientes datos:', $selectedBlogs);
+    private function deleteSelectedBlogs($selectedBlogs)
+    {
+        // Lógica para eliminar los blogs seleccionados
+        // Utiliza los datos de $selectedBlogs según sea necesario
+        //dd('Eliminando blogs con los siguientes datos:', $selectedBlogs);
 
-    // Aquí puedes llamar a tu método existente de eliminación de blogs
-    foreach ($selectedBlogs as $blog) {
-        $this->destroy($blog->id);
+        // Aquí puedes llamar a tu método existente de eliminación de blogs
+        foreach ($selectedBlogs as $blog) {
+            $this->destroy($blog->id);
+        }
     }
-}
-
+    
     
 }
    
