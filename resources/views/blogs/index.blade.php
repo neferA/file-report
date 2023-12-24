@@ -95,7 +95,10 @@
                             <thead>
                                 <tr>
                                     <th style="display: none;">ID</th>
-                                    <th style="display: #fff;"></th>
+                                    <th style="display: #fff;">
+                                        <!-- Casilla de verificación para seleccionar/deseleccionar todos -->
+                                        <input type="checkbox" name="select_all" id="select_all">
+                                    </th>
                                     <th style="display: #fff;">Número de Boleta</th>
                                     <th style="display: #fff;">Afianzado</th>
                                     <th style="display: #fff;">Empresa</th>

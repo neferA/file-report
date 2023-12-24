@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\DB;
 
 
 use Carbon\Carbon;
+use Illuminate\Routing\Controller;
+use Barryvdh\DomPDF\PDF as DomPDF;
 use PDF;
 
 
@@ -807,15 +809,17 @@ class BlogController extends Controller
             }
         }
     }
-    public function Selecteditems(Request $request)
+    public function Selecteditems(Request $request, DomPDF $dompdf)
     {
-        // Recupera los IDs de los blogs seleccionados del formulario
-        $selectedBlogIds = $request->input('selected_blogs');
-        //dd($selectedBlogIds);
+        // Verifica si la casilla "select_all" está marcada
+        $selectAll = $request->has('select_all');
 
-        // Verifica si hay blogs seleccionados
-        if (empty($selectedBlogIds)) {
-            return redirect()->back()->with('error', 'No se han seleccionado blogs para procesar.');
+        // Si "select_all" está marcada, selecciona todos los IDs desde la base de datos
+        if ($selectAll) {
+            $selectedBlogIds = Blog::pluck('id')->toArray();
+        } else {
+            // Si no está marcada, recupera los IDs de los blogs seleccionados del formulario
+            $selectedBlogIds = $request->input('selected_blogs');
         }
 
         // Obtiene los datos de los blogs seleccionados desde la base de datos
@@ -823,13 +827,20 @@ class BlogController extends Controller
 
         // Recupera el valor de submit_action
         $submitAction = $request->input('submit_action');
-        //dd("Botón seleccionado: $submitAction");
 
         // Llama a métodos privados para realizar funciones específicas según la acción seleccionada
         switch ($submitAction) {
             case 'generar_pdf':
-                $this->generatePDF($selectedBlogs);
-                break;
+                // Genera el PDF con los datos seleccionados
+                $pdf = $dompdf->loadView('inform', ['selectedBlogs' => $selectedBlogs]);
+
+                // Define el nombre del archivo PDF
+                $pdfFileName = 'reporte_select.pdf';
+
+                // Devuelve una respuesta con el archivo PDF para descarga
+                return response($pdf->output())
+                    ->header('Content-Type', 'application/pdf')
+                    ->header('Content-Disposition', 'attachment; filename="' . $pdfFileName . '"');
 
             case 'eliminar':
                 $this->deleteSelectedBlogs($selectedBlogs);
@@ -850,35 +861,7 @@ class BlogController extends Controller
             ->get();
     }
 
-    /// Métodos privados para realizar funciones específicas
-    private function generatePDF($selectedBlogs)
-    {
-        // Lógica para generar el PDF
-        // Utiliza los datos de $selectedBlogs según sea necesario
-        //dd('Generando PDF con los siguientes blogs:', $selectedBlogs) 
-        $blogsData = [];
-
-        foreach ($selectedBlogs as $blog) {
-            // Agrega la información del blog al array
-            $blogsData[] = [
-                'id' => $blog->id,
-                'num_boleta' => $blog->num_boleta,
-                'usuario' => $blog->usuario,
-                // Agrega más campos según sea necesario
-            ];
     
-            // Puedes realizar lógica adicional para cada blog individual si es necesario
-        }
-    
-        // dd para imprimir los datos y verificar
-        //dd('Datos de la colección:', $blogsData);
-    
-        // Carga la vista del informe con los datos
-        $pdf = PDF::loadView('report_1', ['blogsData' => $blogsData]);
-
-        // Descargar o mostrar el PDF según tus necesidades
-        return $pdf->stream('informe_1.pdf');
-    }
         
     
 

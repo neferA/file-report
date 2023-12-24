@@ -98,11 +98,11 @@ Route::get('blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.ed
 Route::delete('blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
 Route::post('/blogs/Selecteditems', [BlogController::class, 'Selecteditems'])->name('blogs.Selecteditems');
 
-
 Route::get('/blogs/{id}/renewed', [BlogController::class, 'renovar'])->name('blogs.renovar');
 Route::get('/blogs/{id}/show', [BlogController::class, 'show'])->name('blogs.show');
 
 Route::get('/blogs/{id}/generarpdf', [BlogController::class, 'generarPDF'])->name('blogs.generarpdf');
+
 Route::get('/blogs/{id}/actualizar_estado', [BlogController::class, 'actualizarEstado'])->name('blogs.actualizarEstado');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');
 
