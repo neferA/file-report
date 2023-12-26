@@ -25,6 +25,9 @@ use Illuminate\Routing\Controller;
 use Barryvdh\DomPDF\PDF as DomPDF;
 use PDF;
 
+use App\Notifications\BlackWarrantyExpiredNotification;
+use App\Notifications\RedWarrantyExpiredNotification;
+use App\Notifications\OrangeWarrantyExpiredNotification;
 
 class BlogController extends Controller
 {
@@ -117,20 +120,20 @@ class BlogController extends Controller
             $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
             event($event); // Disparar el evento
     
-        //     // Enviar notificación de alarma negra
-        //     $blog->user->notify(new BlackWarrantyExpiredNotification($blog));
-        // } else {
-        //     // Si no es una alarma negra, podrías realizar acciones adicionales según sea necesario
+            // Enviar notificación de alarma negra
+            $blog->user->notify(new BlackWarrantyExpiredNotification($blog));
+        } else {
+            // Si no es una alarma negra, podrías realizar acciones adicionales según sea necesario
     
-        //     // Enviar notificación de alarma roja
-        //     if ($isRedAlarm) {
-        //         $blog->user->notify(new RedWarrantyExpiredNotification($blog));
-        //     }
+            // Enviar notificación de alarma roja
+            if ($isRedAlarm) {
+                $blog->user->notify(new RedWarrantyExpiredNotification($blog));
+            }
     
-        //     // Enviar notificación de alarma naranja
-        //     if ($isOrangeAlarm) {
-        //         $blog->user->notify(new OrangeWarrantyExpiredNotification($blog));
-        //     }
+            // Enviar notificación de alarma naranja
+            if ($isOrangeAlarm) {
+                $blog->user->notify(new OrangeWarrantyExpiredNotification($blog));
+            }
         }
     }
     
@@ -873,12 +876,8 @@ class BlogController extends Controller
         return Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')
             ->whereIn('id', $blogIds)
             ->get();
-    }
-
+    }      
     
-        
-    
-
     private function deleteSelectedBlogs($selectedBlogs)
     {
         // Lógica para eliminar los blogs seleccionados

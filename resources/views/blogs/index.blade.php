@@ -80,7 +80,10 @@
                         <input type="hidden" name="submit_action" value=""> <!-- Campo oculto para la acción -->
 
                         <div class="d-flex">
-                            <button type="submit" name="submit_action" value="generar_pdf" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
+                            <!-- <button type="submit" name="submit_action" value="generar_excel" class="btn btn-info" onclick="return confirm('¿Estás seguro de generar reporte en Excel')">
+                                <i class="fas fa-file-excel me-1"></i> Generar Excel
+                            </button> -->
+                            <button type="submit" name="submit_action" value="generar_pdf" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de generar reporte')">
                                 <i class="fas fa-file-pdf me-1"></i> Generar PDF
                             </button>
                             @can('borrar_tickets')
@@ -88,6 +91,7 @@
                                 <i class="fas fa-trash me-1"></i> Eliminar seleccionados
                             </button>
                             @endcan
+                            
                         </div>
                     </div>
 
