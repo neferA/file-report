@@ -57,6 +57,6 @@ class HandleWarrantyExpired
     {
         // Lógica para manejar la alarma negra
         // Por ejemplo, enviar una notificación negra
-        // $waranty->user->notify(new BlackWarrantyExpiredNotification($waranty));
+        $waranty->user->notify(new BlackWarrantyExpiredNotification($waranty));
     }
 }

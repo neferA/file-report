@@ -83,9 +83,11 @@
                             <button type="submit" name="submit_action" value="generar_pdf" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
                                 <i class="fas fa-file-pdf me-1"></i> Generar PDF
                             </button>
+                            @can('borrar_tickets')
                             <button type="submit" name="submit_action" value="eliminar" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este blog?')">
                                 <i class="fas fa-trash me-1"></i> Eliminar seleccionados
                             </button>
+                            @endcan
                         </div>
                     </div>
 
@@ -96,9 +98,10 @@
                                 <tr>
                                     <th style="display: none;">ID</th>
                                     <th style="display: #fff;">
-                                        <!-- Casilla de verificación para seleccionar/deseleccionar todos -->
-                                        <input type="checkbox" name="select_all" id="select_all">
-                                    </th>
+                                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="Seleccionar Todo" onmouseover="mostrarMensaje()">
+                                            <input type="checkbox" name="select_all" id="select_all">
+                                        </div>
+                                    </th>                                
                                     <th style="display: #fff;">Número de Boleta</th>
                                     <th style="display: #fff;">Afianzado</th>
                                     <th style="display: #fff;">Empresa</th>
@@ -217,4 +220,10 @@
 
 @section('js')
     <script> console.log('Hi!'); </script>
+    <script>
+        // Inicializa los tooltips
+        $(document).ready(function(){
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
 @stop

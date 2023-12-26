@@ -34,6 +34,7 @@
                 <th>Afianzado</th>
                 <th>Empresa</th>
                 <th>Ejecutora</th>
+                <th>monto</th>
                 <th>Creado por</th>
             </tr>
         </thead>
@@ -45,6 +46,7 @@
                     <td>{{ $blog->afianzado->nombre }}</td>
                     <td>{{ $blog->empresa}}</td>    
                     <td>{{ $blog->unidadEjecutora->nombre }}</td>
+                    <td>{{ $blog->waranty->monto }}</td>
                     <td>{{ $blog->usuario }}</td>
                     <!-- Agrega más celdas según tus necesidades -->
                 </tr>

@@ -104,7 +104,7 @@ class BlogController extends Controller
         $isRedAlarm = $this->isRedAlarm($blog->fecha_final);
         $isOrangeAlarm = $this->isOrangeAlarm($blog->fecha_final);
         $isBlackAlarm = $this->isBlackAlarm($blog->fecha_final);
-
+    
         // Si es una alarma negra, cambia el estado de los blogs con alarma negra a "vencido"
         if ($isBlackAlarm) {
             Blog::where('id', $blog->id)
@@ -112,14 +112,28 @@ class BlogController extends Controller
                     'estado' => Blog::ESTADO_VENCIDO,
                     'updated_at' => now(),  
                 ]);
-                
+    
             // Crear una instancia de WarrantyExpired con los valores correctos
             $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
             event($event); // Disparar el evento
-        } else {
-            // Si no es una alarma negra, podrías realizar acciones adicionales según sea necesario
+    
+        //     // Enviar notificación de alarma negra
+        //     $blog->user->notify(new BlackWarrantyExpiredNotification($blog));
+        // } else {
+        //     // Si no es una alarma negra, podrías realizar acciones adicionales según sea necesario
+    
+        //     // Enviar notificación de alarma roja
+        //     if ($isRedAlarm) {
+        //         $blog->user->notify(new RedWarrantyExpiredNotification($blog));
+        //     }
+    
+        //     // Enviar notificación de alarma naranja
+        //     if ($isOrangeAlarm) {
+        //         $blog->user->notify(new OrangeWarrantyExpiredNotification($blog));
+        //     }
         }
     }
+    
 
     private function getAlarms()
     {
@@ -852,7 +866,7 @@ class BlogController extends Controller
         }
 
         return redirect()->back()->with('success', 'Blogs seleccionados procesados correctamente.');
-    }
+    }   
     // Dentro de tu controlador (por ejemplo, BlogController)
     public function getSelectedBlogs($blogIds)
     {
