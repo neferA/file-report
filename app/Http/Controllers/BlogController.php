@@ -900,16 +900,21 @@ class BlogController extends Controller
     }
 
 
-// Método existente para eliminar blogs seleccionados
-private function deleteSelectedBlogs($selectedBlogIds)
-{
-    // Lógica para eliminar los blogs seleccionados
-    // Utiliza los IDs de $selectedBlogIds según sea necesario
+    // Método para eliminar blogs seleccionados
+    private function deleteSelectedBlogs($selectedBlogIds)
+    {
+        // Verifica si $selectedBlogIds es una colección y la convierte a un array de IDs
+        if ($selectedBlogIds instanceof \Illuminate\Database\Eloquent\Collection) {
+            $selectedBlogIds = $selectedBlogIds->pluck('id')->toArray();
+        }
 
-    // Elimina todos los blogs seleccionados en una sola consulta
-    Blog::whereIn('id', $selectedBlogIds)->delete();
-}
-   
+        // Lógica para eliminar los blogs seleccionados
+        // Utiliza los IDs de $selectedBlogIds según sea necesario
+
+        // Elimina todos los blogs seleccionados en una sola consulta
+        Blog::whereIn('id', $selectedBlogIds)->delete();
+    }
+
     
 }
    
