@@ -58,6 +58,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+
                                             <label for="estado">Estado</label>
                                             {!! Form::text('estado', \App\Models\Blog::ESTADO_VIGENTE, ['class' => 'form-control', 'readonly' => true]) !!}
                                         </div>
@@ -76,6 +77,19 @@
                                         </div>
                                     </div>
                                                                      
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estado">Estado</label>
+                                            {!! Form::text('estado', \App\Models\Blog::ESTADO_VIGENTE, ['class' => 'form-control', 'readonly' => true]) !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="afianzadora_id">aseguradora</label>
+                                            {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
+                                        </div>
+                                    </div> 
+                                                                
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="unidad_ejecutora_id">Ejecutora</label>

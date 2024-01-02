@@ -22,7 +22,7 @@ return new class extends Migration
 
 
             $table->text('num_boleta');
-            $table->text('empresa');
+            $table->text('empresa')->nullable();
             $table->text('motivo');
             $table->text('usuario');
             $table->enum('estado', ['vigente','liberado', 'ejecutado', 'renovado','vencido'])->default('vigente');

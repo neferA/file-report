@@ -348,7 +348,7 @@ return [
             'icon'          => 'fa fa-university',
         ],
         [
-            'text'          => 'afianzadoras',
+            'text'          => 'aseguradoras',
             'url'           => '/suppliers',
             'icon'          => 'fa fa-network-wired',
         ],
