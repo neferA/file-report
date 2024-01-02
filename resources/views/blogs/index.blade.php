@@ -76,9 +76,9 @@
                                 <i class="fas fa-plus me-1"></i> Nueva boleta
                             </a>
                         @endcan
-
+                        
                         <input type="hidden" name="submit_action" value=""> <!-- Campo oculto para la acción -->
-
+                                                   
                         <div class="d-flex">
                             <!-- <button type="submit" name="submit_action" value="generar_excel" class="btn btn-info" onclick="return confirm('¿Estás seguro de generar reporte en Excel')">
                                 <i class="fas fa-file-excel me-1"></i> Generar Excel
@@ -107,8 +107,8 @@
                                         </div>
                                     </th>                                
                                     <th style="display: #fff;">Número de Boleta</th>
-                                    <th style="display: #fff;">Afianzado</th>
-                                    <th style="display: #fff;">Empresa</th>
+                                    <th style="display: #fff;">aseguradora </th>
+                                    <th style="display: #fff;">Empresa/afianzado</th>
                                     <th style="display: #fff;">Ejecutora</th>
                                     <th style="display: #fff;">Creado por</th>
                                     <th style="display: #fff;">Estado</th>

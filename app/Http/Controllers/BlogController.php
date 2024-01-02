@@ -45,25 +45,35 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        dd($request->all()); 
-        $baseQuery = $this->buildQuery($request); // Construye la consulta base
+        // Construye la consulta base
+        $baseQuery = $this->buildQuery($request);
+    
+        // Obtén las fechas del formulario
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        
-        $dateFilteredQuery = clone $baseQuery; // Clona la consulta base para aplicar el filtro de fechas
-        $this->applyDateFilter($dateFilteredQuery, $startDate, $endDate); // Aplica el filtro de fechas
-        
-        $blogs = $dateFilteredQuery->orderBy('created_at', 'asc')->simplePaginate(5); // Ejecuta la consulta filtrada por fechas
-                
+    
+        // Clona la consulta base para aplicar el filtro de fechas
+        $dateFilteredQuery = clone $baseQuery;
+    
+        // Aplica el filtro de fechas
+        $this->applyDateFilter($dateFilteredQuery, $startDate, $endDate);
+    
+        // Ejecuta la consulta filtrada por fechas y obtén los resultados paginados
+        $blogs = $dateFilteredQuery->orderBy('created_at', 'asc')->simplePaginate(5);
+    
+        // Itera a través de los blogs y maneja las alarmas
         $expiringBlogs = $this->getExpiringBlogs();
-        // Iterar a través de los blogs y manejar las alarmas
-        foreach ($expiringBlogs as $blog) { 
+        foreach ($expiringBlogs as $blog) {
             $this->handleBlogAlarm($blog);
         }
     
-        // Obtener las alarmas para mostrar en la vista
+        // Obtén las alarmas para mostrar en la vista
         $alarms = $this->getAlarms();
-        
+    
+        // Almacena los resultados filtrados en la sesión
+        session(['filtered_blogs' => $blogs]);
+    
+        // Devuelve la vista con los datos necesarios
         return view('blogs.index', compact('blogs', 'alarms'));
     }
     
@@ -827,105 +837,68 @@ class BlogController extends Controller
             }
         }
     }
+   
     public function Selecteditems(Request $request, DomPDF $dompdf)
     {
-            // Verifica si la casilla "select_all" está marcada
-    // Verifica si la casilla "select_all" está marcada
-    $selectAll = $request->has('select_all');
+        // Recupera los resultados filtrados de la sesión
+        $filteredBlogs = session('filtered_blogs');
 
-    // Si "select_all" está marcada, selecciona todos los IDs desde la base de datos
-    if ($selectAll) {
-        // Si también se ha aplicado un filtro, obtenemos los IDs filtrados
-        if ($this->hasFiltersApplied($request)) {
-            $selectedBlogIds = $this->getFilteredBlogIds($request);
+        // Verifica si la casilla "select_all" está marcada
+        $selectAll = $request->has('select_all');
+
+        // Si "select_all" está marcada, selecciona todos los IDs desde los resultados filtrados
+        if ($selectAll && $filteredBlogs) {
+            $selectedBlogIds = $filteredBlogs->pluck('id')->toArray();
         } else {
-            // Si no hay filtro, selecciona todos los IDs desde la base de datos
-            $selectedBlogIds = Blog::pluck('id')->toArray();
+            // Si no está marcada o no hay resultados filtrados, recupera los IDs de los blogs seleccionados del formulario
+            $selectedBlogIds = $request->input('selected_blogs');
         }
-    } else {
-        // Si no está marcada, recupera los IDs de los blogs seleccionados del formulario
-        $selectedBlogIds = $request->input('selected_blogs');
-    }
 
-    // Obtiene los datos de los blogs seleccionados desde la base de datos
-    $selectedBlogs = $this->getSelectedBlogs($selectedBlogIds);
-    
+        // Si hay resultados filtrados, aplica la selección solo a esos blogs
+        if ($filteredBlogs) {
+            $selectedBlogs = $filteredBlogs->whereIn('id', $selectedBlogIds);
+        } else {
+            // Si no hay resultados filtrados, obtiene los datos de los blogs seleccionados desde la base de datos
+            $selectedBlogs = $this->getSelectedBlogs($selectedBlogIds);
+        }
+
         // Recupera el valor de submit_action
         $submitAction = $request->input('submit_action');
-    
+
         // Llama a métodos privados para realizar funciones específicas según la acción seleccionada
         switch ($submitAction) {
             case 'generar_pdf':
                 // Genera el PDF con los datos seleccionados
                 $pdf = $dompdf->loadView('inform', ['selectedBlogs' => $selectedBlogs]);
-    
+
                 // Define el nombre del archivo PDF
                 $pdfFileName = 'reporte_select.pdf';
-    
+
                 // Devuelve una respuesta con el archivo PDF para descarga
                 return response($pdf->output())
                     ->header('Content-Type', 'application/pdf')
                     ->header('Content-Disposition', 'attachment; filename="' . $pdfFileName . '"');
+
             case 'eliminar':
                 $this->deleteSelectedBlogs($selectedBlogs);
                 break;
-    
+
             default:
                 // Acción por defecto o manejo de otras acciones si es necesario
                 break;
         }
-    
+
         return redirect()->back()->with('success', 'Blogs seleccionados procesados correctamente.');
     }
-    
+      
+    // Dentro de tu controlador (por ejemplo, BlogController)
+    public function getSelectedBlogs($blogIds)
+    {
+        return Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')
+            ->whereIn('id', $blogIds)
+            ->get();
+    }
 
-// Método existente para verificar si hay filtros aplicados
-private function hasFiltersApplied(Request $request)
-{
-    $filters = [
-        'estado' => $request->input('estado'),
-        'search' => $request->input('search'),
-        'alarma' => $request->input('alarma'),
-        'start_date' => $request->input('start_date'),
-        'end_date' => $request->input('end_date'),
-    ];
-
-    // Filtra solo valores que no son nulos
-    $appliedFilters = array_filter($filters, function ($value) {
-        return $value !== null;
-    });
-
-    // Agrega un dd para imprimir información sobre los filtros
-    dd('Filtros Aplicados:', $appliedFilters);
-
-    // Devuelve un array asociativo con los filtros aplicados
-    return $appliedFilters;
-}
-
- 
-
-private function getFilteredBlogIds(Request $request)
-{
-    // Aquí debes implementar la lógica para obtener los IDs filtrados según tus criterios de búsqueda
-    // Puedes utilizar el método buildQuery y applyDateFilter para construir la consulta
-    $filteredQuery = $this->buildQuery($request);
-    $startDate = $request->input('start_date');
-    $endDate = $request->input('end_date');
-    $this->applyDateFilter($filteredQuery, $startDate, $endDate);
-
-    // Obtén solo los IDs
-    $filteredBlogIds = $filteredQuery->pluck('id')->toArray();
-
-    return $filteredBlogIds;
-}
-
-// Método existente para obtener datos de blogs seleccionados
-private function getSelectedBlogs($blogIds)
-{
-    return Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')
-        ->whereIn('id', $blogIds)
-        ->get();
-}
 
 // Método existente para eliminar blogs seleccionados
 private function deleteSelectedBlogs($selectedBlogIds)

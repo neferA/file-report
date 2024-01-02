@@ -39,7 +39,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="empresa">empresa</label>
+                                            <label for="empresa">empresa/afianzado</label>
                                             {!! Form::text('empresa', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la empresa']) !!}
                                         </div>
                                     </div>
@@ -52,19 +52,6 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="titulo">caracteristicas</label>
-                                            {!! Form::text('caracteristicas', 'A PRIMER REQUERIMIENTO, RENOVABLE, IRREVOCABLE Y EJECUCION INMEDIATA', ['class' => 'form-control', 'readonly' => 'readonly']) !!}
-                                        </div>
-                                    </div>
-            
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="afianzadora_id">afianzado</label>
-                                            {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
-                                        </div>
-                                    </div> 
-                                    <div class="col-md-6">
-                                        <div class="form-group">
                                             <label for="titulo">Monto</label>
                                             {!! Form::number('monto', null, ['class' => 'form-control', 'placeholder' => 'Ingrese monto', 'step' => 'any', 'required' => true]) !!}
                                         </div>
@@ -72,16 +59,23 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="estado">Estado</label>
-                                            {!! Form::select('estado', [
-                                                \App\Models\Blog::ESTADO_VIGENTE => 'Vigente', 
-                                                // \App\Models\Blog::ESTADO_EJECUTADO => 'Ejecutado',
-                                                // \App\Models\Blog::ESTADO_LIBERADO => 'Liberado',
-                                                // \App\Models\Blog::ESTADO_RENOVADO => 'Renovado',
-                                                // \App\Models\Blog::ESTADO_VENCIDO => 'Vencido',
-                                            ], null, ['class' => 'form-control', 'placeholder' => 'Seleccione un estado']) !!}
+                                            {!! Form::text('estado', \App\Models\Blog::ESTADO_VIGENTE, ['class' => 'form-control', 'readonly' => true]) !!}
                                         </div>
-                                        
+                                    </div>   
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="titulo">caracteristicas</label>
+                                            {!! Form::text('caracteristicas', 'A PRIMER REQUERIMIENTO, RENOVABLE, IRREVOCABLE Y EJECUCION INMEDIATA', ['class' => 'form-control', 'readonly' => 'readonly']) !!}
+                                        </div>
                                     </div>
+            
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="afianzadora_id">aseguradora</label>
+                                            {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
+                                        </div>
+                                    </div>
+                                                                     
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="unidad_ejecutora_id">Ejecutora</label>
