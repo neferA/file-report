@@ -38,6 +38,10 @@
                 <th>Tipo de Garantía</th>
                 <th>Monto</th>
                 <th>Unidad Ejecutora</th>
+                <th>caracteristicas</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Final</th>
+                <th>observaciones</th>
             </tr>
         </thead>
         <tbody>
@@ -47,6 +51,10 @@
                 <td>{{ $data['tipo_garantia'] }}</td>
                 <td>{{ $data['monto'] }}</td>
                 <td>{{ $data['unidad_ejecutora'] }}</td>
+                <td>{{ $data['caracteristicas'] }}</td>
+                <td>{{ $data['fecha_inicio'] }}</td>
+                <td>{{ $data['fecha_final'] }}</td>
+                <td>{{ $data['observaciones'] }}</td>
             </tr>
         </tbody>
     </table>
@@ -62,6 +70,10 @@
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
+                    <th>caracteristicas</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Final</th>
+                    <th>observaciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -72,6 +84,11 @@
                         <td>{{ $descendantRenovatedBlog['tipo_garantia'] }}</td>
                         <td>{{ $descendantRenovatedBlog['monto'] }}</td>
                         <td>{{ $descendantRenovatedBlog['unidad_ejecutora'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['caracteristicas'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['fecha_inicio'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['fecha_final'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['observaciones'] }}</td>
+
                     </tr>
                 @endforeach
             </tbody>
@@ -91,6 +108,10 @@
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
+                    <th>caracteristicas</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Final</th>
+                    <th>observaciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -101,6 +122,10 @@
                         <td>{{ $ascendantRenovatedBlog['tipo_garantia'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['monto'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['unidad_ejecutora'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['caracteristicas'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['fecha_inicio'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['fecha_final'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['observaciones'] }}</td>
                     </tr>
                 @endforeach
             </tbody>

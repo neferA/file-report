@@ -437,7 +437,7 @@ class BlogController extends Controller
     public function generarPDF($id)
     {
         // Obtener el blog basado en el ID proporcionado
-        $blog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($id);
+        $blog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia', 'afianzado', 'financiadoras')->find($id);
     
         // Verificar si el blog existe
         if (!$blog) {
@@ -447,8 +447,10 @@ class BlogController extends Controller
         // Obtener los valores necesarios del blog
         $fechaInicio = $blog->waranty->fecha_inicio;
         $fechaFinal = $blog->waranty->fecha_final;
-        $unidadEjecutoraId = $blog->unidad_ejecutora_id;
+        $caracteristicas = $blog->waranty->caracteristicas;
+        $observaciones = $blog->waranty->observaciones;
         $warantyMonto = $blog->waranty->monto;
+        $unidadEjecutoraId = $blog->unidad_ejecutora_id;
         $unidadEjecutoraNombre = $blog->unidadEjecutora->nombre;
      
         // Obtener los IDs de los blogs renovados descendientes y sus datos
@@ -471,11 +473,17 @@ class BlogController extends Controller
             'unidad_ejecutora' => $unidadEjecutoraNombre,
             'descendant_renovated_blog_data' => $descendantRenovatedBlogData,
             'ascendant_renovated_blog_data' => $ascendantRenovatedBlogData,
+            'caracteristicas' => $blog->waranty->caracteristicas,
+            'observaciones' => $blog->waranty->observaciones,
+            'fecha_inicio' => $blog->waranty->fecha_inicio,
+            'fecha_final' => $blog->waranty->fecha_final,
             'total_monto' => $totalMonto, 
         ];
      
         // Generar el informe en PDF usando Laravel PDF
-        $pdf = PDF::loadView('report', compact('data'));   
+        $pdf = PDF::loadView('report', compact('data'))
+                ->setPaper('letter', 'landscape');
+ 
      
         // Descargar el PDF
         return $pdf->download('informe.pdf');
@@ -496,7 +504,7 @@ class BlogController extends Controller
                 return;
             }
 
-            $currentBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia')->find($currentBlogId);
+            $currentBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia', 'afianzadora')->find($currentBlogId);
 
             // Agregar datos de blogs renovados
             $renovatedBlogData[] = [

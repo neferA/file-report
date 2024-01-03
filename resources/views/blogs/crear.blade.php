@@ -75,21 +75,7 @@
                                             <label for="afianzadora_id">aseguradora</label>
                                             {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
                                         </div>
-                                    </div>
-                                                                     
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="estado">Estado</label>
-                                            {!! Form::text('estado', \App\Models\Blog::ESTADO_VIGENTE, ['class' => 'form-control', 'readonly' => true]) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="afianzadora_id">aseguradora</label>
-                                            {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
-                                        </div>
-                                    </div> 
-                                                                
+                                    </div>                                                                                           
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="unidad_ejecutora_id">Ejecutora</label>
@@ -123,10 +109,9 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="fecha_inicio">Fecha inicial</label>
-                                            <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" placeholder="Ingrese la fecha inicial" required value="{{ now()->format('Y-m-d') }}" min="{{ now()->format('Y-m-d') }}">
+                                            <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" placeholder="Ingrese la fecha inicial" required value="{{ now()->format('Y-m-d') }}">
                                         </div>
                                     </div>
-
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="fecha_final">Fecha final</label>
