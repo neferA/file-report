@@ -59,7 +59,7 @@ class BlogController extends Controller
         $this->applyDateFilter($dateFilteredQuery, $startDate, $endDate);
     
         // Ejecuta la consulta filtrada por fechas y obtén los resultados paginados
-        $blogs = $dateFilteredQuery->orderBy('created_at', 'asc')->simplePaginate(5);
+        $blogs = $dateFilteredQuery->orderBy('created_at', 'asc')->simplePaginate(20);
     
         // Itera a través de los blogs y maneja las alarmas
         $expiringBlogs = $this->getExpiringBlogs();
@@ -268,7 +268,6 @@ class BlogController extends Controller
         // Validaciones del formulario
         $request->validate([
             'num_boleta' => 'required',
-            'empresa' => 'required',
             'tipo_garantia_id' => 'required',
             'unidad_ejecutora_id' => 'required',
             'afianzadora_id' => 'required',
@@ -469,7 +468,7 @@ class BlogController extends Controller
         $data = [
             'num_boleta' => $blog->num_boleta,
             'usuario' => $blog->usuario,
-            'empresa' => $blog->empresa,
+            'afianzado' => $blog->afianzado->nombre,
             'motivo' => $blog->motivo,
             'tipo_garantia' => $blog->tipoGarantia->nombre,
             'financiadoras' => $blog->financiadoras->pluck('nombre')->implode(', '),
@@ -515,7 +514,7 @@ class BlogController extends Controller
                 'id' => $currentBlog->id,
                 'num_boleta' => $currentBlog->num_boleta,
                 'usuario' => $currentBlog->usuario,
-                'empresa' => $currentBlog->empresa,
+                'afianzado' => $currentBlog->afianzado->nombre,
                 'motivo' => $currentBlog->motivo,
                 'financiadoras' => $currentBlog->financiadoras->pluck('nombre')->implode(', '),
                 'tipo_garantia' => $currentBlog->tipoGarantia->nombre,
@@ -590,7 +589,6 @@ class BlogController extends Controller
         $request->validate([
             'num_boleta' => 'required',
             'motivo' => 'required',
-            'empresa' => 'required',
             'caracteristicas' => 'required',
             'monto' => 'required',
             'observaciones' => 'required',
@@ -854,60 +852,90 @@ class BlogController extends Controller
     }
    
     public function Selecteditems(Request $request, DomPDF $dompdf)
-    {
-        // Recupera los resultados filtrados de la sesión
-        $filteredBlogs = session('filtered_blogs');
+{
+    // Recupera los resultados filtrados de la sesión
+    $filteredBlogs = session('filtered_blogs');
 
-        // Verifica si la casilla "select_all" está marcada
-        $selectAll = $request->has('select_all');
+    // Verifica si la casilla "select_all" está marcada
+    $selectAll = $request->has('select_all');
 
-        // Si "select_all" está marcada, selecciona todos los IDs desde los resultados filtrados
-        if ($selectAll && $filteredBlogs) {
-            $selectedBlogIds = $filteredBlogs->pluck('id')->toArray();
-        } else {
-            // Si no está marcada o no hay resultados filtrados, recupera los IDs de los blogs seleccionados del formulario
-            $selectedBlogIds = $request->input('selected_blogs');
-        }
+    // Si "select_all" está marcada, selecciona todos los IDs desde los resultados filtrados o desde la base de datos
+    $selectedBlogIds = $selectAll ? $this->getAllBlogIds($filteredBlogs) : $request->input('selected_blogs');
+    //dd($selectedBlogIds);
+    // Si hay resultados filtrados, aplica la selección solo a esos blogs
+    $selectedBlogs = $filteredBlogs ? $filteredBlogs->whereIn('id', $selectedBlogIds) : $this->getSelectedBlogs($selectedBlogIds);
 
-        // Si hay resultados filtrados, aplica la selección solo a esos blogs
-        if ($filteredBlogs) {
-            $selectedBlogs = $filteredBlogs->whereIn('id', $selectedBlogIds);
-        } else {
-            // Si no hay resultados filtrados, obtiene los datos de los blogs seleccionados desde la base de datos
-            $selectedBlogs = $this->getSelectedBlogs($selectedBlogIds);
-        }
+    // Recupera el valor de submit_action
+    $submitAction = $request->input('submit_action');
 
-        // Recupera el valor de submit_action
-        $submitAction = $request->input('submit_action');
+    // Llama a métodos privados para realizar funciones específicas según la acción seleccionada
+    switch ($submitAction) {
+        case 'generar_pdf':
+            // Configuración de Dompdf para hoja horizontal y tamaño carta
+            $dompdf->setPaper('letter', 'landscape');
+            // Genera el PDF con los datos seleccionados
+            $pdf = $dompdf->loadView('inform', ['selectedBlogs' => $selectedBlogs]);
 
-        // Llama a métodos privados para realizar funciones específicas según la acción seleccionada
-        switch ($submitAction) {
-            case 'generar_pdf':
-                // Configuración de Dompdf para hoja horizontal y tamaño carta
-                $dompdf->setPaper('letter', 'landscape');
-                // Genera el PDF con los datos seleccionados
-                $pdf = $dompdf->loadView('inform', ['selectedBlogs' => $selectedBlogs]);
+            // Define el nombre del archivo PDF
+            $pdfFileName = 'reporte_select.pdf';
 
-                // Define el nombre del archivo PDF
-                $pdfFileName = 'reporte_select.pdf';
+            // Devuelve una respuesta con el archivo PDF para descarga
+            return response($pdf->output())
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'attachment; filename="' . $pdfFileName . '"');
 
-                // Devuelve una respuesta con el archivo PDF para descarga
-                return response($pdf->output())
-                    ->header('Content-Type', 'application/pdf')
-                    ->header('Content-Disposition', 'attachment; filename="' . $pdfFileName . '"');
+        case 'eliminar':
+            $this->deleteSelectedBlogs($selectedBlogs);
+            break;
 
-            case 'eliminar':
-                $this->deleteSelectedBlogs($selectedBlogs);
-                break;
-
-            default:
-                // Acción por defecto o manejo de otras acciones si es necesario
-                break;
-        }
-
-        return redirect()->back()->with('success', 'Blogs seleccionados procesados correctamente.');
+        default:
+            // Acción por defecto o manejo de otras acciones si es necesario
+            break;
     }
-      
+
+    return redirect()->back()->with('success', 'Blogs seleccionados procesados correctamente.');
+}
+
+// Método para obtener todos los IDs de blogs desde la base de datos o desde los resultados filtrados
+private function getAllBlogIds($filteredBlogs = null)
+{
+    // Verifica si "select_all" está marcada
+    if (request()->has('select_all')) {
+        // Si hay resultados filtrados y "select_all" está marcada, devuelve todos los IDs de los resultados filtrados
+        if ($filteredBlogs && is_array($selectedBlogs = request()->input('selected_blogs'))) {
+            dd($selectedBlogs); // Agrega un dd para verificar los IDs seleccionados del formulario
+            return $selectedBlogs;
+        }
+
+        // Si no hay resultados filtrados, y "select_all" está marcada, obtiene todos los IDs de la base de datos
+        $allIds = Blog::pluck('id')->toArray();
+        //dd($allIds); // Agrega un dd para verificar todos los IDs de la base de datos
+        return $allIds;
+    }
+
+    // Si hay resultados filtrados, devuelve sus IDs
+    if ($filteredBlogs) {
+        $filteredIds = $filteredBlogs->pluck('id')->toArray();
+        //dd($filteredIds); // Agrega un dd para verificar los IDs filtrados
+        return $filteredIds;
+    }
+
+    // Si no hay "select_all" y no hay resultados filtrados, devuelve un array vacío
+    return [];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+  
     // Dentro de tu controlador (por ejemplo, BlogController)
     public function getSelectedBlogs($blogIds)
     {

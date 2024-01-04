@@ -51,18 +51,16 @@
                     <td>{{ $blog->id }}</td>
                     <td>{{ $blog->num_boleta }}</td>
                     <td>{{ $blog->usuario }}</td>
-                    <td>{{ $blog->empresa}}</td>    
+                    <td>{{ $blog->afianzado->nombre}}</td>    
                     <td>{{ $blog->motivo}}</td>    
                     <td>{{ $blog->financiadoras->pluck('nombre')->implode(', ')}}</td>    
                     <td>{{ $blog->tipoGarantia->nombre}}</td>
-                    <td>{{ $blog->waranty->monto }}</td>
+                    <td>{{ number_format($blog->waranty->monto, 2, ',', '.') }}</td>
                     <td>{{ $blog->unidadEjecutora->nombre }}</td>
                     <td>{{ $blog->waranty->caracteristicas }}</td>
                     <td>{{ $blog->waranty->fecha_inicio }}</td>
                     <td>{{ $blog->waranty->fecha_final }}</td>
                     <td>{{ $blog->waranty->observaciones }}</td>
-                    {{-- <td>{{ $blog->afianzado->nombre }}</td> --}}
-                    <!-- Agrega más celdas según tus necesidades -->
                 </tr>
             @endforeach
         </tbody>

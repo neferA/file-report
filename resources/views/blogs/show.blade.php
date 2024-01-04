@@ -23,7 +23,7 @@
                         <p><strong>ID:</strong> {{ $blog->id }}</p>
                         <p><strong>Estado:</strong> {{ $blog->estado }}</p>
                         <p><strong>Num Boleta:</strong> {{ $blog->num_boleta }}</p>
-                        <p><strong>Empresa:</strong> {{ $blog->empresa }}</p>
+                        {{-- <p><strong>Empresa:</strong> {{ $blog->empresa }}</p> --}}
                         <p><strong>Motivo:</strong> {{ $blog->motivo }}</p>
                         <!-- Agrega más campos según sea necesario -->
                         @if($blog->waranty)
@@ -50,7 +50,7 @@
 
                         <!-- Datos de la relación afianzado -->
                         @if($blog->afianzado)
-                            <p><strong>aseguradora:</strong> {{ $blog->afianzado->nombre }}</p>
+                            <p><strong>Empresa/afianzado:</strong> {{ $blog->afianzado->nombre }}</p>
                         @endif
                     </div>
                 </div>

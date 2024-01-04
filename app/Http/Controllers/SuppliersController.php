@@ -12,7 +12,7 @@ class SuppliersController extends Controller
      */
     public function index()
     {
-        $afianzadoras= afianzadora::all();
+        $afianzadoras = Afianzadora::with('blogs')->get();
         return view('afianzados.index', compact('afianzadoras'));
     }
 

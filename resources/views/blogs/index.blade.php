@@ -107,9 +107,9 @@
                                         </div>
                                     </th>                                
                                     <th style="display: #fff;">Número de Boleta</th>
-                                    <th style="display: #fff;">aseguradora </th>
-                                    <th style="display: #fff;">Empresa/afianzado</th>
+                                    <th style="display: #fff;">Empresa/afianzado </th>
                                     <th style="display: #fff;">Ejecutora</th>
+                                    <th style="display: #fff;">Monto</th>
                                     <th style="display: #fff;">Creado por</th>
                                     <th style="display: #fff;">Estado</th>
                                     <th style="display: #fff;">Fecha de Creación</th>
@@ -126,8 +126,8 @@
                                         </td>
                                         <td>{{ $blog->num_boleta }}</td>
                                         <td>{{ $blog->afianzado->nombre}}</td>    
-                                        <td>{{ $blog->empresa}}</td>    
                                         <td>{{ $blog->unidadEjecutora->nombre }}</td>
+                                        <td>{{ number_format($blog->waranty->monto, 2, ',', '.') }}</td>   
                                         <td>{{ $blog->usuario }}</td>
                                         <td>
                                             <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>

@@ -13,9 +13,9 @@ class afianzadora extends Model
         'nombre',
         'descripcion',
     ];
-    public function blog()
+    public function blogs()
     {
-        return $this->hasOne(Blog::class, 'afianzadora_id');
+        return $this->hasMany(Blog::class, 'afianzadora_id');
     }
 }
 

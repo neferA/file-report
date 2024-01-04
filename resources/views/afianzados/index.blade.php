@@ -23,6 +23,7 @@
                                     <th style="display: none;">ID</th>
                                     <th style="display: #fff;">nombre</th>
                                     <th style="display: #fff;">descripcion</th>
+                                    <th style="display: #fff;">Boletas Asociadas</th>
                                     <th style="display: #fff;">Acciones</th>
 
                                 <tbody>
@@ -31,7 +32,12 @@
                                             <td style="display: none;">{{ $afianzado->id }}</td>
                                             <td>{{ $afianzado->nombre }}</td>
                                             <td>{{ $afianzado->descripcion }}</td>
-                                                                             
+                                            <td>
+                                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ $afianzado->id }}">
+                                                   Ver Detalles
+                                                </button>
+                                             </td>
+                                                                                                                         
                                             <td>
                                                 @can('editar_tickets')
                                                     <a class="btn btn-info" href="{{ route('suppliers.edit', $afianzado->id) }}">Editar</a>
@@ -45,6 +51,35 @@
                                                 @endcan
                                             </td>
                                         </tr>
+                                        <div class="modal fade" id="modal-{{ $afianzado->id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ $afianzado->id }}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                               <div class="modal-content">
+                                                  <div class="modal-header">
+                                                     <h5 class="modal-title" id="modalLabel-{{ $afianzado->id }}">Detalles de la Afianzadora</h5>
+                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                                        <span aria-hidden="true">&times;</span>
+                                                     </button>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                     <p>Nombre: {{ $afianzado->nombre }}</p>
+                                                     <p>Descripción: {{ $afianzado->descripcion }}</p>
+                                                     <h6>Boletas Asociadas:</h6>
+                                                     <ul>
+                                                        @foreach ($afianzado->blogs as $blog)
+                                                           <li>
+                                                              Número de Boleta: {{ $blog->num_boleta }}<br>
+                                                              Ejecutora: {{ $blog->unidadEjecutora->nombre }}<br>
+                                                              Estado: {{ $blog->estado }}
+                                                           </li>
+                                                        @endforeach
+                                                     </ul>
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                  </div>
+                                               </div>
+                                            </div>
+                                         </div>                                         
                                     @endforeach
                                 </tbody>
                                 </table>
