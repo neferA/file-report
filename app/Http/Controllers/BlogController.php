@@ -447,6 +447,7 @@ class BlogController extends Controller
         // Obtener los valores necesarios del blog
         $fechaInicio = $blog->waranty->fecha_inicio;
         $fechaFinal = $blog->waranty->fecha_final;
+        $empresa = $blog->empresa;
         $caracteristicas = $blog->waranty->caracteristicas;
         $observaciones = $blog->waranty->observaciones;
         $warantyMonto = $blog->waranty->monto;
@@ -468,7 +469,10 @@ class BlogController extends Controller
         $data = [
             'num_boleta' => $blog->num_boleta,
             'usuario' => $blog->usuario,
+            'empresa' => $blog->empresa,
+            'motivo' => $blog->motivo,
             'tipo_garantia' => $blog->tipoGarantia->nombre,
+            'financiadoras' => $blog->financiadoras->pluck('nombre')->implode(', '),
             'monto' => $warantyMonto,
             'unidad_ejecutora' => $unidadEjecutoraNombre,
             'descendant_renovated_blog_data' => $descendantRenovatedBlogData,
@@ -504,13 +508,16 @@ class BlogController extends Controller
                 return;
             }
 
-            $currentBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia', 'afianzadora')->find($currentBlogId);
+            $currentBlog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia', 'afianzado', 'financiadoras')->find($currentBlogId);
 
             // Agregar datos de blogs renovados
             $renovatedBlogData[] = [
                 'id' => $currentBlog->id,
                 'num_boleta' => $currentBlog->num_boleta,
                 'usuario' => $currentBlog->usuario,
+                'empresa' => $currentBlog->empresa,
+                'motivo' => $currentBlog->motivo,
+                'financiadoras' => $currentBlog->financiadoras->pluck('nombre')->implode(', '),
                 'tipo_garantia' => $currentBlog->tipoGarantia->nombre,
                 'monto' => $currentBlog->waranty->monto,
                 'unidad_ejecutora' => $currentBlog->unidadEjecutora->nombre,
@@ -876,6 +883,8 @@ class BlogController extends Controller
         // Llama a métodos privados para realizar funciones específicas según la acción seleccionada
         switch ($submitAction) {
             case 'generar_pdf':
+                // Configuración de Dompdf para hoja horizontal y tamaño carta
+                $dompdf->setPaper('letter', 'landscape');
                 // Genera el PDF con los datos seleccionados
                 $pdf = $dompdf->loadView('inform', ['selectedBlogs' => $selectedBlogs]);
 

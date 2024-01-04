@@ -33,6 +33,25 @@
                             <p><strong>Fecha Inicial:</strong> {{ $blog->waranty->fecha_inicio }}</p>
                             <p><strong>Fecha Final:</strong> {{ $blog->waranty->fecha_final }}</p>
                         @endif
+                        <!-- Datos de la relación financiadoras -->
+                        @if($blog->financiadoras && $blog->financiadoras->count() > 0)
+                            <p><strong>Financiadoras:</strong> {{ $blog->financiadoras->pluck('nombre')->implode(', ') }}</p>
+                        @endif
+
+                        <!-- Datos de la relación tipoGarantia -->
+                        @if($blog->tipoGarantia)
+                            <p><strong>Tipo de Garantía:</strong> {{ $blog->tipoGarantia->nombre }}</p>
+                        @endif
+
+                        <!-- Datos de la relación unidadEjecutora -->
+                        @if($blog->unidadEjecutora)
+                            <p><strong>Unidad Ejecutora:</strong> {{ $blog->unidadEjecutora->nombre }}</p>
+                        @endif
+
+                        <!-- Datos de la relación afianzado -->
+                        @if($blog->afianzado)
+                            <p><strong>aseguradora:</strong> {{ $blog->afianzado->nombre }}</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -56,9 +75,11 @@
                                         <p><strong>Num Boleta:</strong> {{ $renovatedBlog['num_boleta'] }}</p>
                                         <p><strong>Estado:</strong> {{ $renovatedBlog['estado'] }}</p>
                                         <p><strong>Usuario:</strong> {{ $renovatedBlog['usuario'] }}</p>
+                                        <p><strong>Motivo:</strong> {{ $renovatedBlog['motivo'] }}</p>
                                         <p><strong>Tipo Garantía:</strong> {{ $renovatedBlog['tipo_garantia'] }}</p>
                                         <p><strong>Monto:</strong> {{ $renovatedBlog['monto'] }}</p>
                                         <p><strong>Unidad Ejecutora:</strong> {{ $renovatedBlog['unidad_ejecutora'] }}</p>
+                                        <p><strong>financiadora:</strong> {{ $renovatedBlog['unidad_ejecutora'] }}</p>
                                         <p><strong>Características:</strong> {{ $renovatedBlog['caracteristicas'] }}</p>
                                         <p><strong>Observaciones:</strong> {{ $renovatedBlog['observaciones'] }}</p>
                                         <p><strong>Fecha Inicio:</strong> {{ $renovatedBlog['fecha_inicio'] }}</p>
@@ -67,12 +88,14 @@
                                 </div>
                             @endforeach
                             <p><strong>Total Monto Descendente:</strong> {{ $totalMontoDescendant }}</p>
-                        @else
+                            <button class="btn btn-primary" onclick="confirm('¿Estás seguro de renovar esta boleta?') ? window.location.href = '{{ route('blogs.renovar', ['id' => $renovatedBlog['id']]) }}' : false">
+                                Renovar Última Boleta (ID: {{ $renovatedBlog['id'] }})
+                            </button>
+                            @else
                             <p>No hay renovaciones descendentes</p>
                         @endif
                     </div>
                 </div>
-
                 <!-- Renovaciones Ascendentes -->
                 <div class="card mt-3">
                     <div class="card-header bg-info text-white">
@@ -91,7 +114,10 @@
                                         <p><strong>Usuario:</strong> {{ $renovatedBlog['usuario'] }}</p>
                                         <p><strong>Estado:</strong> {{ $renovatedBlog['estado'] }}</p>
                                         <p><strong>Monto:</strong> {{ $renovatedBlog['monto'] }}</p>
+                                        <p><strong>Motivo:</strong> {{ $renovatedBlog['motivo'] }}</p>
                                         <p><strong>Unidad Ejecutora:</strong> {{ $renovatedBlog['unidad_ejecutora'] }}</p>
+                                        <p><strong>Tipo Garantía:</strong> {{ $renovatedBlog['tipo_garantia'] }}</p>
+                                        <p><strong>financiadora:</strong> {{ $renovatedBlog['financiadoras'] }}</p>
                                         <p><strong>Características:</strong> {{ $renovatedBlog['caracteristicas'] }}</p>
                                         <p><strong>Observaciones:</strong> {{ $renovatedBlog['observaciones'] }}</p>
                                         <p><strong>Fecha Inicio:</strong> {{ $renovatedBlog['fecha_inicio'] }}</p>

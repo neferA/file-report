@@ -8,25 +8,25 @@
         body {
             font-family: Arial, sans-serif;
         }
-        h1 {
-            font-size: 24px;
-        }
-        h2 {
-            font-size: 20px;
+        h1, h2 {
+            font-size: 18px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
         th, td {
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 6px; /* Ajusta el padding para reducir el espacio en las celdas */
+            font-size: 12px; /* Ajusta el tamaño de la letra */
             text-align: left;
         }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
+    
 </head>
 <body>
     <h1>Informe de Boleta de Garantía</h1>
@@ -35,6 +35,9 @@
             <tr>
                 <th>Número de Boleta</th>
                 <th>Usuario</th>
+                <th>empresa/afianzado</th>
+                <th>motivo</th>
+                <th>financiadora</th>
                 <th>Tipo de Garantía</th>
                 <th>Monto</th>
                 <th>Unidad Ejecutora</th>
@@ -48,6 +51,9 @@
             <tr>
                 <td>{{ $data['num_boleta'] }}</td>
                 <td>{{ $data['usuario'] }}</td>
+                <td>{{ $data['empresa'] }}</td>
+                <td>{{ $data['motivo'] }}</td>
+                <td>{{ isset($data['financiadoras']) ? $data['financiadoras'] : '' }}</td>
                 <td>{{ $data['tipo_garantia'] }}</td>
                 <td>{{ $data['monto'] }}</td>
                 <td>{{ $data['unidad_ejecutora'] }}</td>
@@ -61,12 +67,15 @@
 
     <!-- Sección para mostrar hijos -->
     @if(isset($data['descendant_renovated_blog_data']) && count($data['descendant_renovated_blog_data']) > 0)
-        <h2>Blogs Renovados Descendientes</h2>
+        <h2>Boletas Renovadas Descendientes</h2>
         <table>
             <thead>
                 <tr>
                     <th>Número de Boleta</th>
                     <th>Usuario</th>
+                    <th>empresa/afianzado</th>
+                    <th>motivo</th>
+                    <th>financiadora</th>
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
@@ -81,6 +90,9 @@
                     <tr>
                         <td>{{ $descendantRenovatedBlog['num_boleta'] }}</td>
                         <td>{{ $descendantRenovatedBlog['usuario'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['empresa'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['motivo'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['financiadoras'] }}</td>
                         <td>{{ $descendantRenovatedBlog['tipo_garantia'] }}</td>
                         <td>{{ $descendantRenovatedBlog['monto'] }}</td>
                         <td>{{ $descendantRenovatedBlog['unidad_ejecutora'] }}</td>
@@ -94,17 +106,20 @@
             </tbody>
         </table>
     @else
-        <p>No hay blogs renovados descendientes.</p>
+        <p>No hay Boletas renovados descendientes.</p>
     @endif
 
     <!-- Sección para mostrar ascendientes -->
     @if(isset($data['ascendant_renovated_blog_data']) && count($data['ascendant_renovated_blog_data']) > 0)
-        <h2>Blogs Renovados Ascendientes</h2>
+        <h2>Boletas Renovadas Ascendientes</h2>
         <table>
             <thead>
                 <tr>
                     <th>Número de Boleta</th>
                     <th>Usuario</th>
+                    <th>empresa/afianzado</th>
+                    <th>motivo</th>
+                    <th>financiadora</th>
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
@@ -119,6 +134,9 @@
                     <tr>
                         <td>{{ $ascendantRenovatedBlog['num_boleta'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['usuario'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['empresa'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['motivo'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['financiadoras']}}</td>
                         <td>{{ $ascendantRenovatedBlog['tipo_garantia'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['monto'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['unidad_ejecutora'] }}</td>

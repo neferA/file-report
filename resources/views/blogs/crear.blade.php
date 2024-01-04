@@ -55,10 +55,9 @@
                                             <label for="titulo">Monto</label>
                                             {!! Form::number('monto', null, ['class' => 'form-control', 'placeholder' => 'Ingrese monto', 'step' => 'any', 'required' => true]) !!}
                                         </div>
-                                    </div>
+                                    </div>                                 
                                     <div class="col-md-6">
                                         <div class="form-group">
-
                                             <label for="estado">Estado</label>
                                             {!! Form::text('estado', \App\Models\Blog::ESTADO_VIGENTE, ['class' => 'form-control', 'readonly' => true]) !!}
                                         </div>

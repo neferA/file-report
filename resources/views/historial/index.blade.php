@@ -67,7 +67,7 @@
                                                     <td>{{ $historia->blog->motivo }}</td>
                                                     <td>{{ $historia->caracteristicas }}</td>
                                                     <td>{{ $historia->observaciones }}</td>
-                                                    <td>{{ $historia->monto }}</td>
+                                                    <td>{{ number_format($historia->monto, 2, ',', '.') }}</td>
                                                     <td>{{ $historia->fecha_inicio }}</td>
                                                     <td>{{ $historia->fecha_final }}</td>
                                                     <td>
