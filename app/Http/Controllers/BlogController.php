@@ -903,7 +903,7 @@ private function getAllBlogIds($filteredBlogs = null)
     if (request()->has('select_all')) {
         // Si hay resultados filtrados y "select_all" está marcada, devuelve todos los IDs de los resultados filtrados
         if ($filteredBlogs && is_array($selectedBlogs = request()->input('selected_blogs'))) {
-            dd($selectedBlogs); // Agrega un dd para verificar los IDs seleccionados del formulario
+            //dd($selectedBlogs); // Agrega un dd para verificar los IDs seleccionados del formulario
             return $selectedBlogs;
         }
 
@@ -923,19 +923,6 @@ private function getAllBlogIds($filteredBlogs = null)
     // Si no hay "select_all" y no hay resultados filtrados, devuelve un array vacío
     return [];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-  
     // Dentro de tu controlador (por ejemplo, BlogController)
     public function getSelectedBlogs($blogIds)
     {

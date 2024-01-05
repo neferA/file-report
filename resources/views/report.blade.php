@@ -4,33 +4,35 @@
     <meta charset="utf-8">
     <title>Informe en PDF</title>
     <style>
-        /* Estilos CSS para el PDF */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
-        h1, h2 {
-            font-size: 18px;
+        h2 {
+            page-break-after: avoid; /* Evita que el título se divida entre páginas */
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            page-break-inside: avoid;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 6px; /* Ajusta el padding para reducir el espacio en las celdas */
-            font-size: 12px; /* Ajusta el tamaño de la letra */
+            padding: 6px;
+            font-size: 12px;
             text-align: left;
         }
         th {
             background-color: #f2f2f2;
         }
+        .page-break {
+            page-break-before: always; /* Forzar un salto de página antes de la tabla */
+        }
     </style>
     
 </head>
 <body>
-    <h1>Informe de Boleta de Garantía</h1>
-    <table>
+<h1>Informe de Boleta de Garantía - Número: {{ $data['num_boleta'] }}</h1>    <table>
         <thead>
             <tr>
                 <th>Número de Boleta</th>
@@ -42,10 +44,9 @@
                 <th>Monto</th>
                 <th>Unidad Ejecutora</th>
                 <th>caracteristicas</th>
-                <th>Fecha Inicio</th>
-                <th>Fecha Final</th>
-                <th>observaciones</th>
+                
             </tr>
+            
         </thead>
         <tbody>
             <tr>
@@ -58,9 +59,16 @@
                 <td>{{ number_format($data['monto'], 2, ',', '.') }}</td>
                 <td>{{ $data['unidad_ejecutora'] }}</td>
                 <td>{{ $data['caracteristicas'] }}</td>
-                <td>{{ $data['fecha_inicio'] }}</td>
-                <td>{{ $data['fecha_final'] }}</td>
-                <td>{{ $data['observaciones'] }}</td>
+                
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <p><strong>Fecha Inicio:</strong> {{ $data['fecha_inicio'] }}</p>
+                    <p><strong>Fecha Final:</strong> {{$data['fecha_final'] }}</p>
+                </td>
+                <td colspan="2">
+                    <p><strong>Observaciones:</strong>{{ $data['observaciones'] }}</p>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -80,9 +88,6 @@
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
                     <th>caracteristicas</th>
-                    <th>Fecha Inicio</th>
-                    <th>Fecha Final</th>
-                    <th>observaciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -97,10 +102,15 @@
                         <td>{{ number_format($descendantRenovatedBlog['monto'], 2, ',', '.') }}</td>
                         <td>{{ $descendantRenovatedBlog['unidad_ejecutora'] }}</td>
                         <td>{{ $descendantRenovatedBlog['caracteristicas'] }}</td>
-                        <td>{{ $descendantRenovatedBlog['fecha_inicio'] }}</td>
-                        <td>{{ $descendantRenovatedBlog['fecha_final'] }}</td>
-                        <td>{{ $descendantRenovatedBlog['observaciones'] }}</td>
-
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <p><strong>Fecha Inicio:</strong> {{ $descendantRenovatedBlog['fecha_inicio'] }}</p>
+                            <p><strong>Fecha Final:</strong> {{ $descendantRenovatedBlog['fecha_final'] }}</p>
+                        </td>
+                        <td colspan="2">
+                            <p><strong>Observaciones:</strong>{{ $descendantRenovatedBlog['observaciones'] }}</p>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
@@ -124,9 +134,6 @@
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
                     <th>caracteristicas</th>
-                    <th>Fecha Inicio</th>
-                    <th>Fecha Final</th>
-                    <th>observaciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -141,9 +148,15 @@
                         <td>{{ number_format($ascendantRenovatedBlog['monto'], 2, ',', '.') }}</td>
                         <td>{{ $ascendantRenovatedBlog['unidad_ejecutora'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['caracteristicas'] }}</td>
-                        <td>{{ $ascendantRenovatedBlog['fecha_inicio'] }}</td>
-                        <td>{{ $ascendantRenovatedBlog['fecha_final'] }}</td>
-                        <td>{{ $ascendantRenovatedBlog['observaciones'] }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <p><strong>Fecha Inicio:</strong> {{ $ascendantRenovatedBlog['fecha_inicio'] }}</p>
+                            <p><strong>Fecha Final:</strong> {{ $ascendantRenovatedBlog['fecha_final'] }}</p>
+                        </td>
+                        <td colspan="2">
+                            <p><strong>Observaciones:</strong>{{ $ascendantRenovatedBlog['observaciones'] }}</p>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
