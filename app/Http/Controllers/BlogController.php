@@ -18,10 +18,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 
 
 use Carbon\Carbon;
 use Illuminate\Routing\Controller;
+// use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\PDF as DomPDF;
 use PDF;
 
@@ -44,39 +46,38 @@ class BlogController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        // Construye la consulta base
-        $baseQuery = $this->buildQuery($request);
+{
+    // Construye la consulta base
+    $baseQuery = $this->buildQuery($request);
     
-        // Obtén las fechas del formulario
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+    // Obtén las fechas del formulario
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
     
-        // Clona la consulta base para aplicar el filtro de fechas
-        $dateFilteredQuery = clone $baseQuery;
+    // Clona la consulta base para aplicar el filtro de fechas
+    $dateFilteredQuery = clone $baseQuery;
     
-        // Aplica el filtro de fechas
-        $this->applyDateFilter($dateFilteredQuery, $startDate, $endDate);
+    // Aplica el filtro de fechas
+    $this->applyDateFilter($dateFilteredQuery, $startDate, $endDate);
     
-        // Ejecuta la consulta filtrada por fechas y obtén los resultados paginados
-        $blogs = $dateFilteredQuery->orderBy('created_at', 'asc')->simplePaginate(20);
+    // Ejecuta la consulta filtrada por fechas y obtén los resultados paginados
+    $blogs = $dateFilteredQuery->orderBy('created_at', 'asc')->simplePaginate(20);
     
-        // Itera a través de los blogs y maneja las alarmas
-        $expiringBlogs = $this->getExpiringBlogs();
-        foreach ($expiringBlogs as $blog) {
-            $this->handleBlogAlarm($blog);
-        }
+    // Itera a través de los blogs y maneja las alarmas
+    $expiringBlogs = $this->getExpiringBlogs();
+    foreach ($expiringBlogs as $blog) {
+        $this->handleBlogAlarm($blog);
+    }   
+    // Obtén las alarmas para mostrar en la vista
+    $alarms = $this->getAlarms();
     
-        // Obtén las alarmas para mostrar en la vista
-        $alarms = $this->getAlarms();
+    // Almacena los resultados filtrados en la sesión
+    session(['filtered_blogs' => $blogs]);
     
-        // Almacena los resultados filtrados en la sesión
-        session(['filtered_blogs' => $blogs]);
-    
-        // Devuelve la vista con los datos necesarios
-        return view('blogs.index', compact('blogs', 'alarms'));
-    }
-    
+    // Devuelve la vista con los datos necesarios
+    return view('blogs.index', compact('blogs', 'alarms'));
+}
+       
     private function applyDateFilter($query, $startDate, $endDate)
     {
         if ($startDate && $endDate) {
@@ -428,6 +429,16 @@ class BlogController extends Controller
 
         return view('blogs.crear', compact('financiadoras', 'garantias', 'ejecutoras', 'afianzadoras', 'blogRenovado'));
     }  
+    // public function generarQR($id)
+    // {
+    //    // Obtener el blog basado en el ID proporcionado
+    //    $blog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia', 'afianzado', 'financiadoras')->find($id);
+       
+    //     // Crea el código QR con los datos que desees
+    //     $qrCode = QrCode::size(200)->generate(json_encode($blog));
+
+    //     return view('blogs.index', compact('qrCode', 'blog'));
+    // }
 
     /**
      * Display the specified resource.

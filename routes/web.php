@@ -102,6 +102,7 @@ Route::get('/blogs/{id}/renewed', [BlogController::class, 'renovar'])->name('blo
 Route::get('/blogs/{id}/show', [BlogController::class, 'show'])->name('blogs.show');
 
 Route::get('/blogs/{id}/generarpdf', [BlogController::class, 'generarPDF'])->name('blogs.generarpdf');
+// Route::get('/blogs/generarqr/{id}', [BlogController::class, 'generarQR'])->name('blogs.generarqr');
 
 Route::get('/blogs/{id}/actualizar_estado', [BlogController::class, 'actualizarEstado'])->name('blogs.actualizarEstado');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');

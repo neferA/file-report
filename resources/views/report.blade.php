@@ -36,14 +36,15 @@
         <thead>
             <tr>
                 <th>Número de Boleta</th>
-                <th>Usuario</th>
-                <th>empresa/afianzado</th>
-                <th>motivo</th>
-                <th>financiadora</th>
+                <th>Empresa/afianzado</th>
+                <th>Motivo</th>
+                <th>Afianzadora</th>
                 <th>Tipo de Garantía</th>
                 <th>Monto</th>
                 <th>Unidad Ejecutora</th>
-                <th>caracteristicas</th>
+                <th>Caracteristicas</th>
+                <th>Fecha de vencimiento</th>
+                <th>Observaciones</th>
                 
             </tr>
             
@@ -51,7 +52,6 @@
         <tbody>
             <tr>
                 <td>{{ $data['num_boleta'] }}</td>
-                <td>{{ $data['usuario'] }}</td>
                 <td>{{ $data['afianzado'] }}</td>
                 <td>{{ $data['motivo'] }}</td>
                 <td>{{ isset($data['financiadoras']) ? $data['financiadoras'] : '' }}</td>
@@ -59,9 +59,11 @@
                 <td>{{ number_format($data['monto'], 2, ',', '.') }}</td>
                 <td>{{ $data['unidad_ejecutora'] }}</td>
                 <td>{{ $data['caracteristicas'] }}</td>
+                <td>{{ $data['fecha_final'] }}</td>
+                <td>{{ $data['observaciones'] }}</td>
                 
             </tr>
-            <tr>
+            {{-- <tr>
                 <td colspan="2">
                     <p><strong>Fecha Inicio:</strong> {{ $data['fecha_inicio'] }}</p>
                     <p><strong>Fecha Final:</strong> {{$data['fecha_final'] }}</p>
@@ -69,7 +71,7 @@
                 <td colspan="2">
                     <p><strong>Observaciones:</strong>{{ $data['observaciones'] }}</p>
                 </td>
-            </tr>
+            </tr> --}}
         </tbody>
     </table>
 
@@ -80,21 +82,21 @@
             <thead>
                 <tr>
                     <th>Número de Boleta</th>
-                    <th>Usuario</th>
                     <th>empresa/afianzado</th>
                     <th>motivo</th>
-                    <th>financiadora</th>
+                    <th>Afianzadora</th>
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
-                    <th>caracteristicas</th>
+                    <th>Caracteristicas</th>
+                    <th>Fecha de vencimiento</th>
+                    <th>Observaciones</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($data['descendant_renovated_blog_data'] as $descendantRenovatedBlog)
                     <tr>
                         <td>{{ $descendantRenovatedBlog['num_boleta'] }}</td>
-                        <td>{{ $descendantRenovatedBlog['usuario'] }}</td>
                         <td>{{ $descendantRenovatedBlog['afianzado'] }}</td>
                         <td>{{ $descendantRenovatedBlog['motivo'] }}</td>
                         <td>{{ $descendantRenovatedBlog['financiadoras'] }}</td>
@@ -102,8 +104,10 @@
                         <td>{{ number_format($descendantRenovatedBlog['monto'], 2, ',', '.') }}</td>
                         <td>{{ $descendantRenovatedBlog['unidad_ejecutora'] }}</td>
                         <td>{{ $descendantRenovatedBlog['caracteristicas'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['fecha_final'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['observaciones'] }}</td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <td colspan="2">
                             <p><strong>Fecha Inicio:</strong> {{ $descendantRenovatedBlog['fecha_inicio'] }}</p>
                             <p><strong>Fecha Final:</strong> {{ $descendantRenovatedBlog['fecha_final'] }}</p>
@@ -111,7 +115,7 @@
                         <td colspan="2">
                             <p><strong>Observaciones:</strong>{{ $descendantRenovatedBlog['observaciones'] }}</p>
                         </td>
-                    </tr>
+                    </tr> --}}
                 @endforeach
             </tbody>
         </table>
@@ -119,28 +123,28 @@
         <p>No hay Boletas renovados descendientes.</p>
     @endif
 
-    <!-- Sección para mostrar ascendientes -->
+    <!-- Sección para mostrar padres -->
     @if(isset($data['ascendant_renovated_blog_data']) && count($data['ascendant_renovated_blog_data']) > 0)
         <h2>Boletas Renovadas Ascendientes</h2>
         <table>
             <thead>
                 <tr>
                     <th>Número de Boleta</th>
-                    <th>Usuario</th>
-                    <th>empresa/afianzado</th>
-                    <th>motivo</th>
-                    <th>financiadora</th>
+                    <th>Empresa/afianzado</th>
+                    <th>Motivo</th>
+                    <th>Afianzadora</th>
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
                     <th>Unidad Ejecutora</th>
-                    <th>caracteristicas</th>
+                    <th>Caracteristicas</th>
+                    <th>Fecha de vencimiento</th>
+                    <th>Observaciones</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($data['ascendant_renovated_blog_data'] as $ascendantRenovatedBlog)
                     <tr>
                         <td>{{ $ascendantRenovatedBlog['num_boleta'] }}</td>
-                        <td>{{ $ascendantRenovatedBlog['usuario'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['afianzado'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['motivo'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['financiadoras']}}</td>
@@ -148,8 +152,10 @@
                         <td>{{ number_format($ascendantRenovatedBlog['monto'], 2, ',', '.') }}</td>
                         <td>{{ $ascendantRenovatedBlog['unidad_ejecutora'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['caracteristicas'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['fecha_final'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['observaciones'] }}</td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <td colspan="2">
                             <p><strong>Fecha Inicio:</strong> {{ $ascendantRenovatedBlog['fecha_inicio'] }}</p>
                             <p><strong>Fecha Final:</strong> {{ $ascendantRenovatedBlog['fecha_final'] }}</p>
@@ -157,17 +163,16 @@
                         <td colspan="2">
                             <p><strong>Observaciones:</strong>{{ $ascendantRenovatedBlog['observaciones'] }}</p>
                         </td>
-                    </tr>
+                    </tr> --}}
                 @endforeach
             </tbody>
         </table>
     @else
-        <p>No hay blogs renovados ascendientes.</p>
+        <p>No hay boletas renovados ascendientes.</p>
     @endif
 
     <!-- Muestra la suma de montos -->
     <p>Total Monto: {{ number_format($data['total_monto'], 2, ',', '.') }}</p>
-
-
+   
 </body>
 </html>

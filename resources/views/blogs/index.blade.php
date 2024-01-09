@@ -9,7 +9,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h3 class="page__heading">Boletas de Garantía</h3>
+            <h3 class="page__heading">Detalles de garantias</h3>
         </div>
         <div class="section-body">
             <div class="row">
@@ -200,7 +200,30 @@
                                                     <i class="fas fa-file-pdf me-1"></i> 
                                                      PDF
                                                 </a>
-                                            </div>
+                                                {{-- <!-- En tu bucle foreach para cada boleta, agrega un botón o enlace -->
+                                                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#qrModal{{ $blog->id }}">
+                                                    <i class="fas fa-qrcode"></i> Ver QR
+                                                </a>
+
+                                                <!-- Modal para mostrar el código QR -->
+                                                <div class="modal fade" id="qrModal{{ $blog->id }}" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel{{ $blog->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="qrModalLabel{{ $blog->id }}">Código QR</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <!-- Contenedor para el código QR -->
+                                                                {!! QrCode::size(200)->generate($blog->num_boleta) !!}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> --}}
+
+                                                                                                             
                                         </td>
                                     </tr>
                                 @endforeach

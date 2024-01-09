@@ -32,21 +32,22 @@
     </style>
 </head>
 <body>
-    <h2>Reporte de Boletas Seleccionados</h2>
+    <h2>Reporte de garanias seleccionadas</h2>
 
     <table>
         <thead>
             <tr>
                 <!-- <th>ID</th> -->
-                <th>Número de Boleta</th>
-                <th>Usuario</th>
-                <th>empresa/afianzado</th>
-                <th>motivo</th>
-                <th>financiadora</th>
+                <th>Número de boleta</th>
+                <th>Empresa/afianzado</th>
+                <th>Motivo</th>
+                <th>Afianzadora</th>
                 <th>Tipo de Garantía</th>
                 <th>Monto</th>
                 <th>Unidad Ejecutora</th>
-                <th >caracteristicas</th>
+                <th>Caracteristicas</th>
+                <th>Fecha de vencimiento</th>
+                <th>Observaciones</th>
                 
             </tr>
         </thead>
@@ -55,7 +56,6 @@
                 <tr>
                     <!-- <td>{{ $blog->id }}</td> -->
                     <td>{{ $blog->num_boleta }}</td>
-                    <td>{{ $blog->usuario }}</td>
                     <td>{{ $blog->afianzado->nombre}}</td>    
                     <td>{{ $blog->motivo}}</td>    
                     <td>{{ $blog->financiadoras->pluck('nombre')->implode(', ')}}</td>    
@@ -63,16 +63,10 @@
                     <td>{{ number_format($blog->waranty->monto, 2, ',', '.') }}</td>
                     <td>{{ $blog->unidadEjecutora->nombre }}</td>
                     <td>{{ $blog->waranty->caracteristicas }}</td>
+                    <td>{{ $blog->waranty->fecha_final }}</td>
+                    <td>{{ $blog->waranty->observaciones }}</td>
                 </tr>
-                <tr>
-                    <td colspan="2">
-                        <p><strong>Fecha Inicio:</strong> {{ $blog->waranty->fecha_inicio }}</p>
-                        <p><strong>Fecha Final:</strong> {{ $blog->waranty->fecha_final }}</p>
-                    </td>
-                    <td colspan="2">
-                        <p><strong>Observaciones:</strong> {{ $blog->waranty->observaciones }}</p>
-                    </td>
-                </tr>
+                
             @endforeach
         </tbody>
     </table>

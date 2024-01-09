@@ -14,7 +14,6 @@ class Blog extends Model
         'unidad_ejecutora_id',
         'afianzadora_id',
         'num_boleta',
-        'empresa',
         'motivo',
         'ejecutora',
         'usuario',

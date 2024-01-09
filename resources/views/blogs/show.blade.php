@@ -18,18 +18,18 @@
                 <div class="card">
                     <div class="card-header bg-primary text-white">
                         <h2>Blog Original</h2>
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">Volver Atrás</a>                        
                     </div>
                     <div class="card-body">
                         <p><strong>ID:</strong> {{ $blog->id }}</p>
                         <p><strong>Estado:</strong> {{ $blog->estado }}</p>
                         <p><strong>Num Boleta:</strong> {{ $blog->num_boleta }}</p>
-                        {{-- <p><strong>Empresa:</strong> {{ $blog->empresa }}</p> --}}
                         <p><strong>Motivo:</strong> {{ $blog->motivo }}</p>
                         <!-- Agrega más campos según sea necesario -->
                         @if($blog->waranty)
                             <p><strong>Características:</strong> {{ $blog->waranty->caracteristicas }}</p>
                             <p><strong>Observaciones:</strong> {{ $blog->waranty->observaciones }}</p>
-                            <p><strong>Monto:</strong> {{ $blog->waranty->monto }}</p>
+                            <p><strong>Monto:</strong> {{ number_format($blog->waranty->monto, 2, ',', '.') }}</p>
                             <p><strong>Fecha Inicial:</strong> {{ $blog->waranty->fecha_inicio }}</p>
                             <p><strong>Fecha Final:</strong> {{ $blog->waranty->fecha_final }}</p>
                         @endif
@@ -77,7 +77,7 @@
                                         <p><strong>Usuario:</strong> {{ $renovatedBlog['usuario'] }}</p>
                                         <p><strong>Motivo:</strong> {{ $renovatedBlog['motivo'] }}</p>
                                         <p><strong>Tipo Garantía:</strong> {{ $renovatedBlog['tipo_garantia'] }}</p>
-                                        <p><strong>Monto:</strong> {{ $renovatedBlog['monto'] }}</p>
+                                        <p><strong>Monto:</strong> {{ number_format($renovatedBlog['monto'], 2, ',', '.') }}</p>
                                         <p><strong>Unidad Ejecutora:</strong> {{ $renovatedBlog['unidad_ejecutora'] }}</p>
                                         <p><strong>financiadora:</strong> {{ $renovatedBlog['unidad_ejecutora'] }}</p>
                                         <p><strong>Características:</strong> {{ $renovatedBlog['caracteristicas'] }}</p>
@@ -87,7 +87,7 @@
                                     </div>
                                 </div>
                             @endforeach
-                            <p><strong>Total Monto Descendente:</strong> {{ $totalMontoDescendant }}</p>
+                            <p><strong>Total Monto Descendente:</strong> {{ number_format($totalMontoDescendant, 2, ',', '.') }}</p>
                             <button class="btn btn-primary" onclick="confirm('¿Estás seguro de renovar esta boleta?') ? window.location.href = '{{ route('blogs.renovar', ['id' => $renovatedBlog['id']]) }}' : false">
                                 Renovar Última Boleta (ID: {{ $renovatedBlog['id'] }})
                             </button>
@@ -113,7 +113,7 @@
                                         <p><strong>Num Boleta:</strong> {{ $renovatedBlog['num_boleta'] }}</p>
                                         <p><strong>Usuario:</strong> {{ $renovatedBlog['usuario'] }}</p>
                                         <p><strong>Estado:</strong> {{ $renovatedBlog['estado'] }}</p>
-                                        <p><strong>Monto:</strong> {{ $renovatedBlog['monto'] }}</p>
+                                        <p><strong>Monto:</strong> {{ number_format($renovatedBlog['monto'], 2, ',', '.') }}</p>
                                         <p><strong>Motivo:</strong> {{ $renovatedBlog['motivo'] }}</p>
                                         <p><strong>Unidad Ejecutora:</strong> {{ $renovatedBlog['unidad_ejecutora'] }}</p>
                                         <p><strong>Tipo Garantía:</strong> {{ $renovatedBlog['tipo_garantia'] }}</p>
@@ -125,7 +125,7 @@
                                     </div>
                                 </div>
                             @endforeach
-                            <p><strong>Total Monto Ascendente:</strong> {{ $totalMontoAscendant }}</p>
+                            <p><strong>Total Monto Ascendente:</strong> {{ number_format($totalMontoAscendant, 2, ',', '.') }}</p>
                         @else
                             <p>No hay renovaciones ascendentes</p>
                         @endif
