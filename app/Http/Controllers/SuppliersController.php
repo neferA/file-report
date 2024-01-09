@@ -10,11 +10,42 @@ class SuppliersController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $afianzadoras= afianzadora::all();
+        $afianzadoras = $this->getAfianzadoras($request);
         return view('afianzados.index', compact('afianzadoras'));
     }
+    
+    private function getAfianzadoras(Request $request)
+    {
+        $query = Afianzadora::with('blogs');
+    
+        $searchTerm = $request->input('search');
+        $order = $request->input('order', 'desc');
+    
+        if ($searchTerm) {
+            $query->where('nombre', 'like', "%$searchTerm%")
+                ->orWhere('descripcion', 'like', "%$searchTerm%");
+            // Añade más columnas según tus necesidades
+        }
+    
+        // Ordenamiento
+        $orderColumn = 'created_at';
+        $orderDirection = 'desc';
+    
+        if ($order === 'asc') {
+            $orderDirection = 'asc';
+        } elseif ($order === 'updated_at_desc') {
+            $orderColumn = 'updated_at';
+        }
+    
+        // Aplicar el ordenamiento
+        $query->orderBy($orderColumn, $orderDirection);
+    
+        return $query->get();
+    }
+
+
 
     /**
      * Show the form for creating a new resource.

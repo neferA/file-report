@@ -46,7 +46,7 @@
                                                 <th>Motivo</th>
                                                 <th>Características</th>
                                                 <th>Observaciones</th>
-                                                <th>Monto</th>
+                                                {{-- <th>Monto</th> --}}
                                                 <th>Fecha Inicio</th>
                                                 <th>Fecha Final</th>
                                                 <th>pdf</th>
@@ -67,7 +67,7 @@
                                                     <td>{{ $historia->blog->motivo }}</td>
                                                     <td>{{ $historia->caracteristicas }}</td>
                                                     <td>{{ $historia->observaciones }}</td>
-                                                    <td>{{ number_format($historia->monto, 2, ',', '.') }}</td>
+                                                    {{-- <td>{{ number_format($historia->monto, 2, ',', '.') }}</td> --}}
                                                     <td>{{ $historia->fecha_inicio }}</td>
                                                     <td>{{ $historia->fecha_final }}</td>
                                                     <td>

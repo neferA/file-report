@@ -9,7 +9,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h3 class="page__heading">Boletas de Garantía</h3>
+            <h3 class="page__heading">Detalles de garantias</h3>
         </div>
         <div class="section-body">
             <div class="row">
@@ -80,9 +80,9 @@
                         <input type="hidden" name="submit_action" value=""> <!-- Campo oculto para la acción -->
                                                    
                         <div class="d-flex">
-                            <!-- <button type="submit" name="submit_action" value="generar_excel" class="btn btn-info" onclick="return confirm('¿Estás seguro de generar reporte en Excel')">
+                            <button type="submit" name="submit_action" value="generar_excel" class="btn btn-info" onclick="return confirm('¿Estás seguro de generar reporte en Excel')">
                                 <i class="fas fa-file-excel me-1"></i> Generar Excel
-                            </button> -->
+                            </button>
                             <button type="submit" name="submit_action" value="generar_pdf" class="btn btn-success me-2" onclick="return confirm('¿Estás seguro de generar reporte')">
                                 <i class="fas fa-file-pdf me-1"></i> Generar PDF
                             </button>
@@ -107,9 +107,9 @@
                                         </div>
                                     </th>                                
                                     <th style="display: #fff;">Número de Boleta</th>
-                                    <th style="display: #fff;">aseguradora </th>
-                                    <th style="display: #fff;">Empresa/afianzado</th>
+                                    <th style="display: #fff;">Empresa/afianzado </th>
                                     <th style="display: #fff;">Ejecutora</th>
+                                    <th style="display: #fff;">Monto</th>
                                     <th style="display: #fff;">Creado por</th>
                                     <th style="display: #fff;">Estado</th>
                                     <th style="display: #fff;">Fecha de Creación</th>
@@ -126,8 +126,8 @@
                                         </td>
                                         <td>{{ $blog->num_boleta }}</td>
                                         <td>{{ $blog->afianzado->nombre}}</td>    
-                                        <td>{{ $blog->empresa}}</td>    
                                         <td>{{ $blog->unidadEjecutora->nombre }}</td>
+                                        <td>{{ number_format($blog->waranty->monto, 2, ',', '.') }}</td>   
                                         <td>{{ $blog->usuario }}</td>
                                         <td>
                                             <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
@@ -200,7 +200,30 @@
                                                     <i class="fas fa-file-pdf me-1"></i> 
                                                      PDF
                                                 </a>
-                                            </div>
+                                                {{-- <!-- En tu bucle foreach para cada boleta, agrega un botón o enlace -->
+                                                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#qrModal{{ $blog->id }}">
+                                                    <i class="fas fa-qrcode"></i> Ver QR
+                                                </a>
+
+                                                <!-- Modal para mostrar el código QR -->
+                                                <div class="modal fade" id="qrModal{{ $blog->id }}" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel{{ $blog->id }}" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="qrModalLabel{{ $blog->id }}">Código QR</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <!-- Contenedor para el código QR -->
+                                                                {!! QrCode::size(200)->generate($blog->num_boleta) !!}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> --}}
+
+                                                                                                             
                                         </td>
                                     </tr>
                                 @endforeach

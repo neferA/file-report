@@ -10,7 +10,7 @@
             <!-- Mostrar otros detalles del blog según sea necesario -->
         </div>
     </div>
-
+    <a href="{{ url()->previous() }}" class="btn btn-secondary">Volver Atrás</a>
     <h2>Modificaciones</h2>
     
     <table class="table">

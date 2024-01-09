@@ -37,13 +37,7 @@
                                             {!! Form::text('num_boleta', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="empresa">empresa/afianzado</label>
-                                            {!! Form::text('empresa', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la empresa']) !!}
-                                        </div>
-                                    </div>
-                
+                                                   
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="motivo">motivo</label>
@@ -71,7 +65,7 @@
             
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="afianzadora_id">aseguradora</label>
+                                            <label for="afianzadora_id">Empresa/afianzado</label>
                                             {!! Form::select('afianzadora_id', $afianzadoras, null, ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
                                         </div>
                                     </div>                                                                                           

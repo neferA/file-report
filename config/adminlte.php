@@ -64,7 +64,7 @@ return [
     */
 
     'logo' => '<b>Files</b> Goberment',
-    'logo_img' => 'vendor/adminlte/dist/img/assets/logo_dashboard.png', /*Logo dashboard*/
+    'logo_img' => 'vendor/adminlte/dist/img/assets/logo_gobernation.png', /*Logo dashboard*/
     // 'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png', /*Logo dashboard public//*/
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -111,11 +111,11 @@ return [
         'enabled' => true,
         'img' => [
             // 'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'path' => 'vendor/adminlte/dist/img/assets/logo_dashboard.png',
+            'path' => 'vendor/adminlte/dist/img/assets/logo_gobernation.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
+            'width' => 300,
+            'height' => 300,
         ],
     ],
 
@@ -348,7 +348,7 @@ return [
             'icon'          => 'fa fa-university',
         ],
         [
-            'text'          => 'aseguradoras',
+            'text'          => 'afianzados',
             'url'           => '/suppliers',
             'icon'          => 'fa fa-network-wired',
         ],
