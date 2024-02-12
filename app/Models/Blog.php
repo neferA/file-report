@@ -27,6 +27,7 @@ class Blog extends Model
     const ESTADO_RENOVADO = 'renovado';
     const ESTADO_VIGENTE = 'vigente'; 
     const ESTADO_VENCIDO = 'vencido';
+    const ESTADO_ENTREGADO = 'entregado';
     
     public function getEstadoColorAttribute()
     {
@@ -41,6 +42,8 @@ class Blog extends Model
                 return 'badge-info'; // Cambia esto al color que desees
             case self::ESTADO_VENCIDO:
                 return 'badge-danger'; // Color para el estado "vencido"
+            case self::ESTADO_ENTREGADO:
+                return 'badge-danger'; // Color para el estado "vencido"
             default:
                 return 'badge-secondary'; // Color por defecto si el estado no coincide
         }
@@ -51,6 +54,18 @@ class Blog extends Model
     public function waranty()
     {
         return $this->hasOne(waranty::class, 'blogs_id');
+    }
+    public function entregas()
+    {
+        return $this->hasMany(Entrega::class, 'blogs_id');
+    }
+    public function historial()
+    {
+        return $this->hasMany(ModificationsPdf::class, 'blogs_id');
+    }
+    public function modifications()
+    {
+        return $this->hasMany(Modification::class, 'blogs_id');
     }
     public function financiadoras()
     {

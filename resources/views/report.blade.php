@@ -19,7 +19,7 @@
         th, td {
             border: 1px solid #ddd;
             padding: 6px;
-            font-size: 12px;
+            font-size: 10px;
             text-align: left;
         }
         th {
@@ -38,6 +38,7 @@
                 <th>Número de Boleta</th>
                 <th>Empresa/afianzado</th>
                 <th>Motivo</th>
+                <th>Estado</th>
                 <th>Afianzadora</th>
                 <th>Tipo de Garantía</th>
                 <th>Monto</th>
@@ -54,6 +55,7 @@
                 <td>{{ $data['num_boleta'] }}</td>
                 <td>{{ $data['afianzado'] }}</td>
                 <td>{{ $data['motivo'] }}</td>
+                <td>{{ $data['estado'] }}</td>
                 <td>{{ isset($data['financiadoras']) ? $data['financiadoras'] : '' }}</td>
                 <td>{{ $data['tipo_garantia'] }}</td>
                 <td>{{ number_format($data['monto'], 2, ',', '.') }}</td>
@@ -83,7 +85,8 @@
                 <tr>
                     <th>Número de Boleta</th>
                     <th>empresa/afianzado</th>
-                    <th>motivo</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
                     <th>Afianzadora</th>
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
@@ -99,6 +102,7 @@
                         <td>{{ $descendantRenovatedBlog['num_boleta'] }}</td>
                         <td>{{ $descendantRenovatedBlog['afianzado'] }}</td>
                         <td>{{ $descendantRenovatedBlog['motivo'] }}</td>
+                        <td>{{ $descendantRenovatedBlog['estado'] }}</td>
                         <td>{{ $descendantRenovatedBlog['financiadoras'] }}</td>
                         <td>{{ $descendantRenovatedBlog['tipo_garantia'] }}</td>
                         <td>{{ number_format($descendantRenovatedBlog['monto'], 2, ',', '.') }}</td>
@@ -132,6 +136,7 @@
                     <th>Número de Boleta</th>
                     <th>Empresa/afianzado</th>
                     <th>Motivo</th>
+                    <th>Estado</th>
                     <th>Afianzadora</th>
                     <th>Tipo de Garantía</th>
                     <th>Monto</th>
@@ -147,6 +152,7 @@
                         <td>{{ $ascendantRenovatedBlog['num_boleta'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['afianzado'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['motivo'] }}</td>
+                        <td>{{ $ascendantRenovatedBlog['estado'] }}</td>
                         <td>{{ $ascendantRenovatedBlog['financiadoras']}}</td>
                         <td>{{ $ascendantRenovatedBlog['tipo_garantia'] }}</td>
                         <td>{{ number_format($ascendantRenovatedBlog['monto'], 2, ',', '.') }}</td>

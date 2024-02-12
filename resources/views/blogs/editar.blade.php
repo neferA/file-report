@@ -36,18 +36,12 @@
                                             {!! Form::text('num_boleta', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la boleta']) !!}
                                         </div>
                                     </div>
-                                    {{-- <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="empresa">empresa/afianzado</label>
-                                                {!! Form::text('empresa', null, ['class' => 'form-control', 'placeholder' => 'Ingrese la empresa']) !!}
-                                            </div>
-                                    </div> --}}
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="afianzadora_id">Empresa/afianzado</label>
-                                            {!! Form::select('afianzadora_id',$afianzadoras, $blog->afianzado->pluck('id'), ['class' => 'form-control', 'placeholder' => 'Seleccione un afianzado']) !!}
+                                            <label for="afianzadora_name">Empresa/afianzado</label>
+                                            {!! Form::text('afianzadora_name', $blog->afianzado->nombre, ['class'=> 'form-control', 'placeholder' => 'Nombre de la empresa']) !!}
                                         </div>
-                                    </div>        
+                                    </div>         
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="num_boleta">motivo</label>
@@ -81,6 +75,7 @@
                                             <option value="{{ App\Models\Blog::ESTADO_EJECUTADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_EJECUTADO ? 'selected' : '' }}>Ejecutado</option>
                                             <option value="{{ App\Models\Blog::ESTADO_RENOVADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_RENOVADO ? 'selected' : '' }}>Renovado</option>
                                             <option value="{{ App\Models\Blog::ESTADO_VENCIDO }}" {{ $blog->estado === App\Models\Blog::ESTADO_VENCIDO ? 'selected' : '' }}>vencido</option>
+                                            <option value="{{ App\Models\Blog::ESTADO_ENTREGADO }}" {{ $blog->estado === App\Models\Blog::ESTADO_ENTREGADO ? 'selected' : '' }}>entregado</option>
                                         </select>
                                         </div>
                                         <div class="col-md-6">
@@ -108,7 +103,6 @@
                                                 <label for="fecha_inicio">Fecha inicial</label>
                                                 <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" placeholder="Ingrese la fecha inicial" 
                                                     value="{{ old('fecha_inicio', $blog->waranty ? $blog->waranty->fecha_inicio : now()->format('Y-m-d')) }}" 
-                                                    min="{{ $blog->waranty ? $blog->waranty->fecha_inicio : now()->format('Y-m-d') }}" 
                                                     required>
                                             </div>
                                         </div>
@@ -117,7 +111,6 @@
                                                 <label for="fecha_final">Fecha final</label>
                                                 <input type="date" id="fecha_final" name="fecha_final" class="form-control" placeholder="Ingrese la fecha final" 
                                                     value="{{ old('fecha_final', $blog->waranty ? $blog->waranty->fecha_final : now()->format('Y-m-d')) }}" 
-                                                    min="{{ $blog->waranty ? $blog->waranty->fecha_final : now()->format('Y-m-d') }}" 
                                                     required>
                                             </div>
                                         </div>

@@ -106,6 +106,8 @@ Route::get('/blogs/{id}/generarpdf', [BlogController::class, 'generarPDF'])->nam
 Route::get('/blogs/{id}/actualizar_estado', [BlogController::class, 'actualizarEstado'])->name('blogs.actualizarEstado');
 Route::get('/historial/{id}/pdf-modal', [HistoryController::class, 'showPdfModal'])->name('historial.modal');
 
+Route::get('/blogs/cambiar_estado/{id}/{estado}', [BlogController::class, 'cambiarEstadoForm'])->name('blogs.cambiar_estado_form');
+Route::post('/blogs/cambiar_estado/{id}/{estado}', [BlogController::class, 'cambiarEstado'])->name('blogs.cambiar_estado');
 
 
     

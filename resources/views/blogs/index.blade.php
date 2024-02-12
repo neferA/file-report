@@ -26,6 +26,7 @@
                                     <option value="ejecutado"{{ request('estado') === 'ejecutado' ? ' selected' : '' }}>Ejecutado</option>
                                     <option value="renovado"{{ request('estado') === 'renovado' ? ' selected' : '' }}>Renovado</option>
                                     <option value="vencido"{{ request('estado') === 'vencido' ? ' selected' : '' }}>vencido</option>
+                                    <option value="entregado"{{ request('estado') === 'entregado' ? ' selected' : '' }}>entregado</option>
                                 </select>
                                 <select name="orden" class="form-control">
                                     <option value="">Ordenar por</option>
@@ -130,8 +131,46 @@
                                         <td>{{ number_format($blog->waranty->monto, 2, ',', '.') }}</td>   
                                         <td>{{ $blog->usuario }}</td>
                                         <td>
-                                            <h1 class="badge {{ $blog->estado_color }}" style="font-size: 14px;">{{ $blog->estado }}</h1>
-                                        </td>                                                                                           
+                                            <h1 class="badge {{ $blog->estado_color }}" style="font-size: 18px;">{{ $blog->estado }}</h1>  
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#pdfModal{{ $blog->id }}">
+                                                Ver PDF
+                                            </button> 
+                                        </td>
+                                         <!-- Agrega el modal al final de tu vista -->
+                                         <div class="modal fade" id="pdfModal{{ $blog->id }}" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel{{ $blog->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="pdfModalLabel{{ $blog->id }}">Vista Previa del PDF</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{-- Obtener la última entrega del blog --}}
+                                                        @php
+                                                            $ultimaEntrega = $blog->entregas->last();
+                                                        @endphp
+                                        
+                                                        {{-- Verificar si hay entregas --}}
+                                                        @if ($ultimaEntrega && $ultimaEntrega->pdf_path)
+                                                            {{-- Ruta completa al PDF en el sistema de archivos --}}
+                                                            @php
+                                                                $pdfPath = storage_path('app/public/' . $ultimaEntrega->pdf_path);
+                                                            @endphp
+                                        
+                                                            {{-- Mostrar un visor de PDF incrustado --}}
+                                                            <iframe src="{{ asset('storage/' . $ultimaEntrega->pdf_path) }}" frameborder="0" width="100%" height="500px"></iframe>
+                                                        @else
+                                                            {{-- Mensaje si no hay entregas o PDF --}}
+                                                            <p>No hay entregas o PDF disponible.</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                                                                         
                                         <td>{{ $blog->created_at->format('d/m/Y H:i') }}</td>
 
                                         <td>
@@ -139,6 +178,8 @@
                                                 @if ($alarms[$blog->id]['color'] === 'red')
                                                     <div class="alert alert-danger text-center">
                                                         <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
+                                                        <br>
+                                                        <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Renovar</button>
                                                     </div>
                                                 @elseif ($alarms[$blog->id]['color'] === 'orange')
                                                     <div class="alert alert-warning text-center">
@@ -160,22 +201,59 @@
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="renovarModalLabel">Renovar Boleta</h5>
+                                                        <h5 class="modal-title" id="renovarModalLabel">Estados de la Boleta</h5>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        ¿Está seguro que desea renovar esta boleta?
+                                                        ¿Que desea hacer con esta boleta?
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <a class="btn btn-primary" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">Renovar Blog (ID: {{ $blog->id }})</a>
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                        <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_EJECUTADO]) }}" method="GET">
+                                                            
+                                                        </form>
+                                                        
+                                                        <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_EJECUTADO]) }}" method="GET">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="fas fa-play"></i> Ejecutar Boleta
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_LIBERADO]) }}" method="GET">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="fas fa-unlock"></i> Liberar Boleta
+                                                            </button>
+                                                        </form>
+                                                        
+                                                        <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_VENCIDO]) }}" method="GET">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="fas fa-calendar-times"></i> Vencer Boleta
+                                                            </button>
+                                                        </form>
+                                        
+                                                        <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_ENTREGADO]) }}" method="GET">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="fas fa-check-circle"></i> Entregar Boleta
+                                                            </button>
+                                                        </form>
+                                        
+                                                        <a class="btn btn-success" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">
+                                                            <i class="fas fa-sync"></i> Renovar Boleta
+                                                        </a>
+                                        
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                            <i class="fas fa-times"></i> Cerrar
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                    </form>
+                                        
+                   
                                         <td>
                                             <div class="btn-group" role="group" aria-label="Acciones">
                                                 <a class="btn btn-primary" href="{{ route('historial.index', $blog->id) }}">
@@ -200,28 +278,7 @@
                                                     <i class="fas fa-file-pdf me-1"></i> 
                                                      PDF
                                                 </a>
-                                                {{-- <!-- En tu bucle foreach para cada boleta, agrega un botón o enlace -->
-                                                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#qrModal{{ $blog->id }}">
-                                                    <i class="fas fa-qrcode"></i> Ver QR
-                                                </a>
-
-                                                <!-- Modal para mostrar el código QR -->
-                                                <div class="modal fade" id="qrModal{{ $blog->id }}" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel{{ $blog->id }}" aria-hidden="true">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="qrModalLabel{{ $blog->id }}">Código QR</h5>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <!-- Contenedor para el código QR -->
-                                                                {!! QrCode::size(200)->generate($blog->num_boleta) !!}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div> --}}
+                                            </div>
 
                                                                                                              
                                         </td>

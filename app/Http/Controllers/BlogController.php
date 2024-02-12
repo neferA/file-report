@@ -10,6 +10,8 @@ use App\Models\Financiadora;
 use App\Models\Modification;
 use App\Models\afianzadora;
 use App\Models\RenewedBlog;
+use App\Models\Entrega;
+use App\Models\ModificationsPdf;
 
 use App\Events\BlogUpdated;
 use App\Events\WarrantyExpired;
@@ -18,8 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\File;
 
 use Carbon\Carbon;
 use Illuminate\Routing\Controller;
@@ -124,11 +125,11 @@ class BlogController extends Controller
     
         // Si es una alarma negra, cambia el estado de los blogs con alarma negra a "vencido"
         if ($isBlackAlarm) {
-            Blog::where('id', $blog->id)
-                ->update([
-                    'estado' => Blog::ESTADO_VENCIDO,
-                    'updated_at' => now(),  
-                ]);
+            // Blog::where('id', $blog->id)
+            //     ->update([
+            //         'estado' => Blog::ESTADO_VENCIDO,
+            //         'updated_at' => now(),  
+            //     ]);
     
             // Crear una instancia de WarrantyExpired con los valores correctos
             $event = new WarrantyExpired($blog, $isRedAlarm, $isOrangeAlarm, $isBlackAlarm);
@@ -282,13 +283,9 @@ class BlogController extends Controller
             'fecha_final' => 'required|date_format:Y-m-d',
             'estado' => 'required|in:' . implode(',', [
                 Blog::ESTADO_VIGENTE, 
-                // Blog::ESTADO_LIBERADO,
-                // Blog::ESTADO_EJECUTADO,
-                // Blog::ESTADO_RENOVADO,
-                // Blog::ESTADO_VENCIDO,
             ]),
-            'boleta_pdf' => 'nullable|mimes:pdf|max:2048', // Validación para el archivo PDF
-            'nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
+            'boleta_pdf' => 'nullable|mimes:pdf|max:10240', // Validación para el archivo PDF
+            'nota_pdf' => 'nullable|mimes:pdf|max:10240',   // Validación para el archivo PDF
         ]);
 
         // Lógica para almacenar los datos del formulario en la tabla Blog
@@ -431,16 +428,47 @@ class BlogController extends Controller
 
         return view('blogs.crear', compact('financiadoras', 'garantias', 'ejecutoras', 'afianzadoras', 'blogRenovado'));
     }  
-    // public function generarQR($id)
-    // {
-    //    // Obtener el blog basado en el ID proporcionado
-    //    $blog = Blog::with('waranty', 'unidadEjecutora', 'tipoGarantia', 'afianzado', 'financiadoras')->find($id);
-       
-    //     // Crea el código QR con los datos que desees
-    //     $qrCode = QrCode::size(200)->generate(json_encode($blog));
+    public function cambiarEstadoForm($id, $estado)
+    {
+        // Lógica para mostrar el formulario con fecha de entrega y carga de PDF
+        return view('blogs.cambiar_estado_form', compact('id', 'estado'));
+    }
 
-    //     return view('blogs.index', compact('qrCode', 'blog'));
-    // }
+    public function cambiarEstado(Request $request, $id)
+    {
+        $request->validate([
+            'fecha_entrega' => 'required|date',
+            'pdf_file' => 'required|mimes:pdf|max:10240',
+            'estado' => 'required',
+        ]);
+
+        // Obtener el blog por su ID
+        $blog = Blog::findOrFail($id);
+
+        // Crear una nueva entrega
+        $entrega = new Entrega();
+        $entrega->fecha_entrega = $request->input('fecha_entrega');
+
+        // Procesar el archivo PDF y almacenarlo en la carpeta adecuada según el estado
+        $estadoFolder = strtolower($request->input('estado'));
+        $pdfPath = $request->file('pdf_file')->store("public/estados_pdfs/{$estadoFolder}");
+
+        // Almacenar la ruta relativa en la base de datos (sin el prefijo "public/")
+        $entrega->pdf_path = str_replace('public/', '', $pdfPath);
+
+        // Asignar el estado proporcionado desde el formulario
+        $entrega->estado = $request->input('estado');
+
+        // Relacionar la entrega con el blog
+        $blog->entregas()->save($entrega); // Cambiado a entregas()
+
+        // Actualizar el estado del blog
+        $blog->estado = $request->input('estado');
+        $blog->save();
+
+        return redirect()->route('tickets.index')->with('success', 'Estado cambiado exitosamente.');
+    }
+
 
     /**
      * Display the specified resource.
@@ -483,6 +511,7 @@ class BlogController extends Controller
             'usuario' => $blog->usuario,
             'afianzado' => $blog->afianzado->nombre,
             'motivo' => $blog->motivo,
+            'estado' => $blog->estado,
             'tipo_garantia' => $blog->tipoGarantia->nombre,
             'financiadoras' => $blog->financiadoras->pluck('nombre')->implode(', '),
             'monto' => $warantyMonto,
@@ -608,20 +637,21 @@ class BlogController extends Controller
             'fecha_inicio' => 'required',
             'fecha_final' => 'required',
             'estado' => 'required|in:' . implode(',', [
+                Blog::ESTADO_VIGENTE,
                 Blog::ESTADO_LIBERADO,
                 Blog::ESTADO_EJECUTADO,
                 Blog::ESTADO_RENOVADO,
                 Blog::ESTADO_VENCIDO,
+                Blog::ESTADO_ENTREGADO,
             ]),
-            'new_boleta_pdf' => 'nullable|mimes:pdf|max:2048', // Validación para el archivo PDF
-            'new_nota_pdf' => 'nullable|mimes:pdf|max:2048',   // Validación para el archivo PDF
+            'new_boleta_pdf' => 'nullable|mimes:pdf|max:10240', // 10240 kilobytes = 10 megabytes
+            'new_nota_pdf' => 'nullable|mimes:pdf|max:10240',   // 10240 kilobytes = 10 megabytes
         ]);
 
         // Buscar el registro en la tabla blogs
         $blog = Blog::findOrFail($id);
         $data = $request->except(['new_boleta_pdf', 'new_nota_pdf']);
 
-        
         // Almacenar los nombres de archivo antiguos
         $oldBoletaPdf = $blog->waranty ? $blog->waranty->boleta_pdf : null;
         $oldNotaPdf = $blog->waranty ? $blog->waranty->nota_pdf : null;
@@ -629,60 +659,36 @@ class BlogController extends Controller
         // Verificar si se cargó un nuevo archivo new_boleta_pdf
         if ($request->hasFile('new_boleta_pdf')) {
             if ($oldBoletaPdf) {
-                $this->deletePDF($oldBoletaPdf);
-            }
-            // Subir el nuevo archivo
-            $data['boleta_pdf'] = $this->uploadPDF($request->file('new_boleta_pdf'), 'boletas_pdfs');
+                // Mover el archivo antiguo a una carpeta de historial preexistente
+                $this->moveToHistory($oldBoletaPdf, 'historial_pdfs/boletas_pdfs', $blog->id, 'boleta');            }
+            // Subir el nuevo archivo a la carpeta de boletas_pdfs
+            $data['boleta_pdf'] = $this->uploadPDF($request->file('new_boleta_pdf'), 'boletas_pdfs', $blog->id);
         }
 
         // Verificar si se cargó un nuevo archivo new_nota_pdf
         if ($request->hasFile('new_nota_pdf')) {
             if ($oldNotaPdf) {
-                $this->deletePDF($oldNotaPdf);
-            }
-            // Subir el nuevo archivo
-            $data['nota_pdf'] = $this->uploadPDF($request->file('new_nota_pdf'), 'notas_pdfs');
+                // Mover el archivo antiguo a una carpeta de historial preexistente
+                $this->moveToHistory($oldNotaPdf, 'historial_pdfs/notas_pdfs', $blog->id, 'nota');            }
+            // Subir el nuevo archivo a la carpeta de notas_pdfs
+            $data['nota_pdf'] = $this->uploadPDF($request->file('new_nota_pdf'), 'notas_pdfs', $blog->id);
         }
 
-    // Resto de la lógica para actualizar campos en el registro
-   
-    // Actualizar el registro en la tabla blogs
-    $blog->update($data);
+        // Resto de la lógica para actualizar campos en el registro
 
-    // Llama al nuevo método para registrar las modificaciones
-    $modifications = $this->Modifications($blog, $request->all());
+        // Actualizar el registro en la tabla blogs
+        $blog->update($data);
 
-    // Dispara el evento BlogUpdated con los datos relevantes
-    event(new BlogUpdated($blog, $request->all(), $modifications));
+        // Llama al nuevo método para registrar las modificaciones
+        $modifications = $this->Modifications($blog, $request->all());
 
-    // Eliminar registros de archivos PDF que se desean reemplazar
-    if ($request->hasFile('new_boleta_pdf') && $oldBoletaPdf) {
-        $this->deletePDF($oldBoletaPdf);
-    }
+        // Dispara el evento BlogUpdated con los datos relevantes
+        event(new BlogUpdated($blog, $request->all(), $modifications));
 
-    if ($request->hasFile('new_nota_pdf') && $oldNotaPdf) {
-        $this->deletePDF($oldNotaPdf);
-    }
-
-    // Actualizar el registro en la tabla blogs
-    $blog->update($data);
-
-    // Verificar si hay una garantía asociada
-    if ($blog->waranty) {
-        // Actualizar boleta_pdf si es necesario
-        if (isset($data['boleta_pdf'])) {
-            $blog->waranty->update(['boleta_pdf' => $data['boleta_pdf']]);
-        }
-    
-        // Actualizar nota_pdf si es necesario
-        if (isset($data['nota_pdf'])) {
-            $blog->waranty->update(['nota_pdf' => $data['nota_pdf']]);
-        }
-    }
         // Actualizar la asociación de financiadoras
         $financiadoraIds = $request->input('financiadora_id');
         $blog->financiadoras()->sync($financiadoraIds);
-    
+
         // Actualizar la asociación del tipo de garantía
         $tipoGarantia = TipoGarantia::find($request->input('tipo_garantia_id'));
         $blog->tipoGarantia()->associate($tipoGarantia);
@@ -695,11 +701,6 @@ class BlogController extends Controller
         $afianzadora = afianzadora::find($request->input('afianzadora_id'));
         $blog->afianzado()->associate($afianzadora);
 
-
-        // Parsear las fechas usando Carbon
-        $data['fecha_inicio'] = Carbon::parse($request->input('fecha_inicio'));
-        $data['fecha_final'] = Carbon::parse($request->input('fecha_final'));
- 
         // Obtener o crear el modelo "waranty" asociado
         $waranty = Waranty::where('blogs_id', $blog->id)->first();
         if ($waranty) {
@@ -728,7 +729,7 @@ class BlogController extends Controller
                 'fecha_final' => $request->input('fecha_final'),
             ]);
         }
-            
+
         // Redireccionar a la página de detalles o a donde prefieras después de la actualización.
         return redirect()->route('tickets.index')->with('success', 'Blog actualizado exitosamente.');
     }
@@ -802,6 +803,37 @@ class BlogController extends Controller
             Log::warning("Intento de registro de modificación fallido. Datos inválidos.");
         }
     }
+    private function moveToHistory($filePath, $historyFolder, $blogId, $pdfType)
+    {
+        // Obtener el nombre del archivo sin la ruta
+        $fileName = pathinfo($filePath, PATHINFO_BASENAME);
+
+        // Construir la nueva ruta con la carpeta de historial y la marca de tiempo
+        $newFilePath = $historyFolder . '/' . now()->format('YmdHis') . '_' . $fileName;
+
+        // Mover el archivo a la carpeta de historial
+        if (rename(storage_path("app/public/{$filePath}"), storage_path("app/public/{$newFilePath}"))) {
+            // Registrar la información en la tabla modifications_pdf
+            $modificationPdf = new ModificationsPdf();
+            $modificationPdf->blogs_id = $blogId;
+
+            if ($pdfType === 'boleta') {
+                $modificationPdf->boleta_pdf_path = $newFilePath;
+            } elseif ($pdfType === 'nota') {
+                $modificationPdf->nota_pdf_path = $newFilePath;
+            }
+
+            $modificationPdf->save();
+
+            // Devolver la nueva ruta del archivo en el historial
+            return $newFilePath;
+        } else {
+            // Devolver null o lanzar una excepción según sea necesario
+            return null;
+        }
+    }
+
+
     public function show($id)
     {
         // Recupera el blog original por su ID

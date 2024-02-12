@@ -1,15 +1,12 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Event;
-use App\Models\Modification; 
+
 
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Session;
 
+use App\Models\Modification; 
+use App\Models\ModificationsPdf;
 use App\Models\waranty;
 use App\Models\Blog;
 use App\Events\WarrantyExpired;
@@ -30,22 +27,30 @@ class HistoryController extends Controller
         return view('historial.index', compact('blog', 'historial'));
     }
     public function show($id = null)
-    {
-        if ($id !== null) {
-            // Mostrar detalles del recurso específico con ID $id
-            $blog = Blog::findOrFail($id);
-            $modifications = Modification::where('blogs_id', $id)
-                ->orderBy('created_at', 'desc')
-                ->get();
-            // Tu código adicional para mostrar los detalles del recurso aquí
-            return view('historial.show', compact('blog', 'modifications'));
-        } else {
-            // Mostrar lista de recursos
-            // Otra lógica para mostrar la lista
-            return view('historial.index');
-        }
-        
+{
+    if ($id !== null) {
+        // Mostrar detalles del recurso específico con ID $id
+        $blog = Blog::findOrFail($id);
+
+        // Acceder a las modificaciones generales asociadas al blog
+        $modifications = $blog->modifications()
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Acceder a las modificaciones de PDF asociadas al blog
+        $pdfModifications = $blog->historial()
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Tu código adicional para mostrar los detalles del recurso aquí
+        return view('historial.show', compact('blog', 'modifications', 'pdfModifications'));
+    } else {
+        // Mostrar lista de recursos
+        // Otra lógica para mostrar la lista
+        return view('historial.index');
     }
+}
+
     private function handleAlarms($historial)
     {
         $now = now();
