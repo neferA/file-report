@@ -179,7 +179,7 @@
                                                     <div class="alert alert-danger text-center">
                                                         <i class="fas fa-exclamation-circle"></i> <strong>Alarma Roja</strong>
                                                         <br>
-                                                        <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Renovar</button>
+                                                        <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Estados</button>
                                                     </div>
                                                 @elseif ($alarms[$blog->id]['color'] === 'orange')
                                                     <div class="alert alert-warning text-center">
@@ -189,7 +189,7 @@
                                                     <div class="alert alert-dark text-center text-white">
                                                         <i class="fas fa-exclamation-triangle"></i> <strong>Alarma Negra</strong>
                                                         <br>
-                                                        <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Renovar</button>
+                                                        <button type="button" class="btn btn-warning mt-3" data-toggle="modal" data-target="#renovarModal{{ $blog->id }}">Estados</button>
                                                     </div>
                                                 @endif
                                             @else
@@ -217,32 +217,32 @@
                                                         <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_EJECUTADO]) }}" method="GET">
                                                             @csrf
                                                             <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-play"></i> Ejecutar Boleta
+                                                                <i class="fas fa-play"></i> Ejecutar garantia
                                                             </button>
                                                         </form>
                                                         <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_LIBERADO]) }}" method="GET">
                                                             @csrf
                                                             <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-unlock"></i> Liberar Boleta
+                                                                <i class="fas fa-unlock"></i> Liberar garantia
                                                             </button>
                                                         </form>
                                                         
                                                         <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_VENCIDO]) }}" method="GET">
                                                             @csrf
                                                             <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-calendar-times"></i> Vencer Boleta
+                                                                <i class="fas fa-calendar-times"></i> Vencer garantia
                                                             </button>
                                                         </form>
                                         
                                                         <form action="{{ route('blogs.cambiar_estado', ['id' => $blog->id, 'estado' => \App\Models\Blog::ESTADO_ENTREGADO]) }}" method="GET">
                                                             @csrf
                                                             <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-check-circle"></i> Entregar Boleta
+                                                                <i class="fas fa-check-circle"></i> Entregar garantia
                                                             </button>
                                                         </form>
                                         
                                                         <a class="btn btn-success" href="{{ route('blogs.renovar', ['id' => $blog->id]) }}">
-                                                            <i class="fas fa-sync"></i> Renovar Boleta
+                                                            <i class="fas fa-sync"></i> Renovar garantia
                                                         </a>
                                         
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">

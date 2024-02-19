@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('modifications_pdf', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('blogs_id');
-            $table->string('boleta_pdf_path')->nullable(); // Nueva columna para la ruta de boletas
-            $table->string('nota_pdf_path')->nullable(); // Nueva columna para la ruta de notas
+            $table->string('pdf_path');
             $table->timestamps();
-        
+
             // Definir la clave foránea
             $table->foreign('blogs_id')->references('id')->on('blogs')->onDelete('cascade');
         });

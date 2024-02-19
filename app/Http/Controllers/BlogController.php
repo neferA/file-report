@@ -465,10 +465,10 @@ class BlogController extends Controller
         // Actualizar el estado del blog
         $blog->estado = $request->input('estado');
         $blog->save();
-
+       
         return redirect()->route('tickets.index')->with('success', 'Estado cambiado exitosamente.');
     }
-
+    
 
     /**
      * Display the specified resource.
@@ -803,7 +803,7 @@ class BlogController extends Controller
             Log::warning("Intento de registro de modificación fallido. Datos inválidos.");
         }
     }
-    private function moveToHistory($filePath, $historyFolder, $blogId, $pdfType)
+    private function moveToHistory($filePath, $historyFolder, $blogId)
     {
         // Obtener el nombre del archivo sin la ruta
         $fileName = pathinfo($filePath, PATHINFO_BASENAME);
@@ -816,13 +816,7 @@ class BlogController extends Controller
             // Registrar la información en la tabla modifications_pdf
             $modificationPdf = new ModificationsPdf();
             $modificationPdf->blogs_id = $blogId;
-
-            if ($pdfType === 'boleta') {
-                $modificationPdf->boleta_pdf_path = $newFilePath;
-            } elseif ($pdfType === 'nota') {
-                $modificationPdf->nota_pdf_path = $newFilePath;
-            }
-
+            $modificationPdf->pdf_path = $newFilePath;
             $modificationPdf->save();
 
             // Devolver la nueva ruta del archivo en el historial

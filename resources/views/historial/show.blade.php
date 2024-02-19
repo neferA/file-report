@@ -38,69 +38,63 @@
         </tbody>
     </table>
 
-    <!-- Mostrar las modificaciones de PDF -->
     @if ($pdfModifications->count() > 0)
-        @foreach ($pdfModifications as $pdfModification)
-        <div>
-            <!-- Otras propiedades de $pdfModification -->
-            <p>Ruta del archivo histórico de PDF: {{ storage_path("app/public/{$pdfModification->pdf_path}") }}</p>
+    @php
+        // Agrupar por la fecha y hora exactas de creación
+        $groupedModifications = $pdfModifications->groupBy(function ($item) {
+            return $item->created_at->format('Y-m-d H:i:s');
+        });
+    @endphp
 
-            <!-- Botones para abrir los modales de PDF -->
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#pdfModal{{ $pdfModification->id }}">
-                Ver Boleta PDF
-            </button>
+    @foreach ($groupedModifications as $dateTime => $modifications)
+        <div class="card mb-3">
+            <div class="card-body">
+                <p class="card-text">Fecha y Hora: {{ $dateTime }}</p>
+                @foreach ($modifications as $pdfModification)
+                    @if ($pdfModification->pdf_path)
+                        @php
+                            // Determinar el tipo desde la ruta del archivo
+                            $tipo = Str::contains($pdfModification->pdf_path, 'boletas_pdfs') ? 'Boleta' : 'Nota';
+                        @endphp
 
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#notaPdfModal{{ $pdfModification->id }}">
-                Ver Nota PDF
-            </button>
-
-            <!-- Modales para la previsualización de PDF -->
-            <div class="modal fade" id="pdfModal{{ $pdfModification->id }}" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel{{ $pdfModification->id }}" aria-hidden="true">
-                <!-- Contenido del modal -->
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="pdfModalLabel{{ $pdfModification->id }}">Vista Previa de boleta PDF</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Ver {{ $tipo }} PDF</h5>
+                                <br>
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#pdfModal{{ $pdfModification->id }}">
+                                    Ver PDF
+                                </button>              
+                                <div class="modal fade" id="pdfModal{{ $pdfModification->id }}" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel{{ $pdfModification->id }}" aria-hidden="true">
+                                    <!-- Contenido del modal -->
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="pdfModalLabel{{ $pdfModification->id }}">Vista Previa de {{ $tipo }} PDF</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {{-- <p>Ruta del archivo PDF: {{ storage_path("app/public/{$pdfModification->pdf_path}") }}</p> --}}
+                                                <iframe src="{{ asset("storage/{$pdfModification->pdf_path}") }}" frameborder="0" width="100%" height="500px"></iframe>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            @if ($pdfModification->pdf_path)
-                                <iframe src="{{ Storage::url($pdfModification->pdf_path) }}" frameborder="0" width="100%" height="500px"></iframe>
-                            @else
-                                <p>No hay archivo adjunto.</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal fade" id="notaPdfModal{{ $pdfModification->id }}" tabindex="-1" role="dialog" aria-labelledby="notaPdfModalLabel{{ $pdfModification->id }}" aria-hidden="true">
-                <!-- Contenido del modal -->
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="notaPdfModalLabel{{ $pdfModification->id }}">Vista Previa de Nota PDF</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            @if ($pdfModification->pdf_path)
-                                <iframe src="{{ Storage::url($pdfModification->pdf_path) }}" frameborder="0" width="100%" height="500px"></iframe>
-                            @else
-                                <p>No hay archivo adjunto.</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+                    @endif
+                @endforeach
             </div>
         </div>
-        @endforeach
-    @else
-        <p>No hay modificaciones de PDF disponibles.</p>
-    @endif
+    @endforeach
+@else
+    <p>No hay modificaciones de PDF disponibles.</p>
+@endif
+
+
+
+
 
 </div>
 @endsection
